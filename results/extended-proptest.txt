@@ -1,0 +1,96 @@
+# extended property-test run
+date:    2026-11-13 03:11:13 -05:00
+commit:  2a4acceffcd0dbfc84383117ae987f0a1664d576
+rustc:   rustc 1.99.1 (58cf8f9c3 2026-10-13)
+cpu:     Intel(R) Core(TM) i7-14700HX
+command: PROPTEST_CASES=100000 cargo test --workspace --no-fail-fast
+
+    Finished `test` profile [optimized + debuginfo] target(s) in 0.08s
+     Running unittests src\lib.rs (target\debug\deps\mlkem-0735225f647baf02.exe)
+
+running 38 tests
+test ct::tests::eq_and_select_basic ... ok
+test ct::tests::is_zero_mask_edges ... ok
+test encode::tests::decompress_exhaustive_vs_spec_and_round_trip ... ok
+test encode::tests::compress_exhaustive_vs_spec ... ok
+test field::tests::barrett_reduce_exhaustive ... ok
+test field::tests::fqmul_matches_integer_math ... ok
+test hash::keccak::tests::zero_state_matches_reference_crate ... ok
+test field::tests::r_inv_is_inverse ... ok
+test hash::tests::known_answers ... ok
+test field::tests::to_canonical_and_csubq_exhaustive ... ok
+test ntt::tests::extreme_inputs_do_not_overflow ... ok
+test hash::keccak::tests::round_constants ... ok
+test ntt::tests::tables_match_appendix_a ... ok
+test ntt::tests::zeta_is_primitive_256th_root ... ok
+test params::tests::sizes_match_table_3 ... ok
+test rng::tests::os_rng_produces_varying_output ... ok
+test sample::tests::last_d2_is_dropped ... ok
+test sample::tests::rejects_out_of_range_values ... ok
+test encode::tests::magic_division_is_exact ... ok
+test hash::tests::every_length_across_block_boundaries ... ok
+test ct::tests::is_zero_mask_matches_eq ... ok
+test ct::tests::ct_eq_matches_slice_eq ... ok
+test hash::keccak::tests::matches_reference_crate ... ok
+test field::tests::montgomery_reduce_exhaustive ... ok
+test sample::tests::cbd_matches_spec ... ok
+test encode::tests::decode_arbitrary_bytes_matches_spec ... ok
+test ntt::tests::ntt_round_trip ... ok
+test hash::tests::sample_ntt_with_real_xof ... ok
+test hash::tests::fips203_wrappers ... ok
+test encode::tests::encode_matches_spec_and_round_trips ... ok
+test hash::tests::chunked_squeeze_matches_reference ... ok
+test ntt::tests::ntt_inverse_matches_spec ... ok
+test ntt::tests::ntt_matches_spec ... ok
+test ntt::tests::multiply_ntts_matches_spec ... ok
+test hash::tests::split_input_matches_reference ... ok
+test sample::tests::sample_ntt_matches_spec ... ok
+test ntt::tests::ntt_multiplication_equals_schoolbook ... ok
+test kpke::tests::encrypt_decrypt_round_trip ... ok
+
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.72s
+
+     Running tests\acvp.rs (target\debug\deps\acvp-a849648b9a31a2da.exe)
+
+running 2 tests
+test acvp_keygen ... ok
+test acvp_encap_decap ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\crosscheck.rs (target\debug\deps\crosscheck-69fe3d83af5a5c7f.exe)
+
+running 3 tests
+test crosscheck_1024 has been running for over 60 seconds
+test crosscheck_512 has been running for over 60 seconds
+test crosscheck_768 has been running for over 60 seconds
+test crosscheck_512 ... ok
+test crosscheck_768 ... ok
+test crosscheck_1024 ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 174.00s
+
+     Running tests\props.rs (target\debug\deps\props-dae25f37d33a75b3.exe)
+
+running 7 tests
+test rng_failure_is_reported ... ok
+test public_api_round_trip_with_os_rng ... ok
+test wrong_lengths_are_type_check_failures ... ok
+test ek_with_out_of_range_coefficient_rejected ... ok
+test dk_with_inconsistent_hash_rejected ... ok
+test decaps_recovers_shared_secret ... ok
+test modified_ciphertext_is_implicitly_rejected ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 36.79s
+
+   Doc-tests mlkem
+
+running 1 test
+test crates\mlkem\src\lib.rs - (line 5) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+all doctests ran in 0.47s; merged doctests compilation took 0.38s
+
+exit code: 0
+wall time: 234.3 s

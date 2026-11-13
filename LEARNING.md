@@ -466,3 +466,238 @@ Differential tests against an independent implementation, at every length
 around the block boundaries, not just random lengths. Then a deliberate
 mutation (one bit of padding changed) to confirm that the suite fails:
 6 of 35 tests did, which is all the SHAKE-dependent ones.
+
+---
+
+## Phase 3: K-PKE, ML-KEM and the official test vectors
+
+Code: `kpke.rs` (§5, Alg 13–15), `kem.rs` (§6–7, Alg 16–18 and the input
+checks), `lib.rs` (the typed API, Alg 19–21), `rng.rs` (OS randomness).
+Tests: `tests/acvp.rs`, `tests/crosscheck.rs`, `tests/props.rs`.
+
+### 3.1 K-PKE: encryption from Module-LWE
+
+Write everything as vectors and matrices of polynomials in R_q.
+
+**KeyGen (Alg 13).** Expand a public matrix A from a seed ρ. Sample a
+secret s and an error e with small coefficients. Publish
+**t = A·s + e** and ρ. Recovering s from (A, t) is exactly the Module-LWE
+problem from §1.2.
+
+**Encrypt (Alg 14)** a 32-byte message m. Sample fresh small y, e1, e2 and
+compute
+
+    u = Aᵀ·y + e1                   (k polynomials)
+    v = tᵀ·y + e2 + μ               (one polynomial), μ = m's bits × ⌈q/2⌋
+
+To anyone without s, (u, v) looks like random Module-LWE samples.
+
+**Decrypt (Alg 15).** Compute w = v − sᵀ·u. Expanding everything:
+
+    w = (sᵀAᵀy + eᵀy) + e2 + μ − (sᵀAᵀy + sᵀe1)
+      = μ + (eᵀy + e2 − sᵀe1)        ← the big terms cancel
+      = μ + small noise
+
+Every term in the bracket is a product of small things, so each coefficient
+of w is near 0 (bit 0) or near q/2 (bit 1). Compress_1 rounds it to the
+nearer one. Decryption fails only if the noise exceeds q/4. FIPS 203
+Table 1 gives the failure rates as 2^−138.8 (ML-KEM-512), 2^−164.8 (768) and
+2^−174.8 (1024): too rare to ever observe.
+
+**Why compress the ciphertext?** Uncompressed, u and v need 12 bits per
+coefficient: (k + 1) × 384 bytes, or 1536 bytes for ML-KEM-768. Rounding
+u to du = 10 bits and v to dv = 4 bits adds a little more noise (still well
+under q/4) and gives 1088 bytes, about 29% smaller.
+
+**Everything happens in the NTT domain.** Â, ŝ and t̂ are stored and
+transmitted *already transformed* (FIPS 203 even defines the key format
+that way). The products Â∘ŝ, Âᵀ∘ŷ and t̂ᵀ∘ŷ are therefore cheap pointwise
+products. Only y, e, u′ and the final sums need (inverse) NTTs.
+
+### 3.2 Why K-PKE alone is not enough: chosen-ciphertext attacks
+
+K-PKE is secure against an attacker who only *watches* (IND-CPA). Real
+protocols let attackers *send* things. Suppose a server reuses its key
+pair, and an attacker sends a *modified* ciphertext. If the server's
+behaviour shows whether decryption gave the "same" m (for example, the
+handshake continues or fails), each query tells the attacker whether their
+change pushed some coefficient of the noise across the q/4 boundary. That
+boundary position depends on s. A few thousand such queries recover the
+whole secret key. These are "key-mismatch" or "reaction" attacks, and they
+are real: they work against plain LWE encryption.
+
+### 3.3 The Fujisaki–Okamoto transform and implicit rejection
+
+ML-KEM wraps K-PKE so that tampering gains the attacker nothing.
+
+**Encaps (Alg 17).** Pick random m. Derive **(K, r) = G(m ‖ H(ek))**:
+both the shared key *and the encryption randomness* come from m. Encrypt
+m with that r. Output c, keep K.
+
+**Decaps (Alg 18).** Decrypt c to m′. Recompute (K′, r′) = G(m′ ‖ H(ek)).
+**Re-encrypt** m′ with r′ to get c′. Because encryption is now deterministic
+given m, an honest c re-encrypts to *exactly* itself. Any modified or
+crafted c almost certainly does not.
+- If c = c′: return K′.
+- If c ≠ c′: return **K̄ = J(z ‖ c)**, where z is a secret random value
+  stored in dk.
+
+That second branch is **implicit rejection**. Instead of returning an error,
+Decaps returns a key that looks random, is the same every time for the same
+c, and depends on a secret the attacker does not know. From the outside, a
+rejected ciphertext and a valid one behave the same way: you get 32 bytes
+that will not match the attacker's key. The reaction attack loses its
+signal, because whatever the attacker sends, the result no longer depends
+on whether m′ moved in a way that reveals s.
+
+**Why hash H(ek) into G?** It binds the shared key to the specific
+public key, so a ciphertext made for one key cannot be reused against
+another. It also stops an attacker who targets many keys at once from
+sharing work between them. Storing H(ek) inside dk saves recomputing it on
+every Decaps.
+
+**Constant time matters most here.** If Decaps took a different time for
+c = c′ than for c ≠ c′ (an early return, an `if`, a `memcmp` that stops at
+the first difference), the timing would give back the exact signal that
+implicit rejection removed. So `kem::decaps_internal` always computes both
+K′ and K̄, compares all bytes with `ct_eq_bytes`, and picks one with a mask
+(`ct_select_bytes`). This is not hypothetical: Guo, Johansson and Nilsson
+(CRYPTO 2020, "A Key-Recovery Timing Attack on Post-Quantum Primitives
+Using the Fujisaki–Okamoto Transformation and Its Application on
+FrodoKEM") recovered secret keys from a non-constant-time comparison in
+exactly this step.
+
+### 3.4 The input checks (§7.2, §7.3)
+
+- **Encapsulation key, modulus check:** decode the 12-bit values of t̂
+  and re-encode them. The bytes must not change, which is the same as every
+  value being < q. A value like 4000 would be silently reduced mod q by
+  ByteDecode_12, so two different byte strings would act as the same key
+  while hashing to different H(ek). That is a mismatch FIPS forbids.
+- **Decapsulation key, hash check:** the stored H(ek) must equal the hash
+  of the stored ek. This catches corruption or splicing of two keys.
+- **Type checks** are lengths. In the typed API (`ml_kem_768::Ciphertext`
+  and so on) the length is part of the type, so a wrong-length input
+  cannot even be passed. `TryFrom<&[u8]>` performs the length check.
+
+The checks live in the constructors (`EncapsulationKey::from_bytes`,
+`DecapsulationKey::from_bytes`), so an *unchecked* key cannot reach Encaps
+or Decaps. FIPS 203 says these "shall not be run" with unchecked inputs,
+and making it impossible is stronger than documenting it.
+
+### 3.5 Design decisions and alternatives
+
+- **Slice-based core plus macro-generated typed API.** Rust's const
+  generics cannot yet compute array lengths like `[u8; 384*K + 32]` from a
+  generic parameter on stable. The core (`kpke.rs`, `kem.rs`) therefore
+  takes slices and a runtime `Params`, and a macro stamps out
+  `ml_kem_512` / `768` / `1024` with fixed arrays. Alternative: one generic
+  type using a crate like `hybrid-array` (RustCrypto's approach), which
+  means a dependency and harder-to-read types.
+- **The matrix is never stored.** Each Â entry is regenerated when needed.
+  KeyGen and Encrypt each use every entry once, so this costs nothing. A
+  server doing many Encaps to one key could cache Â (FIPS 203 §3.3 allows
+  it), which is a speed-up for phase 6 to measure.
+- **Internal functions are public** (`generate_internal`,
+  `encapsulate_internal`) and documented as "testing only". FIPS 203 §6
+  says they *should not* be offered to applications. The official vectors
+  and the timing harness both need them. Alternative: put them behind a
+  `hazmat` Cargo feature.
+- **One `unsafe` block.** `OsRng` calls Windows' `BCryptGenRandom`. The
+  crate uses `#![deny(unsafe_code)]` with one `#[allow]` on that module, plus
+  a `// SAFETY:` comment explaining why the call is sound. Alternative: the
+  `getrandom` crate, which is a dependency, but portable.
+- **Secrets are wiped on drop, best effort.** `DecapsulationKey` and
+  `SharedSecret` zero their bytes on drop, and the ML-KEM-level seeds d, z
+  and m are wiped after use. Intermediate values (s, m′, the Keccak state,
+  stack copies) are not. Doing that properly needs `zeroize`-style volatile
+  writes. Phase 4 decides, and it is a Limit.
+- **`SharedSecret` equality is constant time**, and its `Debug` output does
+  not show the bytes, so it cannot leak through logs.
+
+### 3.6 Validation
+
+| What | How many | Source of truth |
+|---|---|---|
+| NIST ACVP KeyGen | 75 | NIST's expected ek, dk |
+| NIST ACVP Encaps | 75 | NIST's expected c, K |
+| NIST ACVP Decaps | 30 (15 tampered) | NIST's expected K, including the rejection key |
+| NIST ACVP key checks | 60 (30 invalid) | NIST's pass/fail |
+| Cross-check vs RustCrypto `ml-kem` 0.3.3 | 256 per parameter set by default | byte equality of ek, dk, c, K, and K for random ciphertexts |
+| Property tests | 256 each by default | round trip; bit-flip gives exactly J(z ‖ c′) (computed with the *reference* SHAKE256); invalid keys rejected |
+| Extended run | 100,000 per property | same properties with PROPTEST_CASES = 100,000. All passed: 234 s on an i7-14700HX, at commit `2a4acce` (raw output: `results/extended-proptest.txt`, from `scripts/extended-proptest.ps1`). The K-PKE unit round trip is pinned to 32 cases and is not affected. |
+
+**Mutation check.** I made Decaps always return K′, which disables implicit
+rejection, and re-ran everything. It failed the NIST vectors, all three
+cross-checks and the bit-flip property. Then I reverted it. A single
+safety-critical line is guarded by three independent kinds of test.
+
+**Fuzzing.** `cargo-fuzz` needs the nightly toolchain (a download of
+several hundred MB) and libFuzzer, which is fragile on Windows/MSVC. Under
+this project's no-big-downloads rule, the substitute is the extended
+property-test run above: the same input-mutation idea, at high volume,
+with invariants checked on every case. What it does *not* give is
+coverage-guided input generation. That is a Limit.
+
+### 3.7 What went wrong
+
+- **Very little, for a reason.** Phases 1 and 2 had tested every building
+  block against literal pseudocode, so phase 3 passed all 240 NIST vectors
+  on the first run. The time spent on per-function oracles is what paid
+  off here.
+- **The reference crate's API had moved on.** `ml-kem` 0.3 builds keys from
+  64-byte seeds and marks the FIPS "expanded" dk format as deprecated, so
+  the cross-check uses `from_seed(d ‖ z)` and `to_expanded_bytes()`. As in
+  phase 2, I read the crate source before writing the tests.
+- **A borrow-checker error** in the cross-check: comparing slices of two
+  temporary keys inside one `assert` statement. Binding them to variables
+  first fixed it.
+- **The encapDecap vector file is marked `isSample: true`.** It is NIST's
+  publicly published sample set, not a private validation run. Passing it
+  is strong evidence of correctness, not a certification.
+
+### 3.8 Interview questions
+
+**Q1. Walk through why ML-KEM decryption works.**
+w = v − sᵀu = μ + (eᵀy + e2 − sᵀe1), plus compression error. The A terms
+cancel because sᵀ(Aᵀy) = (As)ᵀy. What remains is a sum of products of
+small polynomials, so each coefficient of w is within q/4 of 0 or of q/2,
+and rounding (Compress_1) recovers each bit. It fails only if the noise
+exceeds q/4, which happens with probability 2^−138.8 or less (FIPS 203
+Table 1).
+
+**Q2. What does the Fujisaki–Okamoto transform add, and what attack does it
+stop?**
+It makes encryption deterministic given m, by deriving the randomness r from
+G(m ‖ H(ek)), and Decaps re-encrypts the decrypted m′ and checks that it
+gets the same ciphertext. Without it, an attacker who can submit modified
+ciphertexts to a key that is reused, and observe success or failure, learns
+on which side of a decryption threshold the noise falls. That depends on s,
+and enough queries recover the key. With FO, every modified ciphertext is
+rejected, and the output no longer depends on s.
+
+**Q3. Why implicit rejection instead of returning an error?**
+An error is a signal, and signals are what CCA attacks feed on. Returning
+J(z ‖ c), a deterministic pseudorandom key, makes rejected and accepted
+ciphertexts look the same to the outside. The protocol still fails safely
+later, because the keys do not match. It also gives cleaner security proofs.
+And it has to be done in constant time, or timing brings the signal back.
+
+**Q4. What do the encapsulation key and decapsulation key checks protect
+against?**
+The modulus check rejects encodings with values ≥ q, which ByteDecode
+would otherwise reduce silently, so two different byte strings would
+behave as one key but hash differently. The hash check catches a dk whose
+embedded ek and H(ek) do not match (corrupted or spliced keys). The type
+checks reject wrong lengths. In my API, the checks happen in the
+constructors, so unchecked keys cannot reach Encaps or Decaps.
+
+**Q5. How do you know your ML-KEM is correct?**
+Four layers. (1) All 240 official NIST ACVP cases for KeyGen, Encaps,
+Decaps (including tampered ciphertexts) and both key checks. (2)
+Byte-for-byte agreement with an independent implementation (RustCrypto
+`ml-kem`) on random seeds, messages and random ciphertexts. (3) Property
+tests of the KEM's defining behaviour, at 256 cases normally and 100,000 in
+an extended run. (4) Mutation checks showing those tests fail when I break
+the code on purpose. Underneath all of that, every building block was
+already checked against literal pseudocode in phases 1 and 2.
