@@ -33,7 +33,7 @@ $cheap = @('ct-eq', 'message-encode', 'message-encode-zero', 'u-encode-zero')
 $builds = [ordered]@{
     'normal'     = @('', @('aa-ct-eq', 'ct-eq', 'message-encode', 'message-encode-zero',
                            'u-encode-zero', 'aa-decaps-ct', 'decaps-ct', 'decaps-valid',
-                           'encaps-m', 'keygen-d'))
+                           'encaps-m', 'aa-keygen-d', 'keygen-d'))
     'kyberslash' = @('leaky-kyberslash', @('aa-message-encode-zero', 'message-encode-zero',
                                           'message-encode', 'u-encode-zero'))
     'early-exit' = @('leaky-early-exit', @('aa-decaps-ct', 'decaps-ct', 'decaps-valid'))
