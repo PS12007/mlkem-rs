@@ -53,14 +53,19 @@ foreach ($b in $builds) {
     $label, $flags, $strict = $b
     $td = Join-Path $root ("target\asm-check\" + ($label -replace '[^a-z0-9]', '_'))
     if (Test-Path $td) { Remove-Item -Recurse -Force $td }
-    $build = cmd /c "cargo rustc -q -p mlkem --lib --release --features hazmat --target-dir `"$td`" -- --emit asm $flags 2>&1"
+    # Call the tools directly with argument arrays (no `cmd /c "..."`):
+    # Windows PowerShell 5.1 and PowerShell 7 quote nested arguments for
+    # cmd differently, which broke the --target-dir path on the CI runner.
+    $cargoArgs = @('rustc', '-q', '-p', 'mlkem', '--lib', '--release', '--features', 'hazmat',
+                   '--target-dir', $td, '--', '--emit', 'asm') + $flags.Split(' ')
+    $build = & cargo @cargoArgs 2>&1 | ForEach-Object { "$_" }
     if ($LASTEXITCODE -ne 0) { $log += "build failed: $label"; $log += $build; $failed = $true; continue }
-    $s = (Get-ChildItem "$td\release\deps\mlkem-*.s" | Select-Object -First 1).FullName
-    $info = if ($strict) { '' } else { '--info' }
-    Push-Location (Join-Path $root 'scripts')
-    $report = cmd /c "python -I asm_check.py $info $label `"$s`" 2>&1"
+    $s = (Get-ChildItem (Join-Path $td 'release\deps\mlkem-*.s') | Select-Object -First 1).FullName
+    $pyArgs = @('-I', (Join-Path $root 'scripts\asm_check.py'))
+    if (-not $strict) { $pyArgs += '--info' }
+    $pyArgs += @($label, $s)
+    $report = & python @pyArgs 2>&1 | ForEach-Object { "$_" }
     if ($LASTEXITCODE -ne 0) { $failed = $true }
-    Pop-Location
     $log += $report
     $log += ""
 }
