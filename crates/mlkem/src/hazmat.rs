@@ -77,6 +77,16 @@ pub fn message_encode(w: &[i16; N]) -> [u8; 32] {
     m
 }
 
+/// K-PKE.Encrypt line 22 for one polynomial of u at ML-KEM-1024's du = 11:
+/// ByteEncode_11(Compress_11(u)). The KyberSlash1 site (larger dividends
+/// than d = 1: up to 2^11·q).
+#[inline(never)]
+pub fn u_encode_d11(u: &[i16; N]) -> [u8; 352] {
+    let mut out = [0u8; 352];
+    encode::poly_compress_encode(&Poly { coeffs: *u }, 11, &mut out);
+    out
+}
+
 /// ByteDecode_12 of one secret-key polynomial (reduces mod q branch-free).
 #[inline(never)]
 pub fn decode12(b: &[u8; 384]) -> [i16; N] {

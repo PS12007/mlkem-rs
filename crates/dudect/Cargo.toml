@@ -1,0 +1,20 @@
+[package]
+name = "mlkem-dudect"
+version = "0.1.0"
+description = "dudect-style statistical timing-leak tester for the mlkem crate (Windows, x86-64)."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+mlkem = { path = "../mlkem", features = ["hazmat"] }
+
+[features]
+# Pass-through switches for the deliberately leaky builds of mlkem.
+leaky-kyberslash = ["mlkem/leaky-kyberslash"]
+leaky-early-exit = ["mlkem/leaky-early-exit"]
