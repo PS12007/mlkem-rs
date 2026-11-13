@@ -26,6 +26,11 @@ jobs:
       - name: Format
         run: cargo fmt --all -- --check
       - name: Clippy
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
       - name: Test
         run: cargo test --all
+      # Fails if a division appears in mlkem code, or a conditional branch in
+      # a leaf constant-time function, at any optimisation level.
+      - name: Constant-time assembly check
+        shell: pwsh
+        run: ./scripts/asm-check.ps1 -SkipShowAsm
