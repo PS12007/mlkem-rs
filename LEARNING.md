@@ -701,3 +701,256 @@ tests of the KEM's defining behaviour, at 256 cases normally and 100,000 in
 an extended run. (4) Mutation checks showing those tests fail when I break
 the code on purpose. Underneath all of that, every building block was
 already checked against literal pseudocode in phases 1 and 2.
+
+---
+
+## Phase 4: Constant-time review and the assembly check
+
+Code: `hazmat.rs` (probes), `zeroize.rs`, `scripts/asm-check.ps1`,
+`scripts/asm_check.py`. Results: `results/asm-check.txt` and
+`results/asm/*.s`.
+
+### 4.1 How a timing attack works
+
+An attacker does not need to read memory. It is enough to **measure how long
+something takes**, many times, and correlate the measurements with inputs
+they choose or observe. If the time depends even slightly on a secret, say
+a few CPU cycles, then averaging over thousands of measurements makes that
+difference visible through network noise. Classic results: Kocher (1996)
+recovered RSA keys from the timing of modular exponentiation, and Brumley
+and Boneh (2003) did it to OpenSSL over a network.
+
+A program's time depends on secrets in three main ways:
+
+1. **Branches.** `if secret { A } else { B }` runs different instructions.
+   Even if A and B take equally long, the branch predictor learns the
+   pattern, and mispredictions cost 15–20 cycles.
+2. **Memory addresses.** `table[secret]` loads from an address chosen by the
+   secret. Whether that line is in the cache (about 4 cycles) or not
+   (about 100+) leaks the index. Cache attacks on AES T-tables are the
+   classic example. A co-located attacker can even *prime* the cache and
+   watch which lines you evict.
+3. **Variable-latency instructions.** On most x86 CPUs, `div`/`idiv` takes
+   fewer cycles for some operands than others. Some other platforms have
+   data-dependent multipliers (e.g. the ARM Cortex-M3's long multiply,
+   which finishes early for small operands). KyberSlash is this case
+   (phase 5 measures it).
+
+**Constant-time code** means: no secret-dependent branch, no
+secret-dependent address, and no variable-latency instruction on secret
+operands. Then the *sequence* of instructions and addresses is the same
+for every secret, so the timing is too. Note that "constant time" does
+**not** mean "always takes exactly the same number of nanoseconds". It means
+the time does not depend on secrets.
+
+### 4.2 Every place in this crate where it matters
+
+| Where | Secret involved | Technique | Evidence |
+|---|---|---|---|
+| `field::barrett_reduce`, `montgomery_reduce`, `fqmul` | every coefficient of s, e, y, w | multiply/shift only; arithmetic right shift for signs | asm: 0 branches, 0 div at every level |
+| `field::to_canonical`, `csubq` | same | sign mask `x >> 15` instead of `if x < 0` | asm: 0 branches (csubq uses `cmov`) |
+| `encode::compress` (d = 1, 4, 5, 10, 11) | w (Decrypt), u, v (Encrypt) | `/ q` replaced by `× ⌈2^40/q⌉ >> 40` | asm: `imul; add; shr 40; and`. No div at any level |
+| `encode::decompress` (d = 1) | m in Encrypt | `(q·y + 1) >> 1` | asm: 0 branches |
+| `encode::byte_decode(12)` | ŝ from dk | branch-free `csubq` | loop branches only (reviewed) |
+| `encode::byte_encode` | m, compressed u/v | bit-packing loop, counts fixed by d | loop branches only (reviewed) |
+| `sample::sample_poly_cbd` | s, e, y, e1, e2 | bits extracted by shift/mask at public positions | one loop branch (reviewed) |
+| `ntt::ntt`, `ntt_inverse`, `multiply_ntts` | ŝ, ŷ, products | fixed butterfly schedule; table indices from loop counters | loop branches only (reviewed) |
+| `hash::keccak::f1600` and sponge | σ, r, m, K, PRF output | XOR/AND/NOT/fixed rotations; no data-indexed tables | one round-loop branch |
+| `ct::ct_eq_bytes` | c vs c′ in Decaps | OR-accumulate all bytes, mask at end, never exits early | loop branch on the counter only |
+| `ct::ct_select_bytes` | K′ vs K̄ | `b ^ (mask & (a ^ b))` with `black_box(mask)` | 0 branches when unrolled |
+| `kem::decaps_internal` | everything above | both keys always computed, compared and selected by mask, wipes on both paths | no div in its whole call tree at any level |
+| `kem::dk_check` | H(ek) vs stored h (public, but cheap to protect) | `ct_eq_bytes` | |
+| **Not constant time, by design** | | | |
+| `sample::sample_ntt` | none: input is public ρ | rejection loop | documented |
+| `kem::ek_check` | none: ek is public | early return on the first bad value | documented |
+| length / type checks | none: lengths are public | | |
+
+### 4.3 Why check the assembly at all?
+
+Rust, like C, promises *what* a program computes, not *how long* it takes.
+The optimiser is free to turn a mask back into a branch if it thinks that
+is faster, or to turn `x / 3329` into a `div` (at some optimisation levels)
+or into a multiply (at others). Source code alone cannot prove constant
+time. The compiled instructions can.
+
+**Probes.** Small functions such as `compress` get inlined into their
+callers, so they have no assembly of their own. The `hazmat` feature (off
+by default) adds `#[inline(never)]` wrappers (`hazmat::compress_d1`,
+`hazmat::ct_eq_1088`, …) so each one is emitted as a separate function.
+`hazmat::decaps_768` covers the whole composed algorithm, because code
+inlined into a caller can compile differently from the stand-alone version.
+
+**The check** (`scripts/asm-check.ps1`, run in CI with `-SkipShowAsm`):
+1. Build the crate at **every optimisation level** (0, 1, 2, 3, s, z),
+   emitting assembly.
+2. Parse each function, follow its calls, and count `div`/`idiv`,
+   conditional jumps (`jcc`), `cmov` and `setcc`.
+3. Rules:
+   - **No `div`/`idiv` in any `mlkem` function.** Two exceptions are
+     allow-listed by name, with reasons: at opt-level z, the compiler
+     divides the public key's *length* by 384 to compute loop bounds.
+   - **No conditional branch at all** in "leaf" probes (field arithmetic,
+     compress, decompress, masks) or anything they call.
+   - "Loop" probes may branch, but every branch is printed with the two
+     instructions before it, for review. I reviewed all 33 at opt-level 3.
+     Each compares a loop counter or a length with a constant, is a bounds
+     check, or is the function's own `assert!` on the public parameter d.
+   - No indirect jumps, except one allow-listed jump table inside
+     `core::sync::atomic::compiler_fence` at opt-level 0, which switches on
+     the constant `SeqCst`.
+4. `cmov` and `setcc` are allowed: on x86 they have no data-dependent
+   timing, because no jump is taken.
+
+### 4.4 What the check found
+
+- **opt-level 2 and 3 (normal release builds): clean.** `compress_d1`, the
+  KyberSlash2 site, compiles to `imul; add; shr 40; and 1`. The compiler
+  vectorised `to_canonical` inside `poly_compress_encode` into
+  `psraw 15; pand 3329` over 8 values at once.
+- **`ct_eq_bytes` turned into `testb; setne`.** LLVM *recognised* our
+  `(x | −x) >> 31` trick and replaced it with its own comparison. That is
+  fine here (`setne` is constant time), but it shows that the compiler
+  understands what masks mean and could just as well have produced a
+  branch. That is why we check.
+- **opt-level 0 with debug assertions (a `cargo build` debug build) is NOT
+  branch-free.** Two things add branches on secret data:
+  - Rust's overflow checks (`jo`, jump-if-overflow, after secret
+    arithmetic);
+  - my own `debug_assert!(x < q)` in `compress`, which compares the secret
+    x itself.
+
+  `compress_d1`'s call tree has 13 conditional branches in that build
+  versus 0 in release. Given the bound analysis, they are never taken, so
+  timing should not vary, but their conditions are computed from secrets.
+  **Constant time is only claimed for release builds.** That build is
+  reported as INFO, not checked as a rule.
+- **opt-level 0, s and z contain `div` instructions**, all on public values:
+  in Rust's standard library (`chunks_exact`, iterator size hints: slice
+  length divided by chunk size), and at opt-level z in `ek_check` and
+  `encrypt` (key length ÷ 384). **Our Keccak had `% 5` on loop counters,
+  which became `div` at opt-level 0.** It was public, but I replaced it with
+  tables, so the rule "no `div` in our code" holds with only the two
+  documented exceptions.
+- **The same source gives a different "constant-time status" per
+  optimisation level.** That is the KyberSlash lesson in miniature: the
+  reference C code's `/ q` was a multiply at -O2 on x86, but a real `div`
+  elsewhere.
+- CI runs the same check on whatever stable compiler GitHub installs. At
+  the time of writing that was rustc 1.100.0, while results/ came from
+  1.99.1. Both passed.
+
+### 4.5 Wiping secrets (zeroisation)
+
+After use, secrets remain in memory (stack, freed buffers) until something
+overwrites them. A later bug, a crash dump or swapped-out memory can expose
+them. Writing zeros at the end of a function is a **dead store**, because
+nothing reads the buffer again, so the optimiser deletes it.
+
+`zeroize::wipe` uses `core::ptr::write_volatile`, which the compiler must
+perform, followed by a compiler fence. That is the same approach as the
+widely used `zeroize` crate, in about 10 lines, so the crate keeps zero
+runtime dependencies. It is the second and last `unsafe` block in the crate.
+It is applied to: s, e, y, e1, e2, μ, v, w, the PRF output buffers, σ,
+G's output, m′, K′, r′, K̄, c′, and the Keccak state (`Drop` on the sponge
+types). Owned key types (`DecapsulationKey`, `SharedSecret`) wipe on
+`Drop`.
+
+**Evidence it survives optimisation:** the check counts stores of the
+constant 0 in Decaps' call tree at opt-level 3: 64 byte stores in `hash::g`
+(its 64-byte output), 136 in `decaps_internal`, 25+ eight-byte stores in
+each sponge drop.
+
+**What it cannot do:** copies the compiler makes (moves between stack
+slots, spilled registers, frames of functions that already returned) are
+outside our control. That is a Limit for every Rust and C implementation;
+only a few C libraries go further, by explicitly clearing the stack.
+
+### 4.6 Design decisions and alternatives
+
+- **Write our own volatile wipe instead of depending on `zeroize`.** This
+  keeps "no runtime dependencies", and the code is tiny and reviewed. The
+  alternative is the audited crate, which is the better choice for a real
+  product.
+- **Probes behind a feature, instead of always public.** The default build
+  has no extra API. Alternative: `#[no_mangle]` exports. That needs
+  `unsafe` in edition 2024, and pollutes the symbol table.
+- **Our own assembly parser (~200 lines of Python)** instead of a formal
+  tool. Alternatives:
+  - **ctgrind / Valgrind memcheck** (mark secrets "uninitialised" and see
+    if any branch depends on them): precise, but Linux-only.
+  - **Binsec/Rel, ct-verif:** formal verification, much stronger, heavy.
+  - **Dynamic testing (dudect, phase 5):** measures real timing, catches
+    what static checks miss (CPU behaviour), but only statistically.
+
+  Ours is a cheap static gate that runs in CI on Windows and catches the
+  most common regressions (a `/`, an `if` on a secret, an early-exit
+  compare).
+- **Leaf versus loop classification is manual.** The script cannot prove
+  that a loop branch depends only on a counter. A human reviewed them at
+  opt-level 3. It is listed as a limit.
+
+### 4.7 What went wrong
+
+- **Overflow checks re-enabled at opt-level 0.** Passing `-C opt-level=0`
+  silently turns debug assertions and overflow checks back on, because
+  their defaults follow the opt-level. My first run therefore "failed"
+  every leaf probe. The fix was a separate build with the checks off, plus
+  reporting the checked build as information (it is a real finding about
+  debug builds).
+- **`cargo asm` index confusion.** Its function index is the position in
+  the *filtered* list for each query, not a global one. The first saved
+  listings were empty. Fixed, and the script now fails if a listing has no
+  `ret`/`jmp`.
+- **A stale build.** Deleting the `.s` file but not the build cache made
+  cargo think everything was up to date, so no assembly was produced.
+  Fixed by a fresh target directory per optimisation level.
+- **PowerShell 7 on CI quotes arguments differently from Windows
+  PowerShell 5.1**, and CI's newer cargo put its output in a different
+  folder. The script now passes argument arrays directly and searches for
+  the output file.
+- **Two allow-list entries.** The alternative was to restructure
+  `ek_check`/`encrypt` until opt-level z stopped dividing by 384. That
+  fights the compiler for no security gain (the values are public), so the
+  reviewed exceptions are documented instead.
+
+### 4.8 Interview questions
+
+**Q1. What does "constant time" mean, and how did you check your code is?**
+No branch, memory address or variable-latency instruction depends on a
+secret, so the sequence of instructions and addresses is identical for all
+secrets. I wrote it with masks and arithmetic, then checked the *compiled*
+code: a script builds at every optimisation level, emits assembly, and
+fails on any `div` in my code or any conditional branch in the leaf
+functions. It lists loop branches for manual review. It runs in CI. Phase 5
+adds a statistical timing test of the real binary.
+
+**Q2. Why can't you just trust the source code?**
+Because the compiler only preserves what a program computes, not its
+timing. I saw this happen: LLVM rewrote my branch-free zero test into
+`setne`, the same `% 5` became a `div` at opt-level 0 but not at 3, and
+debug builds add branches after secret arithmetic (overflow checks and
+`debug_assert!`s).
+KyberSlash itself was division by a constant that some compilers turned
+into a `div`.
+
+**Q3. Is `cmov` constant time? What about `setcc`?**
+On x86, yes: both always execute and their latency does not depend on the
+condition, because no jump is taken and the predictor is not involved. That
+is why the check allows them and forbids `jcc`. Other architectures need
+their own analysis.
+
+**Q4. Why does zeroising need `volatile`, and what does it still miss?**
+A final write of zeros to a buffer nobody reads again is a dead store, and
+the optimiser removes it. A volatile write must be performed. I checked
+that the zero stores are present in the optimised assembly. It cannot reach
+copies the compiler made on its own (spills, moved values, dead stack
+frames), so wiping is risk reduction, not a guarantee.
+
+**Q5. What are the limits of your constant-time evidence?**
+(1) Only x86-64 (MSVC target) was checked. Other targets, including WASM,
+need their own check. (2) Loop branches were judged by a person, at
+opt-level 3. (3) The check sees instructions, not microarchitecture:
+effects like frequency scaling (Hertzbleed), data-dependent prefetchers, or
+a future CPU with variable-time multiply are out of scope. (4) Debug builds
+are not constant time. Phase 5's measurements complement this, but a
+statistical test can only fail to find a leak, never prove there is none.
