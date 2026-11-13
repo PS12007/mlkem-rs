@@ -70,6 +70,27 @@ const RHO: [u32; 25] = {
     r
 };
 
+/// x + 1, x + 2 and x − 1 (mod 5) as tables. The indices are public loop
+/// counters, so `%` would be harmless. But at opt-level 0 the compiler emits
+/// a real `div` for it, and with tables the assembly check can require
+/// "no division anywhere in this crate, at any optimisation level" with
+/// no exceptions.
+const PLUS1: [usize; 5] = [1, 2, 3, 4, 0];
+const PLUS2: [usize; 5] = [2, 3, 4, 0, 1];
+const MINUS1: [usize; 5] = [4, 0, 1, 2, 3];
+
+/// π source index for each destination (x, y): lane (x + 3y mod 5, x).
+const PI_SRC: [usize; 25] = {
+    let mut t = [0usize; 25];
+    let mut i = 0;
+    while i < 25 {
+        let (x, y) = (i % 5, i / 5); // compile time only
+        t[i] = (x + 3 * y) % 5 + 5 * x;
+        i += 1;
+    }
+    t
+};
+
 /// Keccak-f[1600] = 24 rounds of θ, ρ, π, χ, ι (FIPS 202 §3.3, Alg 7).
 pub(crate) fn f1600(a: &mut [u64; 25]) {
     for rc in RC {
@@ -80,7 +101,7 @@ pub(crate) fn f1600(a: &mut [u64; 25]) {
             c[x] = a[x] ^ a[x + 5] ^ a[x + 10] ^ a[x + 15] ^ a[x + 20];
         }
         for x in 0..5 {
-            let d = c[(x + 4) % 5] ^ c[(x + 1) % 5].rotate_left(1);
+            let d = c[MINUS1[x]] ^ c[PLUS1[x]].rotate_left(1);
             for y in 0..5 {
                 a[x + 5 * y] ^= d;
             }
@@ -89,18 +110,16 @@ pub(crate) fn f1600(a: &mut [u64; 25]) {
         // ρ (Alg 2) and π (Alg 3) together: π moves lane (x+3y mod 5, x) to
         // position (x, y). ρ rotates each lane by its own fixed offset.
         let mut b = [0u64; 25];
-        for y in 0..5 {
-            for x in 0..5 {
-                let src = (x + 3 * y) % 5 + 5 * x;
-                b[x + 5 * y] = a[src].rotate_left(RHO[src]);
-            }
+        for i in 0..25 {
+            let src = PI_SRC[i];
+            b[i] = a[src].rotate_left(RHO[src]);
         }
 
         // χ (Alg 4): the only non-linear step.
         // A[x,y] = B[x,y] ⊕ (¬B[x+1,y] ∧ B[x+2,y]).
         for y in 0..5 {
             for x in 0..5 {
-                a[x + 5 * y] = b[x + 5 * y] ^ (!b[(x + 1) % 5 + 5 * y] & b[(x + 2) % 5 + 5 * y]);
+                a[x + 5 * y] = b[x + 5 * y] ^ (!b[PLUS1[x] + 5 * y] & b[PLUS2[x] + 5 * y]);
             }
         }
 
