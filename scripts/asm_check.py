@@ -52,6 +52,21 @@ REVIEWED_DIVS = {
 def is_reviewed_div(label, name):
     return (label, name) in REVIEWED_DIVS
 
+
+# Functions allowed to contain an indirect call/jump (any build), with the
+# reason the target cannot depend on a secret. Any other indirect control
+# flow fails, because the checker cannot follow it.
+REVIEWED_INDIRECT = {
+    "core::sync::atomic::compiler_fence::mlkem":
+        "opt-level 0 only: jump table on the Ordering argument, which our "
+        "zeroize::wipe always passes as the constant SeqCst",
+}
+
+
+def has_indirect(insns):
+    return any(m in ("call", "callq", "jmp", "jmpq") and o.strip().startswith("*")
+               for m, o in insns)
+
 INSN = re.compile(r"^\s+([a-z][a-z0-9]*)\b\s*(.*)$")
 
 
@@ -180,8 +195,13 @@ def main(label, path, strict=True):
             failures.append(f"{label}: {name} reaches a div")
         if cls == "leaf" and total["jcc"]:
             failures.append(f"{label}: leaf probe {name} has {total['jcc']} conditional branch(es)")
-        if "<indirect>" in called:
-            failures.append(f"{label}: {name} makes an indirect call (cannot be checked)")
+        for f in closure(sym, funcs):
+            if f in funcs and has_indirect(funcs[f]):
+                rn = readable(f)
+                if rn in REVIEWED_INDIRECT:
+                    print(f"{'':<18} note: indirect jump in {rn} reviewed: {REVIEWED_INDIRECT[rn]}")
+                else:
+                    failures.append(f"{label}: {name} reaches an indirect call/jump in {rn} (cannot be checked)")
 
     # 3. Every conditional branch in the loop probes (not decaps_768, which is
     #    these same pieces composed), with the instructions that set the
