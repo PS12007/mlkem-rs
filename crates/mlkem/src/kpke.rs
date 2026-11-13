@@ -183,8 +183,8 @@ mod tests {
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(32))]
         /// Decrypt(Encrypt(m)) = m for honestly generated keys. (This can
-        /// fail with probability about 2^-139 or less, the "decryption
-        /// failure rate", which is far too small to ever see.)
+        /// fail with probability at most 2^-138.8, FIPS 203 Table 1, which
+        /// is far too small to ever see.)
         #[test]
         fn encrypt_decrypt_round_trip(d: [u8; 32], m: [u8; 32], r: [u8; 32], which in 0usize..3) {
             let p = [ML_KEM_512, ML_KEM_768, ML_KEM_1024][which];
