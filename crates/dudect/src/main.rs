@@ -1,13 +1,13 @@
 //! mlkem-dudect: a statistical timing-leak tester for the mlkem crate,
 //! following the dudect method (Reparaz, Balasch, Verbauwhede, DATE 2017).
 //!
-//! For one target operation it repeatedly:
-//!   1. picks an input class at random: 0 = a FIXED input, 1 = a RANDOM one;
-//!   2. prepares the input (not timed) with the SAME instructions for both
-//!      classes: a random candidate is always generated, and the class only
-//!      selects which of two cached buffers is copied into the working slot;
-//!   3. drains pending stores (MFENCE), then times the operation with the
-//!      serialised TSC.
+//! For one target operation it works in batches of 1000 measurements:
+//!   1. picks each measurement's class at random: 0 = a FIXED input,
+//!      1 = a RANDOM one, and generates all the batch's inputs (not timed);
+//!   2. copies the whole batch once more with a single memcpy, so every
+//!      input's memory was last written by the same class-independent code;
+//!   3. walks the copy, timing each operation with the serialised TSC after
+//!      an MFENCE. Nothing in this loop depends on the class.
 //!
 //! Then it runs Welch's t-test between the two classes' timings, uncropped
 //! and cropped at dudect's percentile points, and reports the largest |t|.
@@ -140,15 +140,33 @@ mod app {
             // 1. Prepare every input of the batch (not timed).
             self.inputs.clear();
             for &c in classes {
-                let x = if c == 0 || self.aa {
+                let x = if c == 0 {
                     self.fixed
                 } else {
-                    (self.gen_input)(&self.ctx, rng)
+                    let r = (self.gen_input)(&self.ctx, rng);
+                    // A/A: the random input is still generated (same work,
+                    // same RNG and cache activity as the real test) but
+                    // replaced by the fixed one, so only the data differs
+                    // between an A/A run and the real run.
+                    if self.aa {
+                        black_box(r);
+                        self.fixed
+                    } else {
+                        r
+                    }
                 };
                 self.inputs.push(x);
             }
-            // 2. Time each one. Nothing in this loop depends on the class.
-            for (x, o) in self.inputs.iter().zip(out.iter_mut()) {
+            // 2. Normalise memory state: copy the whole batch once more with
+            //    one class-independent memcpy and time against the copy.
+            //    Step 1 writes class-0 and class-1 slots with different code
+            //    (copy of a cached value vs RNG fill then copy), which left
+            //    their cache lines in different states: an A/A control on
+            //    E-cores reached |t| ~ 11 without this (LEARNING.md 5.x).
+            let timed: Vec<T> = self.inputs.clone();
+            platform::fence();
+            // 3. Time each one. Nothing in this loop depends on the class.
+            for (x, o) in timed.iter().zip(out.iter_mut()) {
                 platform::fence();
                 let t0 = platform::ticks();
                 (self.op)(&self.ctx, black_box(x));
