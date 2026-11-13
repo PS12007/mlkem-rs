@@ -41,7 +41,7 @@ A/A control that cannot leak. Measured on an Intel i7-14700HX, one P-core
 
 | build / target | P-core | E-core |
 |---|---|---|
-| normal: ct-eq, encode targets, Decaps, Encaps (8 targets) | 1.5 – 2.7 | 1.5 – 2.6 |
+| normal: ct-eq, encode targets, Decaps, Encaps (7 targets) | 1.5 – 2.7 | 1.5 – 2.6 |
 | normal: A/A controls | 1.4 – 1.7 | 1.8 – 2.3 |
 | normal: KeyGen, fixed vs random d | 4519 | 3921 |
 | leaky-early-exit: Decaps, valid vs random ciphertext | 660 | 202 |
