@@ -95,9 +95,11 @@ pub(crate) fn j(parts: &[&[u8]]) -> [u8; 32] {
 
 /// (a, b) ← G(c), where G(c) := SHA3-512(c) = a ‖ b  (eq. 4.5)
 pub(crate) fn g(parts: &[&[u8]]) -> ([u8; 32], [u8; 32]) {
-    let ab = sha3_512(parts);
+    let mut ab = sha3_512(parts);
     let (a, b) = ab.split_at(32);
-    (a.try_into().unwrap(), b.try_into().unwrap())
+    let out = (a.try_into().unwrap(), b.try_into().unwrap());
+    crate::zeroize::wipe(&mut ab); // the halves are secret (σ, K, r)
+    out
 }
 
 /// PRF_η(s, b) := SHAKE256(s ‖ b, 8·64·η)  (eqs. 4.2, 4.3).

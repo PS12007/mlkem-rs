@@ -23,8 +23,9 @@ use crate::encode::{poly_compress_encode, poly_decode_decompress, poly_decode12,
 use crate::hash;
 use crate::ntt::{multiply_ntts, ntt, ntt_inverse};
 use crate::params::{MAX_K, Params};
-use crate::poly::Poly;
+use crate::poly::{Poly, wipe_polys};
 use crate::sample::{sample_ntt, sample_poly_cbd};
+use crate::zeroize::wipe;
 
 type PolyVec = [Poly; MAX_K];
 
@@ -41,7 +42,9 @@ fn sample_noise(eta: usize, seed: &[u8; 32], counter: &mut u8) -> Poly {
     let buf = &mut buf[..64 * eta];
     hash::prf(eta, seed, *counter, buf);
     *counter += 1;
-    sample_poly_cbd(eta, buf)
+    let f = sample_poly_cbd(eta, buf);
+    wipe(buf); // the PRF output determines the secret noise
+    f
 }
 
 /// Σ_j a[j] ∘ b[j] in the NTT domain. Each product is below q in absolute
@@ -93,6 +96,11 @@ pub(crate) fn keygen(p: &Params, d: &[u8; 32], ek: &mut [u8], dk: &mut [u8]) {
     for i in 0..k {
         poly_encode12(&s_hat[i], &mut dk[384 * i..384 * (i + 1)]);
     }
+
+    let mut sigma = sigma;
+    wipe(&mut sigma);
+    wipe_polys(&mut s_hat);
+    wipe_polys(&mut e_hat);
 }
 
 /// Algorithm 14 K-PKE.Encrypt(ek_PKE, m, r). Writes c (32(du·k + dv) bytes).
@@ -142,10 +150,18 @@ pub(crate) fn encrypt(p: &Params, ek: &[u8], m: &[u8; 32], r: &[u8; 32], c: &mut
     // line 21: v ← NTT⁻¹(t̂ᵀ ∘ ŷ) + e2 + μ
     let mut v = inner_product_ntt(p, |j| t_hat[j], &y_hat);
     ntt_inverse(&mut v);
-    let v = v.add(&e2).add(&mu);
+    let mut v = v.add(&e2).add(&mu);
 
     // line 23–24: c2 ← ByteEncode_dv(Compress_dv(v)); c ← c1 ‖ c2
     poly_compress_encode(&v, p.dv, &mut c[c1_len * k..]);
+
+    // y, e1, e2 and μ would let anyone recover m from c.
+    let (mut e2, mut mu) = (e2, mu);
+    wipe_polys(&mut y_hat);
+    wipe_polys(&mut e1);
+    wipe_polys(core::slice::from_mut(&mut e2));
+    wipe_polys(core::slice::from_mut(&mut mu));
+    wipe_polys(core::slice::from_mut(&mut v));
 }
 
 /// Algorithm 15 K-PKE.Decrypt(dk_PKE, c). Returns m.
@@ -160,17 +176,20 @@ pub(crate) fn decrypt(p: &Params, dk: &[u8], c: &[u8]) -> [u8; 32] {
     for i in 0..k {
         let mut u_i = poly_decode_decompress(p.du, &c[c1_len * i..c1_len * (i + 1)]);
         ntt(&mut u_i);
-        let s_hat_i = poly_decode12(&dk[384 * i..384 * (i + 1)]);
+        let mut s_hat_i = poly_decode12(&dk[384 * i..384 * (i + 1)]);
         acc = acc.add(&multiply_ntts(&s_hat_i, &u_i));
+        wipe_polys(core::slice::from_mut(&mut s_hat_i));
     }
     ntt_inverse(&mut acc);
     let v = poly_decode_decompress(p.dv, &c[c1_len * k..]);
-    let w = v.sub(&acc);
+    let mut w = v.sub(&acc);
 
     // line 7: m ← ByteEncode_1(Compress_1(w)). w is secret: Compress is the
     // KyberSlash-sensitive step, which is why it uses no division.
     let mut m = [0u8; 32];
     poly_compress_encode(&w, 1, &mut m);
+    wipe_polys(core::slice::from_mut(&mut acc));
+    wipe_polys(core::slice::from_mut(&mut w));
     m
 }
 

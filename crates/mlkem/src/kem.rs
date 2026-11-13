@@ -19,6 +19,7 @@ use crate::encode::{byte_decode, byte_encode};
 use crate::hash;
 use crate::kpke;
 use crate::params::{MAX_CT_LEN, Params};
+use crate::zeroize::wipe;
 
 /// Algorithm 16 ML-KEM.KeyGen_internal(d, z).
 pub(crate) fn keygen_internal(
@@ -44,9 +45,10 @@ pub(crate) fn keygen_internal(
 /// Algorithm 17 ML-KEM.Encaps_internal(ek, m). Writes c, returns K.
 pub(crate) fn encaps_internal(p: &Params, ek: &[u8], m: &[u8; 32], c: &mut [u8]) -> [u8; 32] {
     // line 1: (K, r) ← G(m ‖ H(ek))
-    let (k, r) = hash::g(&[m, &hash::h(&[ek])]);
+    let (k, mut r) = hash::g(&[m, &hash::h(&[ek])]);
     // line 2: c ← K-PKE.Encrypt(ek, m, r)
     kpke::encrypt(p, ek, m, &r, c);
+    wipe(&mut r); // r (with ek) determines m
     k
 }
 
@@ -70,12 +72,12 @@ pub(crate) fn decaps_internal(p: &Params, dk: &[u8], c: &[u8]) -> [u8; 32] {
     let z = &dk[k384 + p.ek_len() + 32..];
 
     // line 5: m′ ← K-PKE.Decrypt(dk_PKE, c)
-    let m_prime = kpke::decrypt(p, dk_pke, c);
+    let mut m_prime = kpke::decrypt(p, dk_pke, c);
     // line 6: (K′, r′) ← G(m′ ‖ h)
-    let (k_prime, r_prime) = hash::g(&[&m_prime, h]);
+    let (mut k_prime, mut r_prime) = hash::g(&[&m_prime, h]);
     // line 7: K̄ ← J(z ‖ c), the implicit-rejection key. Always computed,
     // even if it will not be used.
-    let k_bar = hash::j(&[z, c]);
+    let mut k_bar = hash::j(&[z, c]);
     // line 8: c′ ← K-PKE.Encrypt(ek_PKE, m′, r′)
     let mut c_prime_buf = [0u8; MAX_CT_LEN];
     let c_prime = &mut c_prime_buf[..p.ct_len()];
@@ -85,6 +87,14 @@ pub(crate) fn decaps_internal(p: &Params, dk: &[u8], c: &[u8]) -> [u8; 32] {
     let equal = ct_eq_bytes(c, c_prime); // 0xFF if equal, 0x00 if not
     let mut out = [0u8; 32];
     ct_select_bytes(&mut out, &k_prime, &k_bar, equal);
+
+    // Wipe every intermediate secret. The wipes run whichever key was chosen,
+    // so they add no timing difference between accept and reject.
+    wipe(&mut m_prime);
+    wipe(&mut k_prime);
+    wipe(&mut r_prime);
+    wipe(&mut k_bar);
+    wipe(&mut c_prime_buf);
     out
 }
 

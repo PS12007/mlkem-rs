@@ -108,3 +108,17 @@ impl<const RATE: usize> Squeezer<RATE> {
         }
     }
 }
+
+// The state is a function of everything absorbed, which is often secret
+// (d ‖ k in KeyGen, m ‖ H(ek) in Encaps, s ‖ N in the PRF). Squeezed output
+// is also derivable from it. Wipe it when the sponge goes away.
+impl<const RATE: usize> Drop for Sponge<RATE> {
+    fn drop(&mut self) {
+        crate::zeroize::wipe(&mut self.state);
+    }
+}
+impl<const RATE: usize> Drop for Squeezer<RATE> {
+    fn drop(&mut self) {
+        crate::zeroize::wipe(&mut self.state);
+    }
+}

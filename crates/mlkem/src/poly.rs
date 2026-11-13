@@ -53,3 +53,11 @@ impl Poly {
         self.coeffs.map(to_canonical)
     }
 }
+
+/// Wipe secret polynomials (s, e, y, w, ...) once they are no longer needed.
+/// `Poly` is `Copy`, so it cannot wipe itself on drop: callers do it.
+pub(crate) fn wipe_polys(polys: &mut [Poly]) {
+    for p in polys {
+        crate::zeroize::wipe(&mut p.coeffs);
+    }
+}

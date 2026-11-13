@@ -4,10 +4,11 @@
 //! system's is `BCryptGenRandom` with `BCRYPT_USE_SYSTEM_PREFERRED_RNG`,
 //! which uses the OS's CTR_DRBG (an SP 800-90A design).
 //!
-//! This module holds the **only `unsafe` code in the crate**: one call to
-//! a Windows function through the C calling convention. Rust cannot check
-//! what foreign code does, so every foreign call is `unsafe`. The crate root
-//! says `#![deny(unsafe_code)]`, and only this module opts out.
+//! This module holds one of the crate's two `unsafe` blocks (the other is
+//! the volatile write in `zeroize.rs`): a call to a Windows function through
+//! the C calling convention. Rust cannot check what foreign code does, so
+//! every foreign call is `unsafe`. The crate root says
+//! `#![deny(unsafe_code)]`, and only these two places opt out.
 
 use crate::Error;
 

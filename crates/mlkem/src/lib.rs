@@ -32,8 +32,9 @@
 //! - `spec` (tests only): literal pseudocode transcriptions used as oracles
 
 #![cfg_attr(not(test), no_std)]
-// `deny`, not `forbid`, so that exactly one module (`rng`, the Windows RNG
-// call) can opt out with `#[allow(unsafe_code)]`. Everything else is safe.
+// `deny`, not `forbid`, so that exactly two small functions can opt out with
+// `#[allow(unsafe_code)]`: the Windows RNG call (`rng`) and the volatile
+// writes that wipe secrets (`zeroize`). Everything else is safe Rust.
 #![deny(unsafe_code)]
 
 mod ct;
@@ -51,6 +52,7 @@ mod rng;
 mod sample;
 #[cfg(test)]
 mod spec;
+mod zeroize;
 
 #[cfg(windows)]
 pub use rng::OsRng;
@@ -86,16 +88,10 @@ impl fmt::Display for Error {
 
 impl core::error::Error for Error {}
 
-/// Best-effort wipe of secret bytes. Writing zeros and then passing the
-/// buffer through `black_box` makes it much harder for the optimiser to drop
-/// the writes as "dead" (nothing reads them afterwards). It is *not* a
-/// guarantee: copies made earlier (moves, registers, the stack of called
-/// functions) are not wiped. See Limits in README.md.
+/// Wipe secret bytes with volatile writes (see `zeroize.rs` for what this
+/// does and does not cover).
 fn wipe(buf: &mut [u8]) {
-    for b in buf.iter_mut() {
-        *b = 0;
-    }
-    core::hint::black_box(buf);
+    zeroize::wipe(buf);
 }
 
 /// The 32-byte shared secret K (FIPS 203 Table 3).
