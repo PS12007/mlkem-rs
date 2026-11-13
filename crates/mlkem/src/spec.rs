@@ -128,6 +128,78 @@ pub fn multiply_ntts(f: &[i64; N], g: &[i64; N]) -> [i64; N] {
     h
 }
 
+/// Algorithm 3 BitsToBytes(b), §4.2.1.
+pub fn bits_to_bytes(b: &[u8]) -> Vec<u8> {
+    assert_eq!(b.len() % 8, 0);
+    let mut bytes = vec![0u8; b.len() / 8]; // 1
+    for i in 0..b.len() {
+        // 2
+        bytes[i / 8] += b[i] << (i % 8); // 3
+    }
+    bytes
+}
+
+/// Algorithm 4 BytesToBits(B), §4.2.1.
+pub fn bytes_to_bits(bytes: &[u8]) -> Vec<u8> {
+    let mut c = bytes.to_vec(); // 1
+    let mut b = vec![0u8; 8 * bytes.len()];
+    for i in 0..bytes.len() {
+        // 2
+        for j in 0..8 {
+            // 3
+            b[8 * i + j] = c[i] % 2; // 4
+            c[i] /= 2; // 5
+        }
+    }
+    b
+}
+
+/// Algorithm 5 ByteEncode_d(F), §4.2.1.
+pub fn byte_encode(d: u32, f: &[i64; N]) -> Vec<u8> {
+    let d = d as usize;
+    let mut b = vec![0u8; 256 * d];
+    for i in 0..256 {
+        // 1
+        let mut a = f[i]; // 2
+        for j in 0..d {
+            // 3
+            b[i * d + j] = (a % 2) as u8; // 4
+            a = (a - i64::from(b[i * d + j])) / 2; // 5
+        }
+    }
+    bits_to_bytes(&b) // 8
+}
+
+/// Algorithm 6 ByteDecode_d(B), §4.2.1.
+pub fn byte_decode(d: u32, bytes: &[u8]) -> [i64; N] {
+    let m_ = if d < 12 { 1i64 << d } else { Q };
+    let d = d as usize;
+    let b = bytes_to_bits(bytes); // 1
+    let mut f = [0i64; N];
+    for i in 0..256 {
+        // 2
+        let mut sum = 0;
+        for j in 0..d {
+            sum += i64::from(b[i * d + j]) << j;
+        }
+        f[i] = sum % m_; // 3
+    }
+    f
+}
+
+/// Compress_d, eq. (4.7): ⌈(2^d/q)·x⌋ mod 2^d, with the rounding done in
+/// exact rational arithmetic: ⌈a/b⌋ = ⌊a/b + 1/2⌋ = ⌊(2a + b) / (2b)⌋.
+pub fn compress(x: i64, d: u32) -> i64 {
+    let (a, b) = (x << d, Q);
+    ((2 * a + b) / (2 * b)) % (1 << d)
+}
+
+/// Decompress_d, eq. (4.8): ⌈(q/2^d)·y⌋, rounded the same way.
+pub fn decompress(y: i64, d: u32) -> i64 {
+    let (a, b) = (Q * y, 1i64 << d);
+    (2 * a + b) / (2 * b)
+}
+
 /// Textbook multiplication in R_q = Z_q[X]/(X^256 + 1) (§2.3 / §4.3),
 /// O(n^2). Because X^256 = −1, a term X^(i+j) with i+j ≥ 256 wraps round to
 /// X^(i+j−256) with its sign flipped ("negacyclic").
