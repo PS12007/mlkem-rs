@@ -954,3 +954,281 @@ effects like frequency scaling (Hertzbleed), data-dependent prefetchers, or
 a future CPU with variable-time multiply are out of scope. (4) Debug builds
 are not constant time. Phase 5's measurements complement this, but a
 statistical test can only fail to find a leak, never prove there is none.
+
+---
+
+## Phase 5: Measuring timing leaks (dudect)
+
+Code: `crates/dudect` (the `mlkem-dudect` binary), the `leaky-kyberslash`
+and `leaky-early-exit` features of `mlkem`, `scripts/dudect.ps1`. Results:
+`results/dudect/summary.txt` and one raw file per run in
+`results/dudect/<build>/`.
+
+Phase 4 checked the *instructions*. This phase measures the *time* the real
+binary takes on a real CPU, which catches what a static check cannot see:
+the CPU's own behaviour (variable-latency instructions, caches, predictors).
+
+### 5.1 The dudect method
+
+dudect ("Dude, is my code constant time?", Reparaz, Balasch and
+Verbauwhede, DATE 2017) needs no model of the CPU. It asks one statistical
+question:
+
+1. Choose two **input classes**. Class 0 is one **fixed** input, class 1 is
+   a fresh **random** input each time. Choose the fixed input to be
+   "extreme" where possible (all-zero coefficients, an equal comparison),
+   because that maximises any data-dependent difference.
+2. Run the operation millions of times, picking the class at random each
+   time, and record the duration of each run.
+3. Compare the two timing distributions with **Welch's t-test**:
+   t = (mean₀ − mean₁) / √(var₀/n₀ + var₁/n₁). Welch's version does not
+   assume equal variances, which matters here: random inputs often have a
+   wider spread than a fixed one.
+
+If timing does not depend on the data, both classes have the same mean and
+|t| stays small however many samples you take. If it does, |t| grows like
+√n. Conventional thresholds: |t| < 4.5 nothing detected, |t| ≥ 10 a leak.
+
+**Cropping.** Timing has a long right tail (interrupts, context switches,
+cache misses caused by other programs). One 50 µs interrupt drowns a
+2-cycle difference in the mean. So, like dudect, the tester also runs the
+t-test on only the measurements below the p-th percentile, for 100 values
+of p from 6.7% to 99.9% (`stats::dudect_crop_points`), and reports the
+**maximum |t| over all 101 tests**.
+
+**Consequence of taking a maximum:** with 101 (correlated) tests, the
+maximum |t| of perfectly constant-time code is not around 0.8 (the mean of
+one |t|) but typically 1.5 to 3. That is why every target is run next to an
+**A/A control** (`aa-` prefix): both classes get the identical fixed data
+through exactly the same code. Its result is the noise floor for that
+target on that core. A real target must be judged against its control, not
+against 0.
+
+**What a pass means.** "No leak detected" means only that *this* many
+measurements on *this* CPU could not tell the classes apart. It is not a
+proof (see phase 4 for the static side). A fail is strong evidence, but only
+once the A/A control shows the harness itself is not the cause.
+
+### 5.2 Timing on Windows, on a hybrid CPU
+
+- **Timer:** `RDTSC` with `LFENCE` on both sides. RDTSC is not ordered with
+  the surrounding instructions; LFENCE waits until earlier instructions have
+  completed, so the window really contains the call. The TSC is
+  *invariant* (constant rate, independent of turbo), here 2304 MHz. The
+  tester measures it against `QueryPerformanceCounter` at start-up as a
+  cross-check.
+- **MFENCE before each measurement**, so stores that wrote the input have
+  drained from the store buffer before the clock starts.
+- **Pinning and priority:** `SetThreadAffinityMask` to one logical CPU,
+  `HIGH_PRIORITY_CLASS` and a `TIME_CRITICAL` thread, so the scheduler does
+  not migrate or preempt us mid-run.
+- **P-cores and E-cores.** The i7-14700HX is hybrid: logical CPUs 0–15 are
+  8 hyper-threaded P-cores (Raptor Cove), 16–27 are 12 E-cores (Gracemont)
+  that share an L2 per cluster of 4. They are different
+  microarchitectures, so instruction latencies and cache behaviour differ.
+  Every result is measured on both, cpu 2 (P) and cpu 20 (E). This turned
+  out to matter in both directions (5.3, 5.6).
+- **Batching** (the canonical dudect structure): for each batch of 1000,
+  choose all classes, generate all inputs, copy the whole batch once more
+  with one memcpy, then time each input in a loop that contains no
+  class-dependent code at all. Why each step exists is in 5.6.
+
+### 5.3 KyberSlash, and proving the tester can see a leak
+
+A tester that never reports anything might simply be blind. So the crate has
+two **deliberately leaky builds** (Cargo features, never on by default; the
+tester prints a warning banner when one is compiled in). They are the
+*positive controls*.
+
+**KyberSlash** (Bernstein et al., 2024) is the bug the reference Kyber code
+had: `Compress` computed `((x << d) + q/2) / q` on secret x. Division by the
+constant q is normally compiled into a multiply and shift, but on some
+compilers, optimisation levels and targets it became a real `div`
+instruction, whose latency on many CPUs depends on its operands. Measuring
+that recovered keys.
+- *KyberSlash1*: Compress_du on u in Encrypt (line 22). In Decaps the
+  re-encryption runs on the secret m′, so it leaks. ML-KEM-768 uses du = 10;
+  the probe `hazmat::u_encode_d11` uses d = 11 (ML-KEM-1024), the largest
+  dividends.
+- *KyberSlash2*: Compress_1 in Decrypt (line 7) on w = v − sᵀu. d = 1, so
+  the dividends are small (2x + 1664 < 8322).
+
+`leaky-kyberslash` hides q behind `black_box` so the compiler must emit
+`div`. `leaky-early-exit` makes the FO re-encryption check return at the
+first differing byte.
+
+Measured (10⁷ samples for the encode targets, 10⁶ for Decaps):
+
+| leaky build, target | P-core (cpu 2) | E-core (cpu 20) | A/A control P / E |
+|---|---|---|---|
+| early-exit, `decaps-ct` (fixed valid c vs random c) | **660** | **202** | 2.7 / 3.5 |
+| early-exit, `decaps-valid` (both classes valid) | 2.5 | 2.8 | (same) |
+| kyberslash, `u-encode-zero` (d = 11) | 2.6 | **19857** | 1.3 / 3.1 |
+| kyberslash, `message-encode-zero` (d = 1, w = 0) | 3.0 | 2.4 | (same) |
+| kyberslash, `message-encode` (d = 1, fixed random w) | 1.2 | 1.8 | (same) |
+
+What this shows:
+- **Early exit is caught on both core types.** With a valid ciphertext the
+  leaky compare scans all 1088 bytes; a random one fails at the first byte.
+  The mean difference is about 970 ticks (≈ 420 ns) on the P-core.
+  `decaps-valid` being clean is also the right answer: there the compare
+  always runs to the end. The leak shows only when *validity* differs,
+  which is exactly what an attacker probing the FO check controls.
+- **The `div` leak depends on the core.** On the E-core, 256 divisions with
+  random dividends of up to 23 bits take on average ≈ 450 ticks longer than
+  with dividend 1664 (all-zero u): about 1.8 ticks per division,
+  |t| ≈ 20 000. On the P-core the same binary shows nothing. Gracemont's
+  divider is operand-dependent for these values; Raptor Cove's apparently
+  is not. "Not detected on my laptop's fast cores" would have been the wrong
+  conclusion: an attacker picks the core.
+- **KyberSlash2 (d = 1) is not detected here**, on either core, at 10⁷
+  samples. Its dividends are below 2¹³, and these dividers seem to have a
+  fixed latency in that range. That is a limit of this machine, not a sign
+  the code is safe: the published KyberSlash2 attacks used other CPUs. The
+  normal build has no `div` anyway, and the phase-4 assembly check forbids
+  it at every optimisation level.
+
+### 5.4 The normal build
+
+| target | what differs between classes | P-core | E-core |
+|---|---|---|---|
+| `aa-ct-eq` (control) | nothing | 1.5 | 1.8 |
+| `ct-eq` | second input equal vs random (1088 B) | 1.5 | 2.1 |
+| `message-encode` | fixed random w vs random w | 2.0 | 1.6 |
+| `message-encode-zero` | w = 0 vs random | 1.8 | 1.9 |
+| `u-encode-zero` | u = 0 vs random (d = 11) | 1.5 | 1.5 |
+| `aa-decaps-ct` (control) | nothing | 1.7 | 2.3 |
+| `decaps-ct` | valid fixed c vs random c (implicit rejection) | 2.1 | 2.2 |
+| `decaps-valid` | fixed valid c vs fresh valid c | 2.1 | 2.0 |
+| `encaps-m` | fixed m vs random m | 2.7 | 2.6 |
+| `aa-keygen-d` (control) | nothing | 1.4 | 2.2 |
+| `keygen-d` | fixed d vs random d | **4519** | **3921** |
+
+Everything is inside its control's range except `keygen-d`, and that one is
+expected.
+
+**KeyGen's timing leak is real, and harmless.** KeyGen computes
+(ρ, σ) = G(d‖k) and then expands the matrix Â from ρ with `SampleNTT`,
+which is *rejection sampling*: it reads 12-bit candidates and throws away
+those ≥ q, so the number of SHAKE128 blocks it needs varies with ρ. A fixed
+d means a fixed ρ and one fixed running time; random d gives varying ones
+(means 43.1 µs vs 47.9 µs on the P-core). But ρ is **public**: it is the
+last 32 bytes of the encapsulation key, so timing reveals something about a
+value everyone already has. FIPS 203 specifies rejection sampling knowing
+this, and phase 4's table lists `sample_ntt` as "not constant time, by
+design". The secret σ only feeds CBD sampling, which takes fixed time. So
+the tester is right to flag it, and the code is right not to care. It is a
+reminder that a dudect "leak" means "the time depends on the input", and a
+human still has to ask *which* input and whether it is secret.
+
+(Encaps and Decaps also call SampleNTT, but with a fixed key ρ is the same
+for both classes, so it does not show.)
+
+### 5.5 Design decisions and alternatives
+
+- **Write the tester instead of using the dudect C code or the
+  `dudect-bencher` crate.** Writing it was the point of the phase, and both
+  would have needed adapting to Windows (timer, pinning) anyway. The
+  statistics are ~180 lines with unit tests (`stats.rs`).
+- **Fixed-vs-random classes**, as in the paper. Alternatives: fixed-vs-fixed
+  (two chosen extreme inputs) is more sensitive for one specific hypothesis,
+  and random-vs-random with a secret-derived label is what real attacks
+  correlate on. Fixed-vs-random needs no hypothesis about *where* the leak
+  is.
+- **RDTSC, not QueryPerformanceCounter.** QPC ticks at 10 MHz here (100 ns),
+  far coarser than the effects measured (< 1 ns per division).
+- **No system tuning** (turbo off, isolated cores, SMT off): that needs
+  admin changes to the laptop. The cost is noise, which the crops and the
+  A/A controls deal with; weak leaks just need more samples.
+- **Max |t| over crops, judged against an A/A control**, instead of a
+  corrected significance level. A Bonferroni-style correction over 101
+  correlated tests would be too conservative; the control measures the
+  actual floor.
+
+### 5.6 What went wrong
+
+This phase was mostly about the harness lying. Four times the tester
+reported a leak in constant-time code. Each was found because an A/A
+control, which by construction cannot leak, also "leaked".
+
+1. **Class-dependent input preparation right before timing.** The first
+   harness copied the fixed input for class 0 and wrote RNG output for
+   class 1, then started the clock while the stores were still draining.
+   A/A |t| up to 122. Fixed with identical preparation and an MFENCE.
+2. **`if class == 0` before timing.** Even with equal work, the branch
+   history differed per class, and that changed the predictions for the
+   timed code's own loops.
+3. **A branchless select still left class-dependent cache and store state.**
+   The fix for 1–3 was canonical dudect batching: generate all inputs first,
+   then time them in a loop with no class-dependent code. A/A fell to
+   about 1.5.
+4. **Batching was not enough on the E-cores.** With 10⁷ samples, the normal
+   build's `ct-eq` gave |t| = 19 on cpus 16, 20 and 24, only in the
+   ≥ 99th-percentile crops, while the P-cores were clean. The A/A control
+   said 1.8, but it was not doing the same work: for class 1 it skipped the
+   RNG call. Once it generated (and threw away) the random input like the
+   real test does, **the A/A control also showed |t| ≈ 11 on the E-cores.**
+   Slots written by different code (a copy of a cached value vs an RNG fill
+   followed by a copy) ended up in different cache states, and the E-cores
+   made that visible (likely through the L2 they share per cluster of four).
+   Fix: copy the whole batch once more with one memcpy and time against the
+   copy. A/A and real targets are now 1.2–3.5 everywhere.
+
+   **This also changed a result.** Before the fix, the KyberSlash build's
+   d = 1 targets showed |t| 11 and 38 on the E-core, and I had them down as
+   detected. After it they are 2.4 and 1.8. Those "detections" were at
+   least partly the artifact: the *normal* build had shown 9.8 on the same
+   target with the old harness.
+
+Lesson: **an A/A control is only valid if it does exactly the same work as
+the real test, with only the data changed.** A control that takes a
+shortcut can be clean while the test is not.
+
+Smaller problems:
+- PowerShell variables are case-insensitive: `$n` inside the script
+  silently overwrote the `$N` parameter, so every run used the same count.
+- The first full run was killed halfway through when the laptop ran low on
+  memory. The script now has `-Resume` and rebuilds `summary.txt` from all
+  result files, recording each run's commit. The normal build was measured
+  at commit 6eff2ac and the leaky builds at d250c07 (a script-only change
+  in between).
+
+### 5.7 Interview questions
+
+**Q1. How does dudect decide whether code is constant time?**
+It times the code on two input classes, a fixed input and random inputs,
+interleaved at random, and runs Welch's t-test on the two timing samples,
+also on the data cropped below many percentiles to cut off the noisy tail.
+If the maximum |t| stays below about 4.5, nothing was detected; above 10,
+the timing depends on the input. It cannot prove constant time, only fail
+to find a difference with n samples.
+
+**Q2. Why Welch's t-test, and why crop?**
+Welch's version does not assume both classes have the same variance, and a
+fixed input usually has a narrower spread than random ones. Cropping,
+because timing distributions have a heavy right tail from interrupts: one
+outlier moves a mean more than the effect being looked for, so testing the
+fast bulk separately is far more sensitive.
+
+**Q3. What is an A/A test and why did you need one?**
+Both classes get identical data through identical code, so any |t| it
+shows comes from the harness, or from taking the maximum over 101 tests.
+It caught four harness bugs that produced false leaks (|t| 11–122) in
+correct code. The last one taught me that the control must do exactly the
+same work as the real test.
+
+**Q4. Your KeyGen "leaks" with |t| over 4000. Is that a vulnerability?**
+No. The time varies because SampleNTT rejection-samples the matrix from ρ,
+and ρ is published in the encapsulation key. KeyGen's A/A control is 1.4,
+so the harness is fine; the dependence is real but on public data, and
+FIPS 203 accepts it. A t-test says *that* the time depends on the input,
+not whether that input is secret.
+
+**Q5. You found KyberSlash on the E-core but not on the P-core. What does
+that tell you?**
+That constant-time evidence is per microarchitecture. The same binary's
+`div` showed |t| ≈ 20 000 on Gracemont and nothing on Raptor Cove, and the
+d = 1 version showed nothing on either, although it was exploited on other
+CPUs. So you avoid variable-latency instructions on secrets by
+construction (checked statically in phase 4), and treat measurements as
+evidence, not proof.

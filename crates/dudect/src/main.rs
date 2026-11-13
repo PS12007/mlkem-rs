@@ -114,12 +114,13 @@ mod app {
 
     /// Generic harness: input type T, fixed context C (keys etc.).
     ///
-    /// Design (the canonical dudect structure, arrived at after two harness
-    /// artifacts, see LEARNING.md section 5): all inputs of a batch are
-    /// generated *first*, into one array; class-0 entries hold their own
-    /// copy of the fixed input. The timed loop then walks the array with no
-    /// class-dependent code at all, so the only thing that differs between
-    /// the classes is the data value of the input.
+    /// Design (the canonical dudect structure plus one extra copy, arrived
+    /// at after four harness artifacts, see LEARNING.md 5.6): all inputs of
+    /// a batch are generated *first*, into one array; class-0 entries hold
+    /// their own copy of the fixed input. The array is copied once more,
+    /// and the timed loop walks that copy with no class-dependent code at
+    /// all, so the only thing that differs between the classes is the data
+    /// value of the input.
     struct Harness<T: Copy, C> {
         desc: &'static str,
         ctx: C,
@@ -162,7 +163,7 @@ mod app {
             //    Step 1 writes class-0 and class-1 slots with different code
             //    (copy of a cached value vs RNG fill then copy), which left
             //    their cache lines in different states: an A/A control on
-            //    E-cores reached |t| ~ 11 without this (LEARNING.md 5.x).
+            //    E-cores reached |t| ~ 11 without this (LEARNING.md 5.6).
             let timed: Vec<T> = self.inputs.clone();
             platform::fence();
             // 3. Time each one. Nothing in this loop depends on the class.
