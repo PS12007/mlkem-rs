@@ -303,3 +303,166 @@ reductions. SampleNTT only ever processes the expansion of ρ, which is part
 of the public key. Its timing can reveal something only about data the
 attacker already has. If someone later fed it secret data, it would become
 a leak, which is why the comment states the assumption explicitly.
+
+---
+
+## Phase 2: Keccak, SHA-3 and SHAKE
+
+Reference: FIPS 202, https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf
+Code: `crates/mlkem/src/hash/`.
+
+### 2.1 What ML-KEM needs hashing for
+
+FIPS 203 §4.1 defines five wrappers, and every one is SHA-3 or SHAKE:
+
+| Wrapper | Definition | Used for |
+|---|---|---|
+| H(s) | SHA3-256(s) | hash of the public key, H(ek), stored in the secret key |
+| J(s) | SHAKE256(s, 256 bits) | the implicit-rejection key K̄ = J(z ‖ c) (phase 3) |
+| G(c) | SHA3-512(c), split into two 32-byte halves | derive (ρ, σ) from d. Derive (K, r) from m ‖ H(ek) |
+| PRF_η(s, b) | SHAKE256(s ‖ b, 64·η bytes) | noise bytes for SamplePolyCBD |
+| XOF | SHAKE128, incremental | expand ρ into the matrix A (SampleNTT) |
+
+In a security proof these play the role of "random oracles": functions
+whose outputs look completely random and unrelated to each other. Using
+four different constructions (or different inputs) keeps the roles
+separate.
+
+### 2.2 The sponge construction
+
+Picture the 1600-bit Keccak state as a sponge with two parts:
+- the **rate** r: the part you pour data into and squeeze output from,
+- the **capacity** c = 1600 − r: never touched directly. It is the hidden
+  part that gives security, about c/2 bits against collisions.
+
+**Absorbing:** XOR r bits of message into the rate part, run the
+permutation f, repeat. **Squeezing:** read r bits, run f, repeat, for as
+long as you want output. That is why SHAKE is an *extendable-output
+function*: it can produce any number of bytes. SampleNTT needs a
+variable amount, because it throws some candidates away.
+
+Choosing r trades speed for security. SHAKE128 has a 168-byte rate
+(c = 256), and SHA3-512 only 72 bytes (c = 1024). The table is in
+`sponge.rs`.
+
+**Padding and domain separation.** After the last message byte we append a
+few *suffix* bits, then "pad10*1": a 1, as many 0s as needed, then a final 1
+at the end of the block. The suffix is `01` for SHA3 and `1111` for SHAKE, so
+the same message hashed by SHA3-256 and by SHAKE256 (same rate, 136 bytes)
+gives unrelated outputs. Bits fill each byte from the least significant end,
+so the suffix plus the first pad bit is the byte **0x06** (SHA3) or **0x1F**
+(SHAKE), and the final pad bit is **0x80** in the last byte of the block.
+If the message ends one byte before the block boundary, both land in the
+same byte: 0x06 ^ 0x80 = 0x86. We test that case for every rate.
+
+### 2.3 Keccak-f[1600]: the permutation
+
+The state is a 5 × 5 grid of 64-bit lanes. A round has five steps, and
+there are 24 rounds:
+
+1. **θ (theta), diffusion across columns.** Each bit is XORed with the
+   parity of two neighbouring columns. One flipped input bit spreads to
+   about 11 bits.
+2. **ρ (rho), diffusion within lanes.** Each lane is rotated by its own
+   fixed amount (the triangular numbers (t+1)(t+2)/2 mod 64 along a walk
+   over the grid).
+3. **π (pi), diffusion across lanes.** The lanes swap positions:
+   (x, y) → (y, 2x + 3y mod 5).
+4. **χ (chi), the only non-linear step.** a ⊕ (¬b ∧ c) along each row.
+   Without a non-linear step, the whole function would be a linear map and
+   easy to invert with algebra.
+5. **ι (iota)** XORs a round constant into one lane, so the rounds are not
+   all identical. That blocks "slide" attacks, which exploit identical
+   rounds.
+
+We do not type in the 24 round constants or the 25 rotation offsets. They
+are **computed at compile time** from FIPS 202's definitions: the 8-bit LFSR
+of Algorithm 5 and the (x, y) walk of Algorithm 2. Then a typo cannot
+hide in a table, and the code shows *where* the numbers come from.
+
+**Constant time.** Keccak uses only XOR, AND, NOT and rotations by constant
+amounts, with no tables indexed by data. It is constant time by design.
+Compare AES in software, whose table lookups (S-boxes) are a classic
+cache-timing leak.
+
+### 2.4 Design decisions and alternatives
+
+- **Typestate: absorbing and squeezing are different types.**
+  `Sponge::finalize(self)` *consumes* the absorbing sponge and returns a
+  `Squeezer`. Absorbing after squeezing would be a bug, and now it does not
+  compile. Alternative: one struct with a runtime flag.
+- **Inputs as `&[&[u8]]`.** FIPS 203 hashes concatenations such as d ‖ k and
+  z ‖ c. Absorbing the pieces one after another is mathematically the same
+  as absorbing the concatenation (tested), and needs no heap (`no_std`).
+- **Two absorb paths.** Whole aligned blocks are XORed in a lane (8 bytes) at
+  a time. Everything else goes byte by byte. Simple, and fast enough. A
+  faster version would also handle unaligned blocks lane by lane, and
+  possibly use the SHA-3 instructions that newer ARM CPUs have.
+- **Not wiping the state afterwards.** After hashing secrets (e.g. G(d ‖ k))
+  the Keccak state left in memory is derived from secrets. Wiping it
+  reliably needs volatile writes, which in Rust means `unsafe` or a crate
+  like `zeroize`. This crate forbids `unsafe`, so phase 4 will decide how to
+  handle zeroisation, and it is listed under Limits.
+
+### 2.5 Testing, and testing the tests
+
+- **Known answers:** SHA3-256("") , SHA3-256("abc") and SHAKE128("", 256)
+  from NIST's published example values.
+- **Differential testing** against RustCrypto (dev-dependency only):
+  - the permutation against `keccak::f1600` on random states;
+  - all four functions on *every* message length from 0 to 505 bytes,
+    which crosses every rate boundary (72, 136, 168) several times;
+  - inputs split at random points;
+  - SHAKE output squeezed in random-size pieces;
+  - SampleNTT on our SHAKE128 against the literal Algorithm 7 on theirs.
+- **Mutation check.** To see whether the tests can fail, I changed the
+  SHAKE suffix from 0x1F to 0x1E (one bit) and re-ran them: **6 of 35
+  tests failed**, which is every test that uses SHAKE. Then I reverted it.
+  A test suite that never fails when you break the code is worthless. This
+  is a quick way to check.
+
+### 2.6 What went wrong
+
+- **The newest `sha3` crate (0.12) no longer contains SHAKE128/256.** The
+  cross-check needs SHAKE, so the dev-dependencies are pinned to `sha3 0.10`
+  and `keccak 0.1`, which are long-established versions with the API
+  `keccak::f1600(&mut [u64; 25])`. I read both crates' source before
+  writing tests against them rather than guessing their APIs.
+- **Leftover files from the mutation run.** proptest saves failing cases to
+  `proptest-regressions/` so it can re-run them. The ones saved while the
+  code was deliberately broken were deleted, not committed.
+
+### 2.7 Interview questions
+
+**Q1. Explain the sponge construction and what the capacity does.**
+A 1600-bit state is split into rate r and capacity c. Absorb: XOR r-bit
+blocks into the state and permute. Squeeze: output r bits at a time,
+permuting in between. The capacity is never directly read or written by
+the user, and generic attacks cost about 2^(c/2). That is why SHAKE128
+(c = 256) gives 128-bit security and SHA3-512 (c = 1024) uses a small rate.
+
+**Q2. Why does ML-KEM use SHAKE128 for matrix generation instead of
+SHA3-256?**
+SampleNTT needs an unknown amount of output, because rejection sampling
+discards about 19% of the 12-bit candidates (4096 − 3329 of every 4096).
+An XOF gives any length from one call. SHAKE128's 168-byte rate is the
+largest available, so it is the fastest per byte. The matrix only needs
+to look random, not to be secret, so 128-bit security is enough.
+
+**Q3. How do SHA3-256 and SHAKE256 avoid colliding when they use the same
+rate?**
+Domain separation: a different suffix (`01` versus `1111`) is appended
+before padding, so the inputs to the permutation always differ in the
+last block.
+
+**Q4. Is your Keccak constant time? How would you argue it?**
+Yes, by construction. The operations are XOR, AND, NOT and fixed rotations.
+The only table, the round constants, is indexed by the round number. Loop
+counts depend only on input *length*, which is public in every ML-KEM use.
+In phase 4 the compiled assembly is checked for branches as well.
+
+**Q5. How did you make sure your tests would actually catch a bug?**
+Differential tests against an independent implementation, at every length
+around the block boundaries, not just random lengths. Then a deliberate
+mutation (one bit of padding changed) to confirm that the suite fails:
+6 of 35 tests did, which is all the SHAKE-dependent ones.
