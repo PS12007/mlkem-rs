@@ -22,7 +22,7 @@ $outFile = Join-Path $results 'asm-check.txt'
 
 $cpu = (Get-CimInstance Win32_Processor | Select-Object -First 1).Name.Trim()
 $commit = (git -C $root rev-parse HEAD).Trim()
-$dirty = if (git -C $root status --porcelain) { ' (uncommitted changes present)' } else { '' }
+$dirty = if (git -C $root status --porcelain --untracked-files=no) { ' (uncommitted changes present)' } else { '' }
 $log = @(
     "# constant-time assembly check",
     "date:    $((Get-Date).ToString('yyyy-MM-dd HH:mm:ss zzz'))",
@@ -71,13 +71,19 @@ $probes = 'barrett_reduce', 'montgomery_reduce', 'fqmul', 'to_canonical', 'csubq
           'decompress_d1', 'message_encode', 'decode12', 'cbd_eta2', 'cbd_eta3',
           'is_zero_mask', 'ct_eq_32', 'ct_eq_1088', 'ct_select_32', 'keccak_f1600'
 Push-Location $root
-$list = if ($SkipShowAsm) { @() } else { cmd /c "cargo asm -p mlkem --lib --release --features hazmat --intel mlkem::hazmat:: 2>&1" }
+$showAsm = 'cargo asm -p mlkem --lib --release --features hazmat --intel --simplify'
 foreach ($p in $(if ($SkipShowAsm) { @() } else { $probes })) {
-    # cargo-show-asm matches by substring and lists candidates with an index.
-    $line = $list | Select-String -Pattern "^\s*(\d+) `"mlkem::hazmat::$p`"" | Select-Object -First 1
-    if (-not $line) { $log += "cargo-show-asm: probe $p not found"; $failed = $true; continue }
-    $idx = $line.Matches[0].Groups[1].Value
-    $asm = cmd /c "cargo asm -p mlkem --lib --release --features hazmat --intel --simplify mlkem::hazmat::$p $idx 2>nul"
+    # cargo-show-asm matches by substring. If several functions match (e.g.
+    # compress_d1 also matches compress_d10), it prints a numbered list
+    # instead of code, and the number is the position in THAT list.
+    $asm = cmd /c "$showAsm mlkem::hazmat::$p 2>&1"
+    if ($asm -match 'Try one of those') {
+        $line = $asm | Select-String -Pattern "^\s*(\d+) `"mlkem::hazmat::$p`"" | Select-Object -First 1
+        if (-not $line) { $log += "cargo-show-asm: probe $p not found"; $failed = $true; continue }
+        $asm = cmd /c "$showAsm mlkem::hazmat::$p $($line.Matches[0].Groups[1].Value) 2>&1"
+    }
+    $asm = $asm | Where-Object { $_ -notmatch '^\s*(Compiling|Finished|Blocking|warning: )' }
+    if (-not ($asm -match 'ret')) { $log += "cargo-show-asm: no code for $p"; $failed = $true }
     [IO.File]::WriteAllText((Join-Path $asmDir "$p.s"), (($asm -join "`n") + "`n"), (New-Object Text.UTF8Encoding $false))
 }
 Pop-Location
