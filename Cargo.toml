@@ -1,0 +1,20 @@
+[workspace]
+resolver = "3"
+members = ["crates/mlkem"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.85"
+license = "MIT"
+repository = "https://github.com/PS12007/mlkem-rs"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+# The arithmetic tests are exhaustive (they try every possible input, about
+# 2^28 values for Montgomery reduction). opt-level 2 makes that take seconds
+# instead of minutes. Overflow checks stay ON in the test profile, so any
+# i16/i32 overflow in our bound reasoning makes a test panic instead of
+# silently wrapping.
+[profile.test]
+opt-level = 2

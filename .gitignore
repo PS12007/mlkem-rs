@@ -1,0 +1,4 @@
+﻿/target/
+# Local copies of reference documents (e.g. the FIPS 203 PDF). Not ours to redistribute.
+/refs/
+*.pdb
