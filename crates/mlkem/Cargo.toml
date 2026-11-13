@@ -20,6 +20,12 @@ workspace = true
 # Exposes internal building blocks as separate, non-inlined functions, for
 # the assembly check and the timing harness. Off by default; NOT an API.
 hazmat = []
+# DELIBERATELY INSECURE variants, used only to validate the timing-leak
+# tester (phase 5). Never enable these for anything else.
+# Compress divides by q with a real `div` instruction (KyberSlash).
+leaky-kyberslash = []
+# The FO re-encryption check compares ciphertexts with an early exit.
+leaky-early-exit = []
 
 [dev-dependencies]
 keccak = "0.1"

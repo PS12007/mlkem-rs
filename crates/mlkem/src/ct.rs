@@ -38,6 +38,7 @@ pub(crate) fn is_zero_mask_u32(x: u32) -> u32 {
 /// stop at the first difference, and the time it takes then leaks *where*
 /// the strings first differ. Phase 3 uses this function for the FO
 /// re-encryption check in decapsulation.
+#[cfg(not(feature = "leaky-early-exit"))]
 pub(crate) fn ct_eq_bytes(a: &[u8], b: &[u8]) -> u8 {
     assert_eq!(a.len(), b.len(), "lengths are public and must match");
     let mut acc = 0u8;
@@ -45,6 +46,23 @@ pub(crate) fn ct_eq_bytes(a: &[u8], b: &[u8]) -> u8 {
         acc |= x ^ y; // stays 0 only if every byte pair is equal
     }
     is_zero_mask_u32(u32::from(acc)) as u8
+}
+
+/// **DELIBERATELY LEAKY** comparison, for validating the timing tester only
+/// (feature `leaky-early-exit`): returns at the first differing byte, like
+/// `memcmp` or a naive loop. Its running time reveals *where* the two
+/// inputs first differ. In Decaps, that tells an attacker whether
+/// re-encryption matched, which is exactly the signal the FO transform
+/// relies on hiding.
+#[cfg(feature = "leaky-early-exit")]
+pub(crate) fn ct_eq_bytes(a: &[u8], b: &[u8]) -> u8 {
+    assert_eq!(a.len(), b.len(), "lengths are public and must match");
+    for (x, y) in a.iter().zip(b) {
+        if x != y {
+            return 0x00;
+        }
+    }
+    0xFF
 }
 
 /// Writes `a` into `out` if `mask == 0xFF`, or `b` if `mask == 0x00`.

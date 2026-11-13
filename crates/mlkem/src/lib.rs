@@ -56,6 +56,17 @@ mod zeroize;
 
 #[cfg(windows)]
 pub use rng::OsRng;
+
+/// Names of the deliberately leaky features compiled into this build (empty
+/// in any normal build). The timing harness prints these so a leaky build
+/// can never be mistaken for the real one.
+#[doc(hidden)]
+pub const LEAKY_FEATURES: &[&str] = &[
+    #[cfg(feature = "leaky-kyberslash")]
+    "leaky-kyberslash",
+    #[cfg(feature = "leaky-early-exit")]
+    "leaky-early-exit",
+];
 pub use rng::RandomSource;
 
 use core::fmt;

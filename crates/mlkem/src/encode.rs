@@ -18,6 +18,7 @@ use crate::poly::Poly;
 /// The error term is below 2^23·q/(q·2^40) = 2^−17. The fractional part of
 /// n/q is never in (1 − 1/q, 1), because 1/q ≈ 2^−11.7 is much bigger than
 /// 2^−17. So adding the error never crosses an integer.
+#[cfg_attr(feature = "leaky-kyberslash", allow(dead_code))]
 const COMPRESS_M: u64 = (1u64 << 40).div_ceil(Q32 as u64);
 
 /// Compress_d (eq. 4.7): x ↦ ⌈(2^d / q) · x⌋ mod 2^d, for 1 ≤ d ≤ 11.
@@ -34,12 +35,32 @@ const COMPRESS_M: u64 = (1u64 << 40).div_ceil(Q32 as u64);
 /// ⌊2^d·x/q + 1/2⌋ = ⌊(2^d·x + (q−1)/2) / q⌋. Exact ties cannot happen,
 /// because 2^d·x/q = k + 1/2 would mean 2^(d+1)·x = (2k+1)·q, an even number
 /// equal to an odd one.
+#[cfg(not(feature = "leaky-kyberslash"))]
 #[inline]
 pub(crate) fn compress(x: u16, d: u32) -> u16 {
     debug_assert!((1..=11).contains(&d) && x < Q as u16);
     let n = (u64::from(x) << d) + (Q32 as u64 - 1) / 2; // 2^d·x + 1664 < 2^23
     let quotient = (n * COMPRESS_M) >> 40; // = ⌊n / q⌋, no division
     (quotient as u16) & ((1u16 << d) - 1) // mod 2^d
+}
+
+/// **DELIBERATELY LEAKY** Compress_d, for validating the timing tester only
+/// (feature `leaky-kyberslash`). This is the shape of the code KyberSlash
+/// found in the Kyber reference implementation: `(x << d) + q/2` divided
+/// by q, on secret x.
+///
+/// A compiler turns division by the *constant* 3329 into a multiply and
+/// shift whenever it can, so the divisor goes through `black_box`: the
+/// compiler can no longer see that it is constant and must emit a real
+/// `div` instruction. That is what happened on the platforms and
+/// optimisation levels where KyberSlash was exploitable.
+#[cfg(feature = "leaky-kyberslash")]
+#[inline]
+pub(crate) fn compress(x: u16, d: u32) -> u16 {
+    debug_assert!((1..=11).contains(&d) && x < Q as u16);
+    let n = (u32::from(x) << d) + (Q32 as u32 - 1) / 2;
+    let q = core::hint::black_box(Q32 as u32);
+    ((n / q) as u16) & ((1u16 << d) - 1)
 }
 
 /// Decompress_d (eq. 4.8): y ↦ ⌈(q / 2^d) · y⌋ = ⌊(q·y + 2^(d−1)) / 2^d⌋.
