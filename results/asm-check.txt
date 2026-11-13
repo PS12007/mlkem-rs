@@ -1,0 +1,980 @@
+# constant-time assembly check
+date:    2026-11-13 03:53:34 -05:00
+commit:  f06428e382a5039179b0b751bdfed070885f7479
+rustc:   rustc 1.99.1 (58cf8f9c3 2026-10-13)
+target:  x86_64-pc-windows-msvc
+cpu:     Intel(R) Core(TM) i7-14700HX (only relevant for target-cpu=native; we use the default x86-64 baseline)
+
+## opt-level=0: mlkem-a3b6f66d734aebca.s, 412 functions
+
+### div/idiv instructions (all functions)
+- core::slice::chunks_exact::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+- q::core::slice::iter::ChunksExact::iter::traits::iterator::Iterator::size_hint::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+
+### hazmat probes (own code + everything called)
+probe              class  insns  div  jcc  cmov  setcc  callees
+barrett_reduce     leaf      13    0    0     0      0  mlkem::field::barrett_reduce
+cbd_eta2           loop     186    0    8     0      0  mlkem::sample::sample_poly_cbd, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, core::iter::range::Step::forward_unchecked::mlkem, memcpy
+cbd_eta3           loop     186    0    8     0      0  mlkem::sample::sample_poly_cbd, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, core::iter::range::Step::forward_unchecked::mlkem, memcpy
+compress_d1        leaf      22    0    0     0      0  mlkem::encode::compress
+compress_d10       leaf      22    0    0     0      0  mlkem::encode::compress
+compress_d11       leaf      22    0    0     0      0  mlkem::encode::compress
+compress_d4        leaf      22    0    0     0      0  mlkem::encode::compress
+compress_d5        leaf      22    0    0     0      0  mlkem::encode::compress
+csubq              leaf      12    0    0     0      0  mlkem::field::csubq
+ct_eq_1088         loop     266    0    4     1      0  core::hint::black_box::mlkem, _RINvNtCs7uUmbfRqPp3_4core9panicking13assert_failedjjEB4_, core::slice::iter::Iter::iter::traits::iterator::Iterator::zip::mlkem, core::slice::iter::mlkem, _NtC::core::fmt::Arguments::from_str::mlkem, _NtN::core::slice::iter::Iter::new::mlkem, mlkem::ct::ct_eq_bytes, mlkem::ct::is_zero_mask_u32, core::iter::traits::collect::adapters::zip::Zip::slice::iter::Iter::IntoIterator::into_iter::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::size_hint::mlkem, q_::core::ops::bit::BitXor::bitxor::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::next::mlkem, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, core::iter::adapters::zip::Zip::slice::iter::Iter::traits::iterator::Iterator::next::mlkem, core::slice::iter::Iter::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::cmp::Ord::min::mlkem, memcpy
+ct_eq_32           loop     266    0    4     1      0  core::hint::black_box::mlkem, _RINvNtCs7uUmbfRqPp3_4core9panicking13assert_failedjjEB4_, core::slice::iter::Iter::iter::traits::iterator::Iterator::zip::mlkem, core::slice::iter::mlkem, _NtC::core::fmt::Arguments::from_str::mlkem, _NtN::core::slice::iter::Iter::new::mlkem, mlkem::ct::ct_eq_bytes, mlkem::ct::is_zero_mask_u32, core::iter::traits::collect::adapters::zip::Zip::slice::iter::Iter::IntoIterator::into_iter::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::size_hint::mlkem, q_::core::ops::bit::BitXor::bitxor::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::next::mlkem, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, core::iter::adapters::zip::Zip::slice::iter::Iter::traits::iterator::Iterator::next::mlkem, core::slice::iter::Iter::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::cmp::Ord::min::mlkem, memcpy
+ct_select_32       loop     426    0    5     1      0  core::hint::black_box::mlkem, core::slice::iter::IterMut::iter::traits::iterator::Iterator::zip::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::zip::mlkem, core::slice::iter_mut::mlkem, core::slice::iter::IterMut::new::mlkem, mlkem::ct::ct_select_bytes, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, core::iter::traits::collect::adapters::zip::Zip::slice::iter::IterMut::Iter::IntoIterator::into_iter::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::size_hint::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::size_hint::mlkem, _N::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::get_unchecked::mlkem, o_::core::ops::bit::BitXor::bitxor::mlkem, q_::core::ops::bit::BitXor::bitxor::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::next::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::size_hint::mlkem, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::next::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::size_hint::mlkem, core::slice::iter::Iter::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::slice::iter::IterMut::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::TrustedRandomAccessNoCoerce::size::mlkem, core::cmp::Ord::min::mlkem, memcpy
+decaps_768         loop    6750    0  212    25      4  <indirect>, _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::array, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1sNvNtC5mlkem5field12to_canonica, core::array, core::array, core::array, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuitsENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode13poly_dec, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuitsENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode22poly_dec, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode20poly_com, mlkem::hash::absorb_all, mlkem::hash::absorb_all, mlkem::kpke::inner_product_ntt::encrypt, mlkem::kpke::inner_product_ntt::encrypt, mlkem::sample::sample_ntt::hash::Shake128Reader, mlkem::zeroize::wipe, mlkem::zeroize::wipe, mlkem::zeroize::wipe, core::intrinsics::rotate_left::mlkem, core::ptr::drop_glue::array::iter::IntoIter, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode_decompress, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode, core::ptr::drop_glue::mlkem::hash::sponge::Sponge, core::ptr::drop_glue::mlkem::hash::sponge::Sponge, core::ptr::drop_glue::mlkem::hash::sponge::Sponge, core::ptr::drop_glue::mlkem::hash::sponge::Squeezer, core::ptr::drop_glue::mlkem::hash::sponge::Squeezer, core::ptr::drop_glue::mlkem::hash::sponge::Squeezer, core::ptr::drop_glue::mlkem::hash::Shake128Reader, core::hint::black_box::mlkem, core::hint::black_box::mlkem, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_decode12, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_decode_decompress, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::field::to_canonical, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_compress_encode, _RINvNtCs7uUmbfRqPp3_4core9panicking13assert_failedjjEB4_, core::slice::raw::from_mut::mlkem::poly::Poly, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, core::slice::iter::Iter::iter::traits::iterator::Iterator::zip::mlkem, core::slice::iter::IterMut::iter::traits::iterator::Iterator::zip::mlkem, core::slice::iter::IterMut::iter::traits::iterator::Iterator::zip::ChunksExact::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::zip::mlkem, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode_decompress, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode, mlkem::kpke::encrypt, mlkem::kpke::encrypt, mlkem::encode::poly_decode12, mlkem::encode::poly_compress_encode, mlkem::encode::poly_decode_decompress, mlkem::sample::sample_poly_cbd, mlkem::hash::Shake128, mlkem::hash::Shake128, mlkem::hash::Shake128, mlkem::poly::Poly::add, mlkem::poly::Poly::sub, mlkem::poly::Poly::reduce, mlkem::poly::Poly::canonical, mlkem::params::Params::dk_pke_len, mlkem::params::Params::ct_len, mlkem::params::Params::dk_len, mlkem::params::Params::ek_len, core::slice::chunks_exact::mlkem, core::slice::split_at_unchecked::mlkem, core::slice::iter::mlkem, core::slice::iter_mut::mlkem, core::slice::split_at::mlkem, core::slice::iter_mut::mlkem, core::slice::iter_mut::mlkem, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge::_E6absor, mlkem::hash::sponge::Sponge::_E8final, mlkem::hash::sponge::Sponge::_E8xor_b, _NtC::core::fmt::Arguments::from_str::mlkem, _NtN::core::slice::iter::Iter::new::mlkem, _NtC4co::num::from_le_bytes::mlkem, _NtNtNtC::core::array::iter::iter_inner::PolymorphicIter::mem::maybe_uninit::MaybeUninit::next::mlkem, mlkem::hash::sponge::Squeezer, mlkem::hash::sponge::Squeezer, mlkem::hash::sponge::Squeezer::_E7squee, core::slice::iter::IterMut::new::mlkem, core::slice::iter::IterMut::new::mlkem, core::slice::iter::IterMut::new::mlkem, mlkem::ct::ct_eq_bytes, mlkem::ct::ct_select_bytes, mlkem::ct::is_zero_mask_u32, mlkem::kem::decaps_internal, mlkem::ntt::ntt_inverse, mlkem::ntt::multiply_ntts, mlkem::ntt::base_case_multiply, mlkem::ntt::ntt, mlkem::hash::g, mlkem::hash::j, mlkem::hash::prf, mlkem::hash::xof, mlkem::hash::sha3_512, mlkem::hash::shake256, mlkem::kpke::matrix_entry, mlkem::kpke::sample_noise, mlkem::kpke::decrypt, mlkem::kpke::encrypt, mlkem::poly::wipe_polys, mlkem::field::to_canonical, mlkem::field::barrett_reduce, mlkem::field::montgomery_reduce, mlkem::field::csubq, mlkem::field::fqmul, mlkem::encode::decompress, mlkem::encode::byte_decode, mlkem::encode::byte_encode, mlkem::encode::poly_decode12, mlkem::encode::poly_compress_encode, mlkem::encode::poly_decode_decompress, mlkem::encode::compress, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core6result13unwrap_failed, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtCs7uUmbfRqPp3_4core9panicking9panic_fmt, mlkem::hash::keccak::f1600, core::sync::atomic::compiler_fence::mlkem, _RNvNtNtCs7uUmbfRqPp3_4core5slice5index16slice_index_fail, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const23panic_const_div_by_zero, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const23panic_const_rem_by_zero, core::iter::traits::collect::adapters::zip::Zip::slice::iter::IterMut::Iter::IntoIterator::into_iter::mlkem, core::iter::traits::collect::adapters::zip::Zip::slice::iter::Iter::IntoIterator::into_iter::mlkem, core::iter::traits::collect::adapters::zip::Zip::slice::iter::IterMut::ChunksExact::IntoIterator::into_iter::mlkem, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, core::iter::traits::collect::slice::iter::ChunksExact::IntoIterator::into_iter::mlkem, core::iter::traits::collect::slice::iter::IterMut::IntoIterator::into_iter::mlkem, core::iter::traits::collect::slice::iter::IterMut::IntoIterator::into_iter::mlkem, core::iter::traits::collect::slice::iter::IterMut::IntoIterator::into_iter::mlkem, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge::_ENtNtNt::core::ops::drop::Drop::drop, core::array::iter::_NtNtNtNt4iter6tra::collect::IntoIterator::into_iter::mlkem, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical::function::FnMut::call_mut, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12::function::FnMut::call_mut, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode_decompress::function::FnMut::call_mut, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode::function::FnMut::call_mut, core::slice::iter::mlkem::poly::Poly::iter::traits::collect::IntoIterator::into_iter, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, _::mlkem::hash::sponge::Squeezer, _::mlkem::hash::sponge::Squeezer, _::mlkem::hash::sponge::Squeezer::_ENtNtNt::core::ops::drop::Drop::drop, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical::drop::Drop::drop, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12::drop::Drop::drop, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode_decompress::drop::Drop::drop, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode::drop::Drop::drop, q::core::slice::iter::ChunksExact::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, q::core::slice::iter::ChunksExact::iter::traits::iterator::Iterator::next::mlkem, q::core::slice::iter::ChunksExact::iter::traits::iterator::Iterator::size_hint::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::next::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::next::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::size_hint::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::next::mlkem, Q_::core::slice::iter::IterMut::mlkem::poly::Poly::iter::traits::iterator::Iterator::next, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::size_hint::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::size_hint::mlkem, _N::core::slice::index::ops::range::Range::SliceIndex::index_mut::mlkem, _N::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::get_unchecked::mlkem, o_::core::ops::bit::BitXor::bitxor::mlkem, q_::core::ops::bit::BitXor::bitxor::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _Nt::core::array::iter::IntoIter::_ENtNtNtNt4iter6tr::iterator::Iterator::next::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::next::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::next::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::size_hint::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::ChunksExact::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::ChunksExact::ZipImpl::next::mlkem, _NtC::core::convert::TryInto, _NtC::core::convert::TryInto::_E8try_i::mlkem, _NtC::core::convert::TryInto, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, _NtN::core::slice::index::ops::range::RangeTo::SliceIndex::index_mut::mlkem, _NtC4::array::_INtNt7convert7TryFr::try_from::mlkem, _NtC4::array::_INtNt7c::TryFrom::try_from::mlkem, _NtNt::core::array::iter::IntoIter::_ENtNtNt3ops4drop4::drop::mlkem, _NtNt::core::slice::index::ops::range::RangeFrom::SliceIndex::index::mlkem, _NtNt::core::slice::index::ops::range::RangeFrom::SliceIndex::index_mut::mlkem, _NtC4co::array::_INtNt7convert7TryFr::try_from::mlkem, core::iter::range::Step::forward_unchecked::mlkem, mlkem::hash::Shake128Reader::sample::XofReader::squeeze, core::ops::try_trait::NeverShortCircuit, core::ops::try_trait::NeverShortCircuit, core::ops::try_trait::NeverShortCircuit::Try::branch::mlkem, core::ops::try_trait::NeverShortCircuit::Try::branch::mlkem, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::next::mlkem, core::iter::adapters::zip::Zip::slice::iter::Iter::traits::iterator::Iterator::next::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::size_hint::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::ChunksExact::traits::iterator::Iterator::next::mlkem, core::array, core::array, core::array, core::array, core::array::ops::index::IndexMut::range::RangeTo::index_mut::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::slice::iter::ChunksExact::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::slice::iter::Iter::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::slice::iter::IterMut::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::slice::iter::IterMut::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::TrustedRandomAccessNoCoerce::size::mlkem, mlkem::field::to_canonical::core::ops::function::FnMut::call_mut, core::cmp::Ord::min::mlkem, __chkstk, memcpy, memset
+                   note: indirect jump in core::sync::atomic::compiler_fence::mlkem reviewed: opt-level 0 only: jump table on the Ordering argument, which our zeroize::wipe always passes as the constant SeqCst
+decode12           loop     461    0   15     2      4  _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::array, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuitsENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode13poly_dec, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_decode12, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12, mlkem::encode::poly_decode12, mlkem::field::csubq, mlkem::encode::byte_decode, mlkem::encode::poly_decode12, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12::function::FnMut::call_mut, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12::drop::Drop::drop, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, core::ops::try_trait::NeverShortCircuit, core::ops::try_trait::NeverShortCircuit::Try::branch::mlkem, core::array, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem, memcpy, memset
+decompress_d1      leaf      22    0    0     0      0  mlkem::encode::decompress
+fqmul              leaf      21    0    0     0      0  mlkem::field::montgomery_reduce, mlkem::field::fqmul
+is_zero_mask       leaf      20    0    0     0      0  core::hint::black_box::mlkem, mlkem::ct::is_zero_mask_u32
+keccak_f1600       loop     690    0   29     0      0  core::intrinsics::rotate_left::mlkem, core::ptr::drop_glue::array::iter::IntoIter, _NtNtNtC::core::array::iter::iter_inner::PolymorphicIter::mem::maybe_uninit::MaybeUninit::next::mlkem, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, mlkem::hash::keccak::f1600, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, core::array::iter::_NtNtNtNt4iter6tra::collect::IntoIterator::into_iter::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _Nt::core::array::iter::IntoIter::_ENtNtNtNt4iter6tr::iterator::Iterator::next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, _NtNt::core::array::iter::IntoIter::_ENtNtNt3ops4drop4::drop::mlkem, core::iter::range::Step::forward_unchecked::mlkem, memcpy
+message_encode     loop     647    0   14     1      4  _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::array, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1sNvNtC5mlkem5field12to_canonica, core::array, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode20poly_com, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::field::to_canonical, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_compress_encode, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode, mlkem::encode::poly_compress_encode, mlkem::poly::Poly::canonical, mlkem::field::to_canonical, mlkem::encode::byte_encode, mlkem::encode::poly_compress_encode, mlkem::encode::compress, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical::function::FnMut::call_mut, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode::function::FnMut::call_mut, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical::drop::Drop::drop, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode::drop::Drop::drop, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::next::mlkem, core::ops::try_trait::NeverShortCircuit, core::ops::try_trait::NeverShortCircuit::Try::branch::mlkem, core::array, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem, mlkem::field::to_canonical::core::ops::function::FnMut::call_mut, memcpy, memset
+montgomery_reduce  leaf      13    0    0     0      0  mlkem::field::montgomery_reduce
+multiply_ntts      loop     276    0    9     0      0  mlkem::ntt::multiply_ntts, mlkem::ntt::base_case_multiply, mlkem::field::montgomery_reduce, mlkem::field::fqmul, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, core::iter::range::Step::forward_unchecked::mlkem, memcpy
+ntt                loop     259    0   11     1      0  mlkem::poly::Poly::reduce, mlkem::ntt::ntt, mlkem::field::barrett_reduce, mlkem::field::montgomery_reduce, mlkem::field::fqmul, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, core::iter::range::Step::forward_unchecked::mlkem, core::array, memcpy
+ntt_inverse        loop     286    0   12     1      0  core::slice::iter_mut::mlkem, core::slice::iter::IterMut::new::mlkem, mlkem::ntt::ntt_inverse, mlkem::field::barrett_reduce, mlkem::field::montgomery_reduce, mlkem::field::fqmul, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, core::iter::traits::collect::slice::iter::IterMut::IntoIterator::into_iter::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, core::iter::range::Step::forward_unchecked::mlkem, memcpy
+to_canonical       leaf      11    0    0     0      0  mlkem::field::to_canonical
+
+### conditional branches in loop probes, for review
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #8: movq %rax, 64(%rsp); cmpq %rax, %rdx ; jae .LBB70_2
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #7: movq %rcx, 88(%rsp); cmpq $2, %rdx ; je .LBB219_2
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #10: movq 72(%rsp), %rax; cmpq $3, %rax ; jne .LBB219_3
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #15: shlq $6, %rcx; cmpq %rcx, %rax ; je .LBB219_4
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #40: movq %rdx, 648(%rsp); testq $1, 640(%rsp) ; je .LBB219_7
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #64: movq %rdx, 688(%rsp); testq $1, 680(%rsp) ; je .LBB219_10
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #95: movw %cx, 38(%rsp); cmpq $256, %rax ; jae .LBB219_12
+- cbd_eta2 [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB288_2
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #8: movq %rax, 64(%rsp); cmpq %rax, %rdx ; jae .LBB70_2
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #7: movq %rcx, 88(%rsp); cmpq $2, %rdx ; je .LBB219_2
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #10: movq 72(%rsp), %rax; cmpq $3, %rax ; jne .LBB219_3
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #15: shlq $6, %rcx; cmpq %rcx, %rax ; je .LBB219_4
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #40: movq %rdx, 648(%rsp); testq $1, 640(%rsp) ; je .LBB219_7
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #64: movq %rdx, 688(%rsp); testq $1, 680(%rsp) ; je .LBB219_10
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #95: movw %cx, 38(%rsp); cmpq $256, %rax ; jae .LBB219_12
+- cbd_eta3 [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB288_2
+- ct_eq_1088 [mlkem::ct::ct_eq_bytes] #9: movq 96(%rsp), %rax; cmpq 104(%rsp), %rax ; je .LBB156_2
+- ct_eq_1088 [mlkem::ct::ct_eq_bytes] #54: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB156_5
+- ct_eq_1088 [_Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::next::mlkem] #4: movq 32(%rcx), %rax; cmpq 40(%rcx), %rax ; jb .LBB294_2
+- ct_eq_1088 [core::cmp::Ord::min::mlkem] #6: movq 8(%rsp), %rax; cmpq (%rsp), %rax ; jb .LBB392_2
+- ct_eq_32 [mlkem::ct::ct_eq_bytes] #9: movq 96(%rsp), %rax; cmpq 104(%rsp), %rax ; je .LBB156_2
+- ct_eq_32 [mlkem::ct::ct_eq_bytes] #54: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB156_5
+- ct_eq_32 [_Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::next::mlkem] #4: movq 32(%rcx), %rax; cmpq 40(%rcx), %rax ; jb .LBB294_2
+- ct_eq_32 [core::cmp::Ord::min::mlkem] #6: movq 8(%rsp), %rax; cmpq (%rsp), %rax ; jb .LBB392_2
+- ct_select_32 [mlkem::ct::ct_select_bytes] #12: movq %rax, 120(%rsp); cmpq %r9, %rdx ; je .LBB157_2
+- ct_select_32 [mlkem::ct::ct_select_bytes] #21: movq 112(%rsp), %rcx; cmpq %rcx, %rax ; jne .LBB157_1
+- ct_select_32 [mlkem::ct::ct_select_bytes] #58: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB157_6
+- ct_select_32 [_Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::next::mlkem] #6: movq 64(%rdx), %rax; cmpq 72(%rdx), %rax ; jb .LBB292_2
+- ct_select_32 [core::cmp::Ord::min::mlkem] #6: movq 8(%rsp), %rax; cmpq (%rsp), %rax ; jb .LBB392_2
+- decode12 [core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_decode12] #10: movq -24(%rbp), %rax; cmpq -32(%rbp), %rax ; jb .LBB49_3
+- decode12 [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #9: movq %rax, 56(%rsp); testq %rax, %rax ; je .LBB55_2
+- decode12 [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #13: movq 56(%rsp), %rax; subq $1, %rax ; je .LBB55_3
+- decode12 [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #35: jmp .LBB55_7; testb $1, 71(%rsp) ; jne .LBB55_7
+- decode12 [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #45: movq %rax, 32(%rsp); testq %rax, %rax ; je .LBB55_9
+- decode12 [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #49: movq 32(%rsp), %rax; subq $1, %rax ; je .LBB55_10
+- decode12 [mlkem::encode::byte_decode] #10: callq _RINvMs8_NtNtCs7uUmbfRqPp3_4core3ops5rangeINtB6_14RangeInclusivemE8containsmECs1fbCSMqc7dC_5mlkem; testb $1, %al ; jne .LBB188_2
+- decode12 [mlkem::encode::byte_decode] #20: shlq $5, %rcx; cmpq %rcx, %rax ; jne .LBB188_1
+- decode12 [mlkem::encode::byte_decode] #47: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB188_6
+- decode12 [mlkem::encode::byte_decode] #52: jmp .LBB188_11; cmpl $12, 100(%rsp) ; je .LBB188_8
+- decode12 [mlkem::encode::byte_decode] #73: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB188_7
+- decode12 [mlkem::encode::byte_decode] #84: movl 620(%rsp), %eax; cmpl 100(%rsp), %eax ; jb .LBB188_13
+- decode12 [mlkem::encode::byte_decode] #102: movq %rax, 32(%rsp); cmpq %rcx, %rax ; jae .LBB188_15
+- decode12 [Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem] #9: movq 16(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB273_3
+- decode12 [core::ops::range::RangeInclusive::RangeboundC::mlkem] #3: movq %rcx, (%rsp); testb $1, 8(%rcx) ; jne .LBB363_2
+- keccak_f1600 [_NtNtNtC::core::array::iter::iter_inner::PolymorphicIter::mem::maybe_uninit::MaybeUninit::next::mlkem] #6: subq (%rcx), %rax; cmpq $0, %rax ; ja .LBB146_2
+- keccak_f1600 [mlkem::hash::keccak::f1600] #28: movq %rax, 808(%rbp); testq $1, 800(%rbp) ; je .LBB221_5
+- keccak_f1600 [mlkem::hash::keccak::f1600] #64: movq %rax, 888(%rbp); testq $1, 880(%rbp) ; je .LBB221_10
+- keccak_f1600 [mlkem::hash::keccak::f1600] #68: movq %rax, 312(%rbp); cmpq $25, %rax ; jb .LBB221_63
+- keccak_f1600 [mlkem::hash::keccak::f1600] #93: movq %rax, 920(%rbp); testq $1, 912(%rbp) ; je .LBB221_15
+- keccak_f1600 [mlkem::hash::keccak::f1600] #102: movq 272(%rbp), %rax; cmpq $5, %rax ; jb .LBB221_49
+- keccak_f1600 [mlkem::hash::keccak::f1600] #142: movq %rax, 1264(%rbp); testq $1, 1256(%rbp) ; je .LBB221_20
+- keccak_f1600 [mlkem::hash::keccak::f1600] #151: movq 216(%rbp), %rax; cmpq $25, %rax ; jb .LBB221_43
+- keccak_f1600 [mlkem::hash::keccak::f1600] #176: movq %rax, 1600(%rbp); testq $1, 1592(%rbp) ; je .LBB221_25
+- keccak_f1600 [mlkem::hash::keccak::f1600] #207: movq %rax, 1632(%rbp); testq $1, 1624(%rbp) ; je .LBB221_22
+- keccak_f1600 [mlkem::hash::keccak::f1600] #215: movq %rax, 136(%rbp); cmpq $25, %rax ; jae .LBB221_31
+- keccak_f1600 [mlkem::hash::keccak::f1600] #225: movq 128(%rbp), %rax; cmpq $5, %rax ; jb .LBB221_33
+- keccak_f1600 [mlkem::hash::keccak::f1600] #241: movq %rax, 112(%rbp); cmpq $25, %rax ; jb .LBB221_35
+- keccak_f1600 [mlkem::hash::keccak::f1600] #259: movq 128(%rbp), %rax; cmpq $5, %rax ; jb .LBB221_37
+- keccak_f1600 [mlkem::hash::keccak::f1600] #274: movq %rax, 96(%rbp); cmpq $25, %rax ; jb .LBB221_39
+- keccak_f1600 [mlkem::hash::keccak::f1600] #292: movq %rax, 88(%rbp); cmpq $25, %rax ; jb .LBB221_41
+- keccak_f1600 [mlkem::hash::keccak::f1600] #317: movq %rax, 72(%rbp); cmpq $25, %rax ; jb .LBB221_45
+- keccak_f1600 [mlkem::hash::keccak::f1600] #341: movq %rcx, 64(%rbp); cmpq $25, %rax ; jb .LBB221_47
+- keccak_f1600 [mlkem::hash::keccak::f1600] #363: movq %rax, 48(%rbp); cmpq $5, %rax ; jb .LBB221_51
+- keccak_f1600 [mlkem::hash::keccak::f1600] #380: movq 272(%rbp), %rax; cmpq $5, %rax ; jb .LBB221_53
+- keccak_f1600 [mlkem::hash::keccak::f1600] #392: movq %rax, 32(%rbp); cmpq $5, %rax ; jb .LBB221_55
+- keccak_f1600 [mlkem::hash::keccak::f1600] #437: movq %rax, 1032(%rbp); testq $1, 1024(%rbp) ; je .LBB221_12
+- keccak_f1600 [mlkem::hash::keccak::f1600] #443: movq %rax, -16(%rbp); cmpq $25, %rax ; jae .LBB221_62
+- keccak_f1600 [mlkem::hash::keccak::f1600] #463: movq %rax, -24(%rbp); cmpq $25, %rax ; jb .LBB221_65
+- keccak_f1600 [mlkem::hash::keccak::f1600] #480: movq %rax, -40(%rbp); cmpq $25, %rax ; jb .LBB221_67
+- keccak_f1600 [mlkem::hash::keccak::f1600] #497: movq %rax, -56(%rbp); cmpq $25, %rax ; jb .LBB221_69
+- keccak_f1600 [mlkem::hash::keccak::f1600] #514: movq %rax, -72(%rbp); cmpq $25, %rax ; jb .LBB221_71
+- keccak_f1600 [mlkem::hash::keccak::f1600] #528: movq %rcx, -88(%rbp); cmpq $5, %rax ; jb .LBB221_73
+- keccak_f1600 [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB288_2
+- message_encode [core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::field::to_canonical] #10: movq -24(%rbp), %rax; cmpq -32(%rbp), %rax ; jb .LBB51_3
+- message_encode [core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_compress_encode] #10: movq -24(%rbp), %rax; cmpq -32(%rbp), %rax ; jb .LBB52_3
+- message_encode [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #9: movq %rax, 56(%rsp); testq %rax, %rax ; je .LBB55_2
+- message_encode [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #13: movq 56(%rsp), %rax; subq $1, %rax ; je .LBB55_3
+- message_encode [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #35: jmp .LBB55_7; testb $1, 71(%rsp) ; jne .LBB55_7
+- message_encode [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #45: movq %rax, 32(%rsp); testq %rax, %rax ; je .LBB55_9
+- message_encode [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #49: movq 32(%rsp), %rax; subq $1, %rax ; je .LBB55_10
+- message_encode [mlkem::encode::byte_encode] #9: callq _RINvMs8_NtNtCs7uUmbfRqPp3_4core3ops5rangeINtB6_14RangeInclusivemE8containsmECs1fbCSMqc7dC_5mlkem; testb $1, %al ; jne .LBB189_2
+- message_encode [mlkem::encode::byte_encode] #19: shlq $5, %rcx; cmpq %rcx, %rax ; jne .LBB189_1
+- message_encode [mlkem::encode::byte_encode] #42: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB189_6
+- message_encode [mlkem::encode::byte_encode] #59: retq; cmpl $8, 100(%rsp) ; jb .LBB189_4
+- message_encode [mlkem::encode::byte_encode] #66: movq %rax, 48(%rsp); cmpq %rcx, %rax ; jae .LBB189_10
+- message_encode [J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::next::mlkem] #9: movq 16(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB267_3
+- message_encode [core::ops::range::RangeInclusive::RangeboundC::mlkem] #3: movq %rcx, (%rsp); testb $1, 8(%rcx) ; jne .LBB363_2
+- multiply_ntts [mlkem::ntt::multiply_ntts] #20: movq %rdx, 704(%rsp); testq $1, 696(%rsp) ; je .LBB165_3
+- multiply_ntts [mlkem::ntt::multiply_ntts] #26: movq %rax, 128(%rsp); cmpq $256, %rax ; jb .LBB165_4
+- multiply_ntts [mlkem::ntt::multiply_ntts] #44: movq %rax, 112(%rsp); cmpq $256, %rax ; jb .LBB165_6
+- multiply_ntts [mlkem::ntt::multiply_ntts] #59: movq %rax, 96(%rsp); cmpq $256, %rax ; jb .LBB165_8
+- multiply_ntts [mlkem::ntt::multiply_ntts] #75: movq %rax, 80(%rsp); cmpq $256, %rax ; jb .LBB165_10
+- multiply_ntts [mlkem::ntt::multiply_ntts] #92: movq 120(%rsp), %rax; cmpq $128, %rax ; jb .LBB165_12
+- multiply_ntts [mlkem::ntt::multiply_ntts] #114: movq %rax, 64(%rsp); cmpq $256, %rax ; jb .LBB165_14
+- multiply_ntts [mlkem::ntt::multiply_ntts] #129: movq %rax, 48(%rsp); cmpq $256, %rax ; jb .LBB165_16
+- multiply_ntts [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB288_2
+- ntt [mlkem::poly::Poly::reduce] #13: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB95_3
+- ntt [mlkem::ntt::ntt] #5: movq $128, 104(%rsp); cmpq $2, 104(%rsp) ; jae .LBB167_3
+- ntt [mlkem::ntt::ntt] #13: movq $0, 112(%rsp); cmpq $256, 112(%rsp) ; jb .LBB167_6
+- ntt [mlkem::ntt::ntt] #25: movq %rax, 80(%rsp); cmpq $128, %rax ; jae .LBB167_8
+- ntt [mlkem::ntt::ntt] #49: movq %rdx, 400(%rsp); testq $1, 392(%rsp) ; je .LBB167_11
+- ntt [mlkem::ntt::ntt] #55: movq %rax, 64(%rsp); cmpq $256, %rax ; jb .LBB167_12
+- ntt [mlkem::ntt::ntt] #71: movw %cx, 54(%rsp); cmpq $256, %rax ; jb .LBB167_14
+- ntt [mlkem::ntt::ntt] #85: movq %rax, 40(%rsp); cmpq $256, %rax ; jb .LBB167_16
+- ntt [mlkem::ntt::ntt] #100: movw %r8w, (%rcx,%rdx,2); cmpq $256, %rax ; jb .LBB167_18
+- ntt [Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem] #9: movq 16(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB272_3
+- ntt [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB288_2
+- ntt_inverse [mlkem::ntt::ntt_inverse] #5: movq $2, 128(%rsp); cmpq $128, 128(%rsp) ; jbe .LBB164_3
+- ntt_inverse [mlkem::ntt::ntt_inverse] #25: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB164_6
+- ntt_inverse [mlkem::ntt::ntt_inverse] #38: retq; cmpq $256, 136(%rsp) ; jb .LBB164_9
+- ntt_inverse [mlkem::ntt::ntt_inverse] #50: movq %rax, 96(%rsp); cmpq $128, %rax ; jae .LBB164_11
+- ntt_inverse [mlkem::ntt::ntt_inverse] #74: movq %rdx, 424(%rsp); testq $1, 416(%rsp) ; je .LBB164_14
+- ntt_inverse [mlkem::ntt::ntt_inverse] #78: movq %rax, 80(%rsp); cmpq $256, %rax ; jb .LBB164_15
+- ntt_inverse [mlkem::ntt::ntt_inverse] #92: movq %rax, 72(%rsp); cmpq $256, %rax ; jb .LBB164_17
+- ntt_inverse [mlkem::ntt::ntt_inverse] #108: movw %cx, 68(%rsp); cmpq $256, %rax ; jb .LBB164_19
+- ntt_inverse [mlkem::ntt::ntt_inverse] #122: movq %rax, 56(%rsp); cmpq $256, %rax ; jb .LBB164_21
+- ntt_inverse [mlkem::ntt::ntt_inverse] #142: movq %rax, 48(%rsp); cmpq $256, %rax ; jb .LBB164_23
+- ntt_inverse [Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem] #9: movq 16(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB272_3
+- ntt_inverse [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB288_2
+
+### zero-stores to memory reachable from decaps_768 (wipe evidence)
+- mlkem::ct::ct_eq_bytes: {'movb': 1}
+- mlkem::encode::byte_decode: {'movl': 2, 'movq': 1}
+- mlkem::encode::byte_encode: {'movl': 2, 'movq': 1}
+- mlkem::hash::keccak::f1600: {'movq': 2}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge::_E6absor: {'movq': 1}
+- mlkem::hash::sponge::Sponge::_E8final: {'movq': 1}
+- mlkem::hash::sponge::Squeezer: {'movq': 1}
+- mlkem::hash::sponge::Squeezer: {'movq': 1}
+- mlkem::hash::sponge::Squeezer::_E7squee: {'movq': 1}
+- mlkem::hash::xof: {'movb': 3}
+- mlkem::kpke::encrypt: {'movb': 1}
+- mlkem::ntt::ntt: {'movq': 1}
+- mlkem::ntt::ntt_inverse: {'movq': 1}
+- mlkem::sample::sample_ntt::hash::Shake128Reader: {'movq': 1}
+- mlkem::sample::sample_poly_cbd: {'movw': 2}
+- mlkem::zeroize::wipe: {'movq': 1}
+- mlkem::zeroize::wipe: {'movb': 1}
+- mlkem::zeroize::wipe: {'movw': 1}
+
+### verdict
+PASS: no unreviewed div/idiv in mlkem code; no conditional branch in any leaf probe
+
+## opt-level=0+checks: mlkem-85888e38cf05b7de.s, 430 functions
+(informational build: findings are reported but do not fail the check)
+
+### div/idiv instructions (all functions)
+- core::slice::chunks_exact::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+- core::slice::raw::from_raw_parts::precondition_check::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+- core::slice::raw::from_raw_parts_mut::precondition_check::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+- q::core::slice::iter::ChunksExact::iter::traits::iterator::Iterator::size_hint::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+
+### hazmat probes (own code + everything called)
+probe              class  insns  div  jcc  cmov  setcc  callees
+barrett_reduce     leaf      32    0    2     0      2  mlkem::field::barrett_reduce, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow
+cbd_eta2           loop     310    0   21     0      8  mlkem::sample::sample_poly_cbd, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shr_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, _NtC4core::num::unchecked_add::precondition_check::mlkem, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, core::iter::range::Step::forward_unchecked::mlkem, memcpy
+cbd_eta3           loop     310    0   21     0      8  mlkem::sample::sample_poly_cbd, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shr_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, _NtC4core::num::unchecked_add::precondition_check::mlkem, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, core::iter::range::Step::forward_unchecked::mlkem, memcpy
+compress_d1        leaf     181    0   13     0      5  _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, mlkem::encode::compress, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shl_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem
+compress_d10       leaf     181    0   13     0      5  _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, mlkem::encode::compress, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shl_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem
+compress_d11       leaf     181    0   13     0      5  _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, mlkem::encode::compress, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shl_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem
+compress_d4        leaf     181    0   13     0      5  _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, mlkem::encode::compress, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shl_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem
+compress_d5        leaf     181    0   13     0      5  _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, mlkem::encode::compress, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shl_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem
+csubq              leaf      30    0    2     0      2  mlkem::field::csubq, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow
+ct_eq_1088         loop     283    0    5     1      0  core::hint::black_box::mlkem, _RINvNtCs7uUmbfRqPp3_4core9panicking13assert_failedjjEB4_, core::slice::iter::Iter::iter::traits::iterator::Iterator::zip::mlkem, core::slice::iter::mlkem, _NtC::core::fmt::Arguments::from_str::mlkem, _NtN::core::slice::iter::Iter::new::mlkem, mlkem::ct::ct_eq_bytes, mlkem::ct::is_zero_mask_u32, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem, core::iter::traits::collect::adapters::zip::Zip::slice::iter::Iter::IntoIterator::into_iter::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::size_hint::mlkem, q_::core::ops::bit::BitXor::bitxor::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::next::mlkem, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, core::iter::adapters::zip::Zip::slice::iter::Iter::traits::iterator::Iterator::next::mlkem, core::slice::iter::Iter::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::cmp::Ord::min::mlkem, memcpy
+ct_eq_32           loop     283    0    5     1      0  core::hint::black_box::mlkem, _RINvNtCs7uUmbfRqPp3_4core9panicking13assert_failedjjEB4_, core::slice::iter::Iter::iter::traits::iterator::Iterator::zip::mlkem, core::slice::iter::mlkem, _NtC::core::fmt::Arguments::from_str::mlkem, _NtN::core::slice::iter::Iter::new::mlkem, mlkem::ct::ct_eq_bytes, mlkem::ct::is_zero_mask_u32, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem, core::iter::traits::collect::adapters::zip::Zip::slice::iter::Iter::IntoIterator::into_iter::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::size_hint::mlkem, q_::core::ops::bit::BitXor::bitxor::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::next::mlkem, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, core::iter::adapters::zip::Zip::slice::iter::Iter::traits::iterator::Iterator::next::mlkem, core::slice::iter::Iter::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::cmp::Ord::min::mlkem, memcpy
+ct_select_32       loop     447    0    6     1      0  core::hint::black_box::mlkem, core::slice::iter::IterMut::iter::traits::iterator::Iterator::zip::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::zip::mlkem, core::slice::iter_mut::mlkem, core::slice::iter::IterMut::new::mlkem, mlkem::ct::ct_select_bytes, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem, core::iter::traits::collect::adapters::zip::Zip::slice::iter::IterMut::Iter::IntoIterator::into_iter::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::size_hint::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::size_hint::mlkem, _N::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::get_unchecked::mlkem, o_::core::ops::bit::BitXor::bitxor::mlkem, q_::core::ops::bit::BitXor::bitxor::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::next::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::size_hint::mlkem, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::next::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::size_hint::mlkem, core::slice::iter::Iter::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::slice::iter::IterMut::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::TrustedRandomAccessNoCoerce::size::mlkem, core::cmp::Ord::min::mlkem, memcpy
+decaps_768         loop    8435    0  376    25     78  <indirect>, _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::array, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1sNvNtC5mlkem5field12to_canonica, core::array, core::array, core::array, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuitsENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode13poly_dec, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuitsENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode22poly_dec, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode20poly_com, mlkem::hash::absorb_all, mlkem::hash::absorb_all, mlkem::kpke::inner_product_ntt::encrypt, mlkem::kpke::inner_product_ntt::encrypt, mlkem::sample::sample_ntt::hash::Shake128Reader, mlkem::zeroize::wipe, mlkem::zeroize::wipe, mlkem::zeroize::wipe, core::intrinsics::rotate_left::mlkem, core::ptr::drop_glue::array::iter::IntoIter, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode_decompress, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode, core::ptr::drop_glue::mlkem::hash::sponge::Sponge, core::ptr::drop_glue::mlkem::hash::sponge::Sponge, core::ptr::drop_glue::mlkem::hash::sponge::Sponge, core::ptr::drop_glue::mlkem::hash::sponge::Squeezer, core::ptr::drop_glue::mlkem::hash::sponge::Squeezer, core::ptr::drop_glue::mlkem::hash::sponge::Squeezer, core::ptr::drop_glue::mlkem::hash::Shake128Reader, core::hint::black_box::mlkem, core::hint::black_box::mlkem, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_decode12, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_decode_decompress, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::field::to_canonical, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_compress_encode, _RINvNtCs7uUmbfRqPp3_4core9panicking13assert_failedjjEB4_, core::slice::raw::from_mut::mlkem::poly::Poly, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, core::slice::iter::Iter::iter::traits::iterator::Iterator::zip::mlkem, core::slice::iter::IterMut::iter::traits::iterator::Iterator::zip::mlkem, core::slice::iter::IterMut::iter::traits::iterator::Iterator::zip::ChunksExact::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::zip::mlkem, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode_decompress, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode, mlkem::kpke::encrypt, mlkem::kpke::encrypt, mlkem::encode::poly_decode12, mlkem::encode::poly_compress_encode, mlkem::encode::poly_decode_decompress, mlkem::sample::sample_poly_cbd, mlkem::hash::Shake128, mlkem::hash::Shake128, mlkem::hash::Shake128, mlkem::poly::Poly::add, mlkem::poly::Poly::sub, mlkem::poly::Poly::reduce, mlkem::poly::Poly::canonical, mlkem::params::Params::dk_pke_len, mlkem::params::Params::ct_len, mlkem::params::Params::dk_len, mlkem::params::Params::ek_len, core::slice::chunks_exact::mlkem, core::slice::split_at_unchecked::mlkem, core::slice::iter::mlkem, core::slice::iter_mut::mlkem, core::slice::split_at::mlkem, core::slice::iter_mut::mlkem, core::slice::iter_mut::mlkem, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge::_E6absor, mlkem::hash::sponge::Sponge::_E8final, mlkem::hash::sponge::Sponge::_E8xor_b, core::ptr::const_ptr::is_aligned_to::mlkem, _NtC::core::fmt::Arguments::from_str::mlkem, _NtN::core::slice::iter::Iter::new::mlkem, _NtC4co::num::from_le_bytes::mlkem, _NtNtNtC::core::array::iter::iter_inner::PolymorphicIter::mem::maybe_uninit::MaybeUninit::next::mlkem, mlkem::hash::sponge::Squeezer, mlkem::hash::sponge::Squeezer, mlkem::hash::sponge::Squeezer::_E7squee, core::slice::iter::IterMut::new::mlkem, core::slice::iter::IterMut::new::mlkem, core::slice::iter::IterMut::new::mlkem, mlkem::ct::ct_eq_bytes, mlkem::ct::ct_select_bytes, mlkem::ct::is_zero_mask_u32, mlkem::kem::decaps_internal, mlkem::ntt::ntt_inverse, mlkem::ntt::multiply_ntts, mlkem::ntt::base_case_multiply, mlkem::ntt::ntt, mlkem::hash::g, mlkem::hash::j, mlkem::hash::prf, mlkem::hash::xof, mlkem::hash::sha3_512, mlkem::hash::shake256, mlkem::kpke::matrix_entry, mlkem::kpke::sample_noise, mlkem::kpke::decrypt, mlkem::kpke::encrypt, mlkem::poly::wipe_polys, mlkem::field::to_canonical, mlkem::field::barrett_reduce, mlkem::field::montgomery_reduce, mlkem::field::csubq, mlkem::field::fqmul, mlkem::encode::decompress, mlkem::encode::byte_decode, mlkem::encode::byte_encode, mlkem::encode::poly_decode12, mlkem::encode::poly_compress_encode, mlkem::encode::poly_decode_decompress, mlkem::encode::compress, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core6result13unwrap_failed, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtCs7uUmbfRqPp3_4core9panicking9panic_fmt, mlkem::hash::keccak::f1600, core::sync::atomic::compiler_fence::mlkem, _RNvNtNtCs7uUmbfRqPp3_4core5slice5index16slice_index_fail, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const23panic_const_div_by_zero, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const23panic_const_rem_by_zero, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shl_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shr_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, core::slice::split_at_unchecked::precondition_check::mlkem, core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem, _NtC4core::num::unchecked_add::precondition_check::mlkem, core::ptr::write_volatile::precondition_check::mlkem, core::slice::raw::from_raw_parts::precondition_check::mlkem, core::slice::index::SliceIndex::get_unchecked::precondition_check::mlkem, core::slice::index::SliceIndex::get_unchecked_mut::precondition_check::mlkem, core::iter::traits::collect::adapters::zip::Zip::slice::iter::IterMut::Iter::IntoIterator::into_iter::mlkem, core::iter::traits::collect::adapters::zip::Zip::slice::iter::Iter::IntoIterator::into_iter::mlkem, core::iter::traits::collect::adapters::zip::Zip::slice::iter::IterMut::ChunksExact::IntoIterator::into_iter::mlkem, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, core::iter::traits::collect::slice::iter::ChunksExact::IntoIterator::into_iter::mlkem, core::iter::traits::collect::slice::iter::IterMut::IntoIterator::into_iter::mlkem, core::iter::traits::collect::slice::iter::IterMut::IntoIterator::into_iter::mlkem, core::iter::traits::collect::slice::iter::IterMut::IntoIterator::into_iter::mlkem, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge::_ENtNtNt::core::ops::drop::Drop::drop, core::array::iter::_NtNtNtNt4iter6tra::collect::IntoIterator::into_iter::mlkem, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical::function::FnMut::call_mut, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12::function::FnMut::call_mut, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode_decompress::function::FnMut::call_mut, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode::function::FnMut::call_mut, core::slice::iter::mlkem::poly::Poly::iter::traits::collect::IntoIterator::into_iter, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, _::mlkem::hash::sponge::Squeezer, _::mlkem::hash::sponge::Squeezer, _::mlkem::hash::sponge::Squeezer::_ENtNtNt::core::ops::drop::Drop::drop, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical::drop::Drop::drop, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12::drop::Drop::drop, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode_decompress::drop::Drop::drop, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode::drop::Drop::drop, q::core::slice::iter::ChunksExact::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, q::core::slice::iter::ChunksExact::iter::traits::iterator::Iterator::next::mlkem, q::core::slice::iter::ChunksExact::iter::traits::iterator::Iterator::size_hint::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::next::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::next::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::size_hint::mlkem, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::next::mlkem, Q_::core::slice::iter::IterMut::mlkem::poly::Poly::iter::traits::iterator::Iterator::next, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::size_hint::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::size_hint::mlkem, _N::core::slice::index::ops::range::Range::SliceIndex::index_mut::mlkem, _N::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::get_unchecked::mlkem, o_::core::ops::bit::BitXor::bitxor::mlkem, q_::core::ops::bit::BitXor::bitxor::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _Nt::core::array::iter::IntoIter::_ENtNtNtNt4iter6tr::iterator::Iterator::next::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::next::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::next::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::size_hint::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::ChunksExact::ZipImpl::new::mlkem, _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::ChunksExact::ZipImpl::next::mlkem, _NtC::core::convert::TryInto, _NtC::core::convert::TryInto::_E8try_i::mlkem, _NtC::core::convert::TryInto, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, _NtN::core::slice::index::ops::range::RangeTo::SliceIndex::index_mut::mlkem, _NtC4::array::_INtNt7convert7TryFr::try_from::mlkem, _NtC4::array::_INtNt7c::TryFrom::try_from::mlkem, _NtNt::core::array::iter::IntoIter::_ENtNtNt3ops4drop4::drop::mlkem, _NtNt::core::slice::index::ops::range::RangeFrom::SliceIndex::index::mlkem, _NtNt::core::slice::index::ops::range::RangeFrom::SliceIndex::index_mut::mlkem, _NtC4co::array::_INtNt7convert7TryFr::try_from::mlkem, core::iter::range::Step::forward_unchecked::mlkem, mlkem::hash::Shake128Reader::sample::XofReader::squeeze, core::ops::try_trait::NeverShortCircuit, core::ops::try_trait::NeverShortCircuit, core::ops::try_trait::NeverShortCircuit::Try::branch::mlkem, core::ops::try_trait::NeverShortCircuit::Try::branch::mlkem, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, core::slice::iter::iter::traits::collect::IntoIterator::into_iter::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::next::mlkem, core::iter::adapters::zip::Zip::slice::iter::Iter::traits::iterator::Iterator::next::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::___iterator_get_unchecke::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::traits::iterator::Iterator::size_hint::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::ChunksExact::traits::iterator::Iterator::next::mlkem, core::array, core::array, core::array, core::array, core::array::ops::index::IndexMut::range::RangeTo::index_mut::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::slice::iter::ChunksExact::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::slice::iter::Iter::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::slice::iter::IterMut::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::slice::iter::IterMut::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::TrustedRandomAccessNoCoerce::size::mlkem, mlkem::field::to_canonical::core::ops::function::FnMut::call_mut, core::cmp::Ord::min::mlkem, __chkstk, memcpy, memset
+                   note: indirect jump in core::sync::atomic::compiler_fence::mlkem reviewed: opt-level 0 only: jump table on the Ordering argument, which our zeroize::wipe always passes as the constant SeqCst
+decode12           loop     606    0   28     2      7  _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::array, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuitsENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode13poly_dec, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_decode12, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12, mlkem::encode::poly_decode12, mlkem::field::csubq, mlkem::encode::byte_decode, mlkem::encode::poly_decode12, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shl_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shr_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem, _NtC4core::num::unchecked_add::precondition_check::mlkem, core::slice::index::SliceIndex::get_unchecked_mut::precondition_check::mlkem, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12::function::FnMut::call_mut, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode12::drop::Drop::drop, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, core::ops::try_trait::NeverShortCircuit, core::ops::try_trait::NeverShortCircuit::Try::branch::mlkem, core::array, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem, memcpy, memset
+decompress_d1      leaf     187    0   14     0      5  _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, mlkem::encode::decompress, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shl_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shr_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem
+fqmul              leaf      47    0    3     0      3  mlkem::field::montgomery_reduce, mlkem::field::fqmul, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow
+is_zero_mask       leaf      20    0    0     0      0  core::hint::black_box::mlkem, mlkem::ct::is_zero_mask_u32
+keccak_f1600       loop     868    0   45     0      5  core::intrinsics::rotate_left::mlkem, core::ptr::drop_glue::array::iter::IntoIter, _NtNtNtC::core::array::iter::iter_inner::PolymorphicIter::mem::maybe_uninit::MaybeUninit::next::mlkem, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, mlkem::hash::keccak::f1600, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _NtC4core::num::unchecked_add::precondition_check::mlkem, core::slice::index::SliceIndex::get_unchecked::precondition_check::mlkem, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, core::array::iter::_NtNtNtNt4iter6tra::collect::IntoIterator::into_iter::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _Nt::core::array::iter::IntoIter::_ENtNtNtNt4iter6tr::iterator::Iterator::next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, _NtNt::core::array::iter::IntoIter::_ENtNtNt3ops4drop4::drop::mlkem, core::iter::range::Step::forward_unchecked::mlkem, memcpy
+message_encode     loop     854    0   32     1      7  _NtNtC4c::ops::range::RangeInclusive::contains::mlkem, core::array, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1sNvNtC5mlkem5field12to_canonica, core::array, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode20poly_com, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical, core::ptr::drop_glue::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn::ops::try_trait::NeverShortCircuit, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::field::to_canonical, core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_compress_encode, core::ops::range::RangeInclusive::RangeBounds::contains::mlkem, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical, core::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode, mlkem::encode::poly_compress_encode, mlkem::poly::Poly::canonical, mlkem::field::to_canonical, mlkem::encode::byte_encode, mlkem::encode::poly_compress_encode, mlkem::encode::compress, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_shl_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem, _NtC4core::num::unchecked_add::precondition_check::mlkem, core::slice::index::SliceIndex::get_unchecked_mut::precondition_check::mlkem, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical::function::FnMut::call_mut, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode::function::FnMut::call_mut, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::field::to_canonical::drop::Drop::drop, _::core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode::drop::Drop::drop, J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::next::mlkem, core::ops::try_trait::NeverShortCircuit, core::ops::try_trait::NeverShortCircuit::Try::branch::mlkem, core::array, core::ops::range::RangeInclusive::RangeboundC::mlkem, core::ops::range::RangeInclusive::RangeboundC::mlkem, mlkem::field::to_canonical::core::ops::function::FnMut::call_mut, memcpy, memset
+montgomery_reduce  leaf      32    0    2     0      2  mlkem::field::montgomery_reduce, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow
+multiply_ntts      loop     446    0   28     0     15  mlkem::ntt::multiply_ntts, mlkem::ntt::base_case_multiply, mlkem::field::montgomery_reduce, mlkem::field::fqmul, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, _NtC4core::num::unchecked_add::precondition_check::mlkem, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, core::iter::range::Step::forward_unchecked::mlkem, memcpy
+ntt                loop     397    0   25     1      8  mlkem::poly::Poly::reduce, mlkem::ntt::ntt, mlkem::field::barrett_reduce, mlkem::field::montgomery_reduce, mlkem::field::fqmul, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, _NtC4core::num::unchecked_add::precondition_check::mlkem, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, core::iter::range::Step::forward_unchecked::mlkem, core::array, memcpy
+ntt_inverse        loop     440    0   28     1      9  core::slice::iter_mut::mlkem, core::slice::iter::IterMut::new::mlkem, mlkem::ntt::ntt_inverse, mlkem::field::barrett_reduce, mlkem::field::montgomery_reduce, mlkem::field::fqmul, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_nounwind_fmt, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_mul_overflow, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_sub_overflow, _NtC4core::num::unchecked_add::precondition_check::mlkem, core::iter::traits::collect::ops::range::Range::IntoIterator::into_iter::mlkem, core::iter::traits::collect::slice::iter::IterMut::IntoIterator::into_iter::mlkem, Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem, _Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem, _NtN::core::iter::range::ops::range::Range::traits::iterator::Iterator::next::mlkem, core::iter::range::Step::forward_unchecked::mlkem, memcpy
+to_canonical       leaf      20    0    1     0      1  mlkem::field::to_canonical, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const24panic_const_add_overflow
+
+### conditional branches in loop probes, for review
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #8: movq %rax, 80(%rsp); cmpq %rax, %rdx ; jae .LBB70_2
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #18: movq %rax, 48(%rsp); cmpq $8, %rax ; jb .LBB70_3
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #7: movq %rcx, 168(%rsp); cmpq $2, %rdx ; je .LBB220_2
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #10: movq 152(%rsp), %rax; cmpq $3, %rax ; jne .LBB220_3
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #16: movq %rax, 128(%rsp); seto %al ; jo .LBB220_5
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #26: movq 128(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB220_6
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #50: movq %rdx, 728(%rsp); testq $1, 720(%rsp) ; je .LBB220_9
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #74: movq %rdx, 768(%rsp); testq $1, 760(%rsp) ; je .LBB220_12
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #82: movq %rax, 112(%rsp); seto %al ; jo .LBB220_18
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #89: seto %al; testb $1, %al ; jne .LBB220_14
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #92: movq 120(%rsp), %rax; cmpq $256, %rax ; jb .LBB220_15
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #111: movq %rax, 88(%rsp); seto %al ; jo .LBB220_20
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #122: movq %rax, 80(%rsp); cmpq %rcx, %rax ; jb .LBB220_22
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #134: seto %al; testb $1, %al ; jne .LBB220_24
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #146: movq %rax, 64(%rsp); seto %al ; jo .LBB220_26
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #156: movq %rax, 56(%rsp); seto %al ; jo .LBB220_28
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #167: movq %rax, 48(%rsp); cmpq %rcx, %rax ; jb .LBB220_30
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #178: movq %rax, 40(%rsp); cmpq %rcx, %rax ; jb .LBB220_32
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #190: seto %al; testb $1, %al ; jne .LBB220_34
+- cbd_eta2 [_NtC4core::num::unchecked_add::precondition_check::mlkem] #6: addq %rdx, %rcx; cmpq %rax, %rcx ; jb .LBB228_2
+- cbd_eta2 [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB302_2
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #8: movq %rax, 80(%rsp); cmpq %rax, %rdx ; jae .LBB70_2
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #18: movq %rax, 48(%rsp); cmpq $8, %rax ; jb .LBB70_3
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #7: movq %rcx, 168(%rsp); cmpq $2, %rdx ; je .LBB220_2
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #10: movq 152(%rsp), %rax; cmpq $3, %rax ; jne .LBB220_3
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #16: movq %rax, 128(%rsp); seto %al ; jo .LBB220_5
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #26: movq 128(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB220_6
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #50: movq %rdx, 728(%rsp); testq $1, 720(%rsp) ; je .LBB220_9
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #74: movq %rdx, 768(%rsp); testq $1, 760(%rsp) ; je .LBB220_12
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #82: movq %rax, 112(%rsp); seto %al ; jo .LBB220_18
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #89: seto %al; testb $1, %al ; jne .LBB220_14
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #92: movq 120(%rsp), %rax; cmpq $256, %rax ; jb .LBB220_15
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #111: movq %rax, 88(%rsp); seto %al ; jo .LBB220_20
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #122: movq %rax, 80(%rsp); cmpq %rcx, %rax ; jb .LBB220_22
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #134: seto %al; testb $1, %al ; jne .LBB220_24
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #146: movq %rax, 64(%rsp); seto %al ; jo .LBB220_26
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #156: movq %rax, 56(%rsp); seto %al ; jo .LBB220_28
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #167: movq %rax, 48(%rsp); cmpq %rcx, %rax ; jb .LBB220_30
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #178: movq %rax, 40(%rsp); cmpq %rcx, %rax ; jb .LBB220_32
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #190: seto %al; testb $1, %al ; jne .LBB220_34
+- cbd_eta3 [_NtC4core::num::unchecked_add::precondition_check::mlkem] #6: addq %rdx, %rcx; cmpq %rax, %rcx ; jb .LBB228_2
+- cbd_eta3 [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB302_2
+- ct_eq_1088 [mlkem::ct::ct_eq_bytes] #9: movq 96(%rsp), %rax; cmpq 104(%rsp), %rax ; je .LBB157_2
+- ct_eq_1088 [mlkem::ct::ct_eq_bytes] #54: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB157_5
+- ct_eq_1088 [core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem] #3: movq %r8, 32(%rsp); cmpq %rdx, %rcx ; jae .LBB227_2
+- ct_eq_1088 [_Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::next::mlkem] #4: movq 32(%rcx), %rax; cmpq 40(%rcx), %rax ; jb .LBB308_2
+- ct_eq_1088 [core::cmp::Ord::min::mlkem] #6: movq 8(%rsp), %rax; cmpq (%rsp), %rax ; jb .LBB406_2
+- ct_eq_32 [mlkem::ct::ct_eq_bytes] #9: movq 96(%rsp), %rax; cmpq 104(%rsp), %rax ; je .LBB157_2
+- ct_eq_32 [mlkem::ct::ct_eq_bytes] #54: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB157_5
+- ct_eq_32 [core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem] #3: movq %r8, 32(%rsp); cmpq %rdx, %rcx ; jae .LBB227_2
+- ct_eq_32 [_Nt::core::iter::adapters::zip::Zip::slice::iter::Iter::ZipImpl::next::mlkem] #4: movq 32(%rcx), %rax; cmpq 40(%rcx), %rax ; jb .LBB308_2
+- ct_eq_32 [core::cmp::Ord::min::mlkem] #6: movq 8(%rsp), %rax; cmpq (%rsp), %rax ; jb .LBB406_2
+- ct_select_32 [mlkem::ct::ct_select_bytes] #12: movq %rax, 120(%rsp); cmpq %r9, %rdx ; je .LBB158_2
+- ct_select_32 [mlkem::ct::ct_select_bytes] #21: movq 112(%rsp), %rcx; cmpq %rcx, %rax ; jne .LBB158_1
+- ct_select_32 [mlkem::ct::ct_select_bytes] #58: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB158_6
+- ct_select_32 [core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem] #3: movq %r8, 32(%rsp); cmpq %rdx, %rcx ; jae .LBB227_2
+- ct_select_32 [_Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::Iter::ZipImpl::next::mlkem] #6: movq 64(%rdx), %rax; cmpq 72(%rdx), %rax ; jb .LBB306_2
+- ct_select_32 [core::cmp::Ord::min::mlkem] #6: movq 8(%rsp), %rax; cmpq (%rsp), %rax ; jb .LBB406_2
+- decode12 [core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_decode12] #10: movq -24(%rbp), %rax; cmpq -32(%rbp), %rax ; jb .LBB49_3
+- decode12 [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #9: movq %rax, 56(%rsp); testq %rax, %rax ; je .LBB55_2
+- decode12 [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #13: movq 56(%rsp), %rax; subq $1, %rax ; je .LBB55_3
+- decode12 [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #35: jmp .LBB55_7; testb $1, 71(%rsp) ; jne .LBB55_7
+- decode12 [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #45: movq %rax, 32(%rsp); testq %rax, %rax ; je .LBB55_9
+- decode12 [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #49: movq 32(%rsp), %rax; subq $1, %rax ; je .LBB55_10
+- decode12 [mlkem::field::csubq] #5: seto %al; testb $1, %al ; jne .LBB186_2
+- decode12 [mlkem::field::csubq] #14: seto %al; testb $1, %al ; jne .LBB186_4
+- decode12 [mlkem::encode::byte_decode] #10: callq _RINvMs8_NtNtCs7uUmbfRqPp3_4core3ops5rangeINtB6_14RangeInclusivemE8containsmECs1fbCSMqc7dC_5mlkem; testb $1, %al ; jne .LBB189_2
+- decode12 [mlkem::encode::byte_decode] #21: movq %rax, 104(%rsp); seto %al ; jo .LBB189_4
+- decode12 [mlkem::encode::byte_decode] #25: movq 104(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB189_5
+- decode12 [mlkem::encode::byte_decode] #31: ud2; cmpl $32, 148(%rsp) ; jae .LBB189_7
+- decode12 [mlkem::encode::byte_decode] #40: movl %ecx, 100(%rsp); cmpl $1, %eax ; jb .LBB189_9
+- decode12 [mlkem::encode::byte_decode] #69: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB189_12
+- decode12 [mlkem::encode::byte_decode] #74: jmp .LBB189_17; cmpl $12, 148(%rsp) ; je .LBB189_14
+- decode12 [mlkem::encode::byte_decode] #95: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB189_13
+- decode12 [mlkem::encode::byte_decode] #106: movl 668(%rsp), %eax; cmpl 148(%rsp), %eax ; jb .LBB189_19
+- decode12 [mlkem::encode::byte_decode] #112: movw %cx, (%rax); cmpl $32, 148(%rsp) ; jb .LBB189_20
+- decode12 [mlkem::encode::byte_decode] #118: movq %rax, 72(%rsp); cmpq %rcx, %rax ; jb .LBB189_24
+- decode12 [mlkem::encode::byte_decode] #131: movl %edx, 68(%rsp); cmpl %ecx, %eax ; jb .LBB189_23
+- decode12 [mlkem::encode::byte_decode] #149: movl %eax, 64(%rsp); cmpl $32, %eax ; jb .LBB189_26
+- decode12 [mlkem::encode::byte_decode] #167: movq %rax, 48(%rsp); cmpq %rcx, %rax ; jb .LBB189_29
+- decode12 [mlkem::encode::byte_decode] #179: movl %eax, 44(%rsp); cmpl %ecx, %eax ; jb .LBB189_31
+- decode12 [core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem] #3: movq %r8, 32(%rsp); cmpq %rdx, %rcx ; jae .LBB227_2
+- decode12 [_NtC4core::num::unchecked_add::precondition_check::mlkem] #6: addq %rdx, %rcx; cmpq %rax, %rcx ; jb .LBB228_2
+- decode12 [core::slice::index::SliceIndex::get_unchecked_mut::precondition_check::mlkem] #3: movq %r8, 32(%rsp); cmpq %rdx, %rcx ; jb .LBB235_2
+- decode12 [Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem] #9: movq 16(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB287_3
+- decode12 [core::ops::range::RangeInclusive::RangeboundC::mlkem] #3: movq %rcx, (%rsp); testb $1, 8(%rcx) ; jne .LBB377_2
+- keccak_f1600 [_NtNtNtC::core::array::iter::iter_inner::PolymorphicIter::mem::maybe_uninit::MaybeUninit::next::mlkem] #6: subq (%rcx), %rax; cmpq $0, %rax ; ja .LBB147_2
+- keccak_f1600 [mlkem::hash::keccak::f1600] #28: movq %rax, 856(%rbp); testq $1, 848(%rbp) ; je .LBB223_5
+- keccak_f1600 [mlkem::hash::keccak::f1600] #64: movq %rax, 936(%rbp); testq $1, 928(%rbp) ; je .LBB223_10
+- keccak_f1600 [mlkem::hash::keccak::f1600] #68: movq %rax, 360(%rbp); cmpq $25, %rax ; jb .LBB223_83
+- keccak_f1600 [mlkem::hash::keccak::f1600] #93: movq %rax, 968(%rbp); testq $1, 960(%rbp) ; je .LBB223_15
+- keccak_f1600 [mlkem::hash::keccak::f1600] #102: movq 320(%rbp), %rax; cmpq $5, %rax ; jb .LBB223_65
+- keccak_f1600 [mlkem::hash::keccak::f1600] #142: movq %rax, 1312(%rbp); testq $1, 1304(%rbp) ; je .LBB223_20
+- keccak_f1600 [mlkem::hash::keccak::f1600] #151: movq 264(%rbp), %rax; cmpq $25, %rax ; jb .LBB223_59
+- keccak_f1600 [mlkem::hash::keccak::f1600] #176: movq %rax, 1648(%rbp); testq $1, 1640(%rbp) ; je .LBB223_25
+- keccak_f1600 [mlkem::hash::keccak::f1600] #207: movq %rax, 1680(%rbp); testq $1, 1672(%rbp) ; je .LBB223_22
+- keccak_f1600 [mlkem::hash::keccak::f1600] #215: movq %rax, 184(%rbp); seto %al ; jo .LBB223_31
+- keccak_f1600 [mlkem::hash::keccak::f1600] #222: movq %rax, 168(%rbp); cmpq %rcx, %rax ; jb .LBB223_34
+- keccak_f1600 [mlkem::hash::keccak::f1600] #231: movq 168(%rbp), %rax; cmpq $25, %rax ; jb .LBB223_35
+- keccak_f1600 [mlkem::hash::keccak::f1600] #246: movq 176(%rbp), %rax; cmpq $5, %rax ; jb .LBB223_37
+- keccak_f1600 [mlkem::hash::keccak::f1600] #262: movq %rax, 152(%rbp); seto %al ; jo .LBB223_40
+- keccak_f1600 [mlkem::hash::keccak::f1600] #276: movq %rax, 136(%rbp); cmpq %rcx, %rax ; jb .LBB223_42
+- keccak_f1600 [mlkem::hash::keccak::f1600] #284: movq 136(%rbp), %rax; cmpq $25, %rax ; jb .LBB223_43
+- keccak_f1600 [mlkem::hash::keccak::f1600] #300: movq 176(%rbp), %rax; cmpq $5, %rax ; jb .LBB223_45
+- keccak_f1600 [mlkem::hash::keccak::f1600] #316: movq %rax, 120(%rbp); seto %al ; jo .LBB223_48
+- keccak_f1600 [mlkem::hash::keccak::f1600] #330: movq %rax, 104(%rbp); cmpq %rcx, %rax ; jb .LBB223_50
+- keccak_f1600 [mlkem::hash::keccak::f1600] #338: movq 104(%rbp), %rax; cmpq $25, %rax ; jb .LBB223_51
+- keccak_f1600 [mlkem::hash::keccak::f1600] #353: movq %rax, 96(%rbp); seto %al ; jo .LBB223_54
+- keccak_f1600 [mlkem::hash::keccak::f1600] #367: movq %rax, 80(%rbp); cmpq %rcx, %rax ; jb .LBB223_56
+- keccak_f1600 [mlkem::hash::keccak::f1600] #375: movq 80(%rbp), %rax; cmpq $25, %rax ; jb .LBB223_57
+- keccak_f1600 [mlkem::hash::keccak::f1600] #398: movq %rax, 72(%rbp); cmpq $25, %rax ; jb .LBB223_61
+- keccak_f1600 [mlkem::hash::keccak::f1600] #422: movq %rcx, 64(%rbp); cmpq $25, %rax ; jb .LBB223_63
+- keccak_f1600 [mlkem::hash::keccak::f1600] #444: movq %rax, 48(%rbp); cmpq $5, %rax ; jb .LBB223_67
+- keccak_f1600 [mlkem::hash::keccak::f1600] #461: movq 320(%rbp), %rax; cmpq $5, %rax ; jb .LBB223_69
+- keccak_f1600 [mlkem::hash::keccak::f1600] #473: movq %rax, 32(%rbp); cmpq $5, %rax ; jb .LBB223_71
+- keccak_f1600 [mlkem::hash::keccak::f1600] #518: movq %rax, 1080(%rbp); testq $1, 1072(%rbp) ; je .LBB223_12
+- keccak_f1600 [mlkem::hash::keccak::f1600] #524: movq %rax, -16(%rbp); seto %al ; jo .LBB223_78
+- keccak_f1600 [mlkem::hash::keccak::f1600] #531: movq %rax, -24(%rbp); cmpq %rcx, %rax ; jb .LBB223_80
+- keccak_f1600 [mlkem::hash::keccak::f1600] #539: movq -24(%rbp), %rax; cmpq $25, %rax ; jb .LBB223_81
+- keccak_f1600 [mlkem::hash::keccak::f1600] #565: movq %rax, -32(%rbp); cmpq %rcx, %rax ; jb .LBB223_86
+- keccak_f1600 [mlkem::hash::keccak::f1600] #575: movq -32(%rbp), %rax; cmpq $25, %rax ; jb .LBB223_87
+- keccak_f1600 [mlkem::hash::keccak::f1600] #591: movq %rax, -48(%rbp); cmpq %rcx, %rax ; jb .LBB223_90
+- keccak_f1600 [mlkem::hash::keccak::f1600] #601: movq -48(%rbp), %rax; cmpq $25, %rax ; jb .LBB223_91
+- keccak_f1600 [mlkem::hash::keccak::f1600] #617: movq %rax, -64(%rbp); cmpq %rcx, %rax ; jb .LBB223_94
+- keccak_f1600 [mlkem::hash::keccak::f1600] #627: movq -64(%rbp), %rax; cmpq $25, %rax ; jb .LBB223_95
+- keccak_f1600 [mlkem::hash::keccak::f1600] #643: movq %rax, -80(%rbp); cmpq %rcx, %rax ; jb .LBB223_98
+- keccak_f1600 [mlkem::hash::keccak::f1600] #653: movq -80(%rbp), %rax; cmpq $25, %rax ; jb .LBB223_99
+- keccak_f1600 [mlkem::hash::keccak::f1600] #665: movq %rcx, -96(%rbp); cmpq $5, %rax ; jb .LBB223_101
+- keccak_f1600 [_NtC4core::num::unchecked_add::precondition_check::mlkem] #6: addq %rdx, %rcx; cmpq %rax, %rcx ; jb .LBB228_2
+- keccak_f1600 [core::slice::index::SliceIndex::get_unchecked::precondition_check::mlkem] #3: movq %r8, 32(%rsp); cmpq %rdx, %rcx ; jb .LBB234_2
+- keccak_f1600 [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB302_2
+- message_encode [core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::field::to_canonical] #10: movq -24(%rbp), %rax; cmpq -32(%rbp), %rax ; jb .LBB51_3
+- message_encode [core::array::try_from_fn_erased::ops::try_trait::NeverShortCircuit::drain::Drain::wrap_mut_1::mlkem::encode::poly_compress_encode] #10: movq -24(%rbp), %rax; cmpq -32(%rbp), %rax ; jb .LBB52_3
+- message_encode [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #9: movq %rax, 56(%rsp); testq %rax, %rax ; je .LBB55_2
+- message_encode [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #13: movq 56(%rsp), %rax; subq $1, %rax ; je .LBB55_3
+- message_encode [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #35: jmp .LBB55_7; testb $1, 71(%rsp) ; jne .LBB55_7
+- message_encode [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #45: movq %rax, 32(%rsp); testq %rax, %rax ; je .LBB55_9
+- message_encode [core::ops::range::RangeInclusive::RangeBounds::contains::mlkem] #49: movq 32(%rsp), %rax; subq $1, %rax ; je .LBB55_10
+- message_encode [mlkem::field::to_canonical] #8: seto %al; testb $1, %al ; jne .LBB183_2
+- message_encode [mlkem::encode::byte_encode] #9: callq _RINvMs8_NtNtCs7uUmbfRqPp3_4core3ops5rangeINtB6_14RangeInclusivemE8containsmECs1fbCSMqc7dC_5mlkem; testb $1, %al ; jne .LBB190_2
+- message_encode [mlkem::encode::byte_encode] #20: movq %rax, 88(%rsp); seto %al ; jo .LBB190_4
+- message_encode [mlkem::encode::byte_encode] #24: movq 88(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB190_5
+- message_encode [mlkem::encode::byte_encode] #30: ud2; cmpl $32, 124(%rsp) ; jae .LBB190_7
+- message_encode [mlkem::encode::byte_encode] #39: movl %ecx, 84(%rsp); cmpl $1, %eax ; jb .LBB190_9
+- message_encode [mlkem::encode::byte_encode] #64: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB190_12
+- message_encode [mlkem::encode::byte_encode] #73: movl %eax, 80(%rsp); cmpl $32, %eax ; jb .LBB190_13
+- message_encode [mlkem::encode::byte_encode] #88: movl %eax, 72(%rsp); cmpl %ecx, %eax ; jb .LBB190_16
+- message_encode [mlkem::encode::byte_encode] #100: ud2; cmpl $8, 132(%rsp) ; jb .LBB190_10
+- message_encode [mlkem::encode::byte_encode] #107: movq %rax, 64(%rsp); cmpq %rcx, %rax ; jae .LBB190_20
+- message_encode [mlkem::encode::byte_encode] #117: movq %rax, 48(%rsp); cmpq %rcx, %rax ; jb .LBB190_22
+- message_encode [mlkem::encode::byte_encode] #134: movl %ecx, 44(%rsp); cmpl $8, %eax ; jb .LBB190_24
+- message_encode [mlkem::encode::compress] #7: callq _RINvMs8_NtNtCs7uUmbfRqPp3_4core3ops5rangeINtB6_14RangeInclusivemE8containsmECs1fbCSMqc7dC_5mlkem; testb $1, %al ; jne .LBB195_2
+- message_encode [mlkem::encode::compress] #15: movw 66(%rsp), %ax; cmpw $3329, %ax ; jae .LBB195_1
+- message_encode [mlkem::encode::compress] #20: movq %rax, 56(%rsp); cmpl $64, 68(%rsp) ; jae .LBB195_5
+- message_encode [mlkem::encode::compress] #31: movq %rax, 48(%rsp); cmpq %rcx, %rax ; jb .LBB195_7
+- message_encode [mlkem::encode::compress] #41: movq %rax, 40(%rsp); seto %al ; jo .LBB195_9
+- message_encode [mlkem::encode::compress] #50: movw %ax, 38(%rsp); cmpl $16, 68(%rsp) ; jb .LBB195_10
+- message_encode [mlkem::encode::compress] #64: movw %cx, 36(%rsp); cmpw $1, %ax ; jb .LBB195_13
+- message_encode [core::ptr::const_ptr::offset_from_unsigned::precondition_check::mlkem] #3: movq %r8, 32(%rsp); cmpq %rdx, %rcx ; jae .LBB227_2
+- message_encode [_NtC4core::num::unchecked_add::precondition_check::mlkem] #6: addq %rdx, %rcx; cmpq %rax, %rcx ; jb .LBB228_2
+- message_encode [core::slice::index::SliceIndex::get_unchecked_mut::precondition_check::mlkem] #3: movq %r8, 32(%rsp); cmpq %rdx, %rcx ; jb .LBB235_2
+- message_encode [J_::core::slice::iter::Iter::iter::traits::iterator::Iterator::next::mlkem] #9: movq 16(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB281_3
+- message_encode [core::ops::range::RangeInclusive::RangeboundC::mlkem] #3: movq %rcx, (%rsp); testb $1, 8(%rcx) ; jne .LBB377_2
+- multiply_ntts [mlkem::ntt::multiply_ntts] #20: movq %rdx, 736(%rsp); testq $1, 728(%rsp) ; je .LBB166_3
+- multiply_ntts [mlkem::ntt::multiply_ntts] #27: movq %rax, 160(%rsp); seto %al ; jo .LBB166_5
+- multiply_ntts [mlkem::ntt::multiply_ntts] #38: movq 160(%rsp), %rax; cmpq $256, %rax ; jb .LBB166_6
+- multiply_ntts [mlkem::ntt::multiply_ntts] #52: movq %rax, 144(%rsp); seto %al ; jo .LBB166_9
+- multiply_ntts [mlkem::ntt::multiply_ntts] #64: movq %rax, 128(%rsp); cmpq %rcx, %rax ; jb .LBB166_11
+- multiply_ntts [mlkem::ntt::multiply_ntts] #71: movq 128(%rsp), %rax; cmpq $256, %rax ; jb .LBB166_12
+- multiply_ntts [mlkem::ntt::multiply_ntts] #85: movq %rax, 120(%rsp); seto %al ; jo .LBB166_15
+- multiply_ntts [mlkem::ntt::multiply_ntts] #94: movq 120(%rsp), %rax; cmpq $256, %rax ; jb .LBB166_16
+- multiply_ntts [mlkem::ntt::multiply_ntts] #108: movq %rax, 104(%rsp); seto %al ; jo .LBB166_19
+- multiply_ntts [mlkem::ntt::multiply_ntts] #120: movq %rax, 88(%rsp); cmpq %rcx, %rax ; jb .LBB166_21
+- multiply_ntts [mlkem::ntt::multiply_ntts] #127: movq 88(%rsp), %rax; cmpq $256, %rax ; jb .LBB166_22
+- multiply_ntts [mlkem::ntt::multiply_ntts] #142: movq 152(%rsp), %rax; cmpq $128, %rax ; jb .LBB166_24
+- multiply_ntts [mlkem::ntt::multiply_ntts] #165: movq %rax, 72(%rsp); seto %al ; jo .LBB166_27
+- multiply_ntts [mlkem::ntt::multiply_ntts] #174: movq 72(%rsp), %rax; cmpq $256, %rax ; jb .LBB166_28
+- multiply_ntts [mlkem::ntt::multiply_ntts] #187: movq %rax, 56(%rsp); seto %al ; jo .LBB166_31
+- multiply_ntts [mlkem::ntt::multiply_ntts] #199: movq %rax, 48(%rsp); cmpq %rcx, %rax ; jb .LBB166_33
+- multiply_ntts [mlkem::ntt::multiply_ntts] #206: movq 48(%rsp), %rax; cmpq $256, %rax ; jb .LBB166_34
+- multiply_ntts [mlkem::ntt::base_case_multiply] #20: movl %eax, 68(%rsp); seto %al ; jo .LBB167_2
+- multiply_ntts [mlkem::ntt::base_case_multiply] #28: movl %eax, 52(%rsp); seto %al ; jo .LBB167_4
+- multiply_ntts [mlkem::ntt::base_case_multiply] #38: movl %eax, 48(%rsp); seto %al ; jo .LBB167_6
+- multiply_ntts [mlkem::ntt::base_case_multiply] #50: movl %eax, 44(%rsp); seto %al ; jo .LBB167_8
+- multiply_ntts [mlkem::ntt::base_case_multiply] #62: movl %eax, 40(%rsp); seto %al ; jo .LBB167_10
+- multiply_ntts [mlkem::ntt::base_case_multiply] #72: movl %eax, 36(%rsp); seto %al ; jo .LBB167_12
+- multiply_ntts [mlkem::field::montgomery_reduce] #9: movl %eax, 52(%rsp); seto %al ; jo .LBB185_2
+- multiply_ntts [mlkem::field::montgomery_reduce] #15: movl %eax, 44(%rsp); seto %al ; jo .LBB185_4
+- multiply_ntts [mlkem::field::fqmul] #6: movl %eax, 36(%rsp); seto %al ; jo .LBB187_2
+- multiply_ntts [_NtC4core::num::unchecked_add::precondition_check::mlkem] #6: addq %rdx, %rcx; cmpq %rax, %rcx ; jb .LBB228_2
+- multiply_ntts [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB302_2
+- ntt [mlkem::poly::Poly::reduce] #13: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB95_3
+- ntt [mlkem::ntt::ntt] #5: movq $128, 152(%rsp); cmpq $2, 152(%rsp) ; jae .LBB168_3
+- ntt [mlkem::ntt::ntt] #13: movq $0, 160(%rsp); cmpq $256, 160(%rsp) ; jb .LBB168_6
+- ntt [mlkem::ntt::ntt] #25: movq %rax, 128(%rsp); cmpq $128, %rax ; jae .LBB168_8
+- ntt [mlkem::ntt::ntt] #34: movq %rax, 120(%rsp); cmpq %rcx, %rax ; jb .LBB168_10
+- ntt [mlkem::ntt::ntt] #50: movq %rax, 104(%rsp); cmpq %rcx, %rax ; jb .LBB168_12
+- ntt [mlkem::ntt::ntt] #69: movq %rdx, 448(%rsp); testq $1, 440(%rsp) ; je .LBB168_15
+- ntt [mlkem::ntt::ntt] #76: movq %rax, 88(%rsp); cmpq %rcx, %rax ; jb .LBB168_21
+- ntt [mlkem::ntt::ntt] #83: movq %rax, 72(%rsp); seto %al ; jo .LBB168_17
+- ntt [mlkem::ntt::ntt] #90: movq %rax, 64(%rsp); cmpq %rcx, %rax ; jb .LBB168_19
+- ntt [mlkem::ntt::ntt] #103: movq 88(%rsp), %rax; cmpq $256, %rax ; jb .LBB168_22
+- ntt [mlkem::ntt::ntt] #117: movw %cx, 62(%rsp); cmpq $256, %rax ; jb .LBB168_24
+- ntt [mlkem::ntt::ntt] #132: seto %al; testb $1, %al ; jne .LBB168_27
+- ntt [mlkem::ntt::ntt] #144: movq %rax, 48(%rsp); cmpq %rcx, %rax ; jb .LBB168_29
+- ntt [mlkem::ntt::ntt] #151: movq 48(%rsp), %rax; cmpq $256, %rax ; jb .LBB168_30
+- ntt [mlkem::ntt::ntt] #162: movw %r8w, (%rcx,%rdx,2); cmpq $256, %rax ; jb .LBB168_32
+- ntt [mlkem::ntt::ntt] #176: seto %al; testb $1, %al ; jne .LBB168_35
+- ntt [mlkem::field::barrett_reduce] #7: movl %eax, 52(%rsp); seto %al ; jo .LBB184_2
+- ntt [mlkem::field::barrett_reduce] #12: movl %eax, 44(%rsp); seto %al ; jo .LBB184_4
+- ntt [mlkem::field::montgomery_reduce] #9: movl %eax, 52(%rsp); seto %al ; jo .LBB185_2
+- ntt [mlkem::field::montgomery_reduce] #15: movl %eax, 44(%rsp); seto %al ; jo .LBB185_4
+- ntt [mlkem::field::fqmul] #6: movl %eax, 36(%rsp); seto %al ; jo .LBB187_2
+- ntt [_NtC4core::num::unchecked_add::precondition_check::mlkem] #6: addq %rdx, %rcx; cmpq %rax, %rcx ; jb .LBB228_2
+- ntt [Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem] #9: movq 16(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB286_3
+- ntt [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB302_2
+- ntt_inverse [mlkem::ntt::ntt_inverse] #5: movq $2, 176(%rsp); cmpq $128, 176(%rsp) ; jbe .LBB165_3
+- ntt_inverse [mlkem::ntt::ntt_inverse] #25: cmoveq %rcx, %rax; testq $1, %rax ; je .LBB165_6
+- ntt_inverse [mlkem::ntt::ntt_inverse] #38: retq; cmpq $256, 184(%rsp) ; jb .LBB165_9
+- ntt_inverse [mlkem::ntt::ntt_inverse] #44: movq %rax, 144(%rsp); seto %al ; jo .LBB165_11
+- ntt_inverse [mlkem::ntt::ntt_inverse] #53: movq %rax, 136(%rsp); cmpq $128, %rax ; jb .LBB165_12
+- ntt_inverse [mlkem::ntt::ntt_inverse] #69: movq %rcx, 128(%rsp); cmpq $1, %rax ; jb .LBB165_15
+- ntt_inverse [mlkem::ntt::ntt_inverse] #85: movq %rax, 112(%rsp); cmpq %rcx, %rax ; jb .LBB165_17
+- ntt_inverse [mlkem::ntt::ntt_inverse] #104: movq %rdx, 472(%rsp); testq $1, 464(%rsp) ; je .LBB165_20
+- ntt_inverse [mlkem::ntt::ntt_inverse] #108: movq %rax, 96(%rsp); cmpq $256, %rax ; jb .LBB165_25
+- ntt_inverse [mlkem::ntt::ntt_inverse] #115: movq %rax, 88(%rsp); seto %al ; jo .LBB165_22
+- ntt_inverse [mlkem::ntt::ntt_inverse] #122: movq %rax, 80(%rsp); cmpq %rcx, %rax ; jb .LBB165_24
+- ntt_inverse [mlkem::ntt::ntt_inverse] #141: movq %rax, 72(%rsp); cmpq %rcx, %rax ; jb .LBB165_28
+- ntt_inverse [mlkem::ntt::ntt_inverse] #150: movq 72(%rsp), %rax; cmpq $256, %rax ; jb .LBB165_29
+- ntt_inverse [mlkem::ntt::ntt_inverse] #162: seto %al; testb $1, %al ; jne .LBB165_32
+- ntt_inverse [mlkem::ntt::ntt_inverse] #175: movw %cx, 66(%rsp); cmpq $256, %rax ; jb .LBB165_33
+- ntt_inverse [mlkem::ntt::ntt_inverse] #188: movq %rax, 56(%rsp); cmpq %rcx, %rax ; jb .LBB165_36
+- ntt_inverse [mlkem::ntt::ntt_inverse] #197: movq 56(%rsp), %rax; cmpq $256, %rax ; jb .LBB165_37
+- ntt_inverse [mlkem::ntt::ntt_inverse] #210: seto %al; testb $1, %al ; jne .LBB165_40
+- ntt_inverse [mlkem::ntt::ntt_inverse] #226: movq %rax, 40(%rsp); cmpq %rcx, %rax ; jb .LBB165_42
+- ntt_inverse [mlkem::ntt::ntt_inverse] #233: movq 40(%rsp), %rax; cmpq $256, %rax ; jb .LBB165_43
+- ntt_inverse [mlkem::field::barrett_reduce] #7: movl %eax, 52(%rsp); seto %al ; jo .LBB184_2
+- ntt_inverse [mlkem::field::barrett_reduce] #12: movl %eax, 44(%rsp); seto %al ; jo .LBB184_4
+- ntt_inverse [mlkem::field::montgomery_reduce] #9: movl %eax, 52(%rsp); seto %al ; jo .LBB185_2
+- ntt_inverse [mlkem::field::montgomery_reduce] #15: movl %eax, 44(%rsp); seto %al ; jo .LBB185_4
+- ntt_inverse [mlkem::field::fqmul] #6: movl %eax, 36(%rsp); seto %al ; jo .LBB187_2
+- ntt_inverse [_NtC4core::num::unchecked_add::precondition_check::mlkem] #6: addq %rdx, %rcx; cmpq %rax, %rcx ; jb .LBB228_2
+- ntt_inverse [Q_::core::slice::iter::IterMut::iter::traits::iterator::Iterator::next::mlkem] #9: movq 16(%rsp), %rcx; cmpq %rcx, %rax ; je .LBB286_3
+- ntt_inverse [_Nt::core::iter::range::ops::range::Range::RangeIteratorImpl::spec_next::mlkem] #4: movq (%rcx), %rax; cmpq 8(%rcx), %rax ; jb .LBB302_2
+
+### zero-stores to memory reachable from decaps_768 (wipe evidence)
+- mlkem::ct::ct_eq_bytes: {'movb': 1}
+- mlkem::encode::byte_decode: {'movl': 2, 'movq': 1}
+- mlkem::encode::byte_encode: {'movl': 2, 'movq': 1}
+- mlkem::hash::keccak::f1600: {'movq': 2}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 1}
+- mlkem::hash::sponge::Sponge::_E6absor: {'movq': 1}
+- mlkem::hash::sponge::Sponge::_E8final: {'movq': 1}
+- mlkem::hash::sponge::Squeezer: {'movq': 1}
+- mlkem::hash::sponge::Squeezer: {'movq': 1}
+- mlkem::hash::sponge::Squeezer::_E7squee: {'movq': 1}
+- mlkem::hash::xof: {'movb': 3}
+- mlkem::kpke::encrypt: {'movb': 1}
+- mlkem::ntt::ntt: {'movq': 1}
+- mlkem::ntt::ntt_inverse: {'movq': 1}
+- mlkem::sample::sample_ntt::hash::Shake128Reader: {'movq': 1}
+- mlkem::sample::sample_poly_cbd: {'movw': 2}
+- mlkem::zeroize::wipe: {'movw': 1}
+- mlkem::zeroize::wipe: {'movq': 1}
+- mlkem::zeroize::wipe: {'movb': 1}
+
+### verdict
+INFO opt-level=0+checks: leaf probe barrett_reduce has 2 conditional branch(es)
+INFO opt-level=0+checks: leaf probe compress_d1 has 13 conditional branch(es)
+INFO opt-level=0+checks: leaf probe compress_d10 has 13 conditional branch(es)
+INFO opt-level=0+checks: leaf probe compress_d11 has 13 conditional branch(es)
+INFO opt-level=0+checks: leaf probe compress_d4 has 13 conditional branch(es)
+INFO opt-level=0+checks: leaf probe compress_d5 has 13 conditional branch(es)
+INFO opt-level=0+checks: leaf probe csubq has 2 conditional branch(es)
+INFO opt-level=0+checks: leaf probe decompress_d1 has 14 conditional branch(es)
+INFO opt-level=0+checks: leaf probe fqmul has 3 conditional branch(es)
+INFO opt-level=0+checks: leaf probe montgomery_reduce has 2 conditional branch(es)
+INFO opt-level=0+checks: leaf probe to_canonical has 1 conditional branch(es)
+
+## opt-level=1: mlkem-3059a1a9680eba4d.s, 137 functions
+
+### div/idiv instructions (all functions)
+- _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::ChunksExact::ZipImpl::new::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+- core::slice::iter::ChunksExact::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+
+### hazmat probes (own code + everything called)
+probe              class  insns  div  jcc  cmov  setcc  callees
+barrett_reduce     leaf       7    0    0     0      0  -
+cbd_eta2           loop      50    0    1     0      2  memcpy, memset
+cbd_eta3           loop      75    0    1     0      4  memcpy, memset
+compress_d1        leaf       7    0    0     0      0  -
+compress_d10       leaf       8    0    0     0      0  -
+compress_d11       leaf       8    0    0     0      0  -
+compress_d4        leaf       8    0    0     0      0  -
+compress_d5        leaf       8    0    0     0      0  -
+csubq              leaf       4    0    0     1      0  -
+ct_eq_1088         loop      27    0    1     0      1  -
+ct_eq_32           loop      27    0    1     0      1  -
+ct_select_32       loop      35    0    4     0      0  -
+decaps_768         loop    3481    0  187    11     18  mlkem::hash::absorb_all, mlkem::hash::sponge::Sponge, mlkem::kem::decaps_internal, mlkem::ntt::ntt_inverse, mlkem::ntt::ntt, mlkem::hash::g, mlkem::hash::shake256, mlkem::kpke::matrix_entry, mlkem::kpke::sample_noise, mlkem::kpke::encrypt, mlkem::encode::poly_compress_encode, mlkem::encode::poly_decode_decompress, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core6result13unwrap_failed, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, mlkem::hash::keccak::f1600, _RNvNtNtCs7uUmbfRqPp3_4core5slice5index16slice_index_fail, __chkstk, memcpy, memset
+decode12           loop      75    0    6     3      0  _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, memcpy, memset
+decompress_d1      leaf       5    0    0     0      0  -
+fqmul              leaf       9    0    0     0      0  -
+is_zero_mask       leaf      10    0    0     0      1  -
+keccak_f1600       loop     364    0    2     0      1  mlkem::hash::keccak::f1600, memcpy
+message_encode     loop     139    0    9     1      2  mlkem::encode::poly_compress_encode, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic
+montgomery_reduce  leaf       6    0    0     0      0  -
+multiply_ntts      loop      73    0    1     0      0  memcpy, memset
+ntt                loop     113    0    7     1      0  mlkem::ntt::ntt, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, memcpy
+ntt_inverse        loop     122    0    7     0      0  mlkem::ntt::ntt_inverse, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, memcpy
+to_canonical       leaf       5    0    0     0      0  -
+
+### conditional branches in loop probes, for review
+- cbd_eta2 [mlkem::hazmat::cbd_eta2] #39: addb $4, %bl; cmpq $256, %rax ; jb .LBB74_1
+- cbd_eta3 [mlkem::hazmat::cbd_eta3] #62: addq $6, %rbx; cmpq $256, %rax ; jb .LBB75_1
+- ct_eq_1088 [mlkem::hazmat::ct_eq_1088] #17: addq $4, %r8; cmpq $1091, %r8 ; jne .LBB54_1
+- ct_eq_32 [mlkem::hazmat::ct_eq_32] #17: orb %r9b, %al; cmpq $32, %r8 ; jne .LBB76_1
+- ct_select_32 [mlkem::hazmat::ct_select_32] #9: xorl %r9d, %r9d; cmpq $31, %r9 ; ja .LBB62_2
+- ct_select_32 [mlkem::hazmat::ct_select_32] #16: addq %r8, %r11; testq %rsi, %rsi ; jne .LBB62_5
+- ct_select_32 [mlkem::hazmat::ct_select_32] #20: xorl %esi, %esi; testq %rsi, %rsi ; je .LBB62_6
+- ct_select_32 [mlkem::hazmat::ct_select_32] #28: movb %dil, (%rsi); cmpq $31, %r9 ; ja .LBB62_2
+- decode12 [mlkem::hazmat::decode12] #23: addl $-12, %eax; addq $2, %rdx ; je .LBB77_3
+- decode12 [mlkem::hazmat::decode12] #25: je .LBB77_3; cmpl $12, %eax ; jae .LBB77_2
+- decode12 [mlkem::hazmat::decode12] #27: jae .LBB77_2; cmpq $383, %r8 ; ja .LBB77_11
+- decode12 [mlkem::hazmat::decode12] #35: leal 8(%rax), %ecx; cmpl $3, %eax ; ja .LBB77_8
+- decode12 [mlkem::hazmat::decode12] #37: ja .LBB77_8; cmpq $384, %r9 ; je .LBB77_11
+- decode12 [mlkem::hazmat::decode12] #57: addq $4, %rax; cmpq $514, %rax ; jne .LBB77_4
+- keccak_f1600 [mlkem::hash::keccak::f1600] #198: movq %r10, (%rsi); cmpq $24, 136(%rsp) ; je .LBB79_5
+- keccak_f1600 [mlkem::hash::keccak::f1600] #340: movq %r9, 144(%rsp,%r8,8); cmpq $24, %rax ; ja .LBB79_4
+- message_encode [mlkem::encode::poly_compress_encode] #21: addq $2, %rax; cmpq $256, %rax ; jne .LBB52_1
+- message_encode [mlkem::encode::poly_compress_encode] #49: addq $2, %r10; cmpq $256, %r10 ; jne .LBB52_3
+- message_encode [mlkem::encode::poly_compress_encode] #56: sete %al; cmpl $12, %ecx ; jae .LBB52_5
+- message_encode [mlkem::encode::poly_compress_encode] #58: jae .LBB52_5; testb %al, %al ; je .LBB52_15
+- message_encode [mlkem::encode::poly_compress_encode] #75: setne %r14b; leaq (%rdi,%r14,2), %rbx ; je .LBB52_14
+- message_encode [mlkem::encode::poly_compress_encode] #84: leal (%rcx,%rdx), %ebx; cmpl $8, %ebx ; jb .LBB52_8
+- message_encode [mlkem::encode::poly_compress_encode] #92: incl %ecx; cmpq %rax, %r14 ; je .LBB52_13
+- message_encode [mlkem::encode::poly_compress_encode] #98: addl $-8, %ebx; decl %ecx ; jne .LBB52_11
+- message_encode [mlkem::encode::poly_compress_encode] #109: xorl %eax, %eax; testb %al, %al ; jne .LBB52_7
+- multiply_ntts [mlkem::hazmat::multiply_ntts] #60: addq $2, %rax; cmpq $128, %r14 ; jb .LBB67_1
+- ntt [mlkem::ntt::ntt] #17: cmpq $3, %rdx; movq %r9, %rdx ; jbe .LBB45_6
+- ntt [mlkem::ntt::ntt] #22: cmovaeq %rax, %r10; cmpq $127, %rax ; ja .LBB45_12
+- ntt [mlkem::ntt::ntt] #32: leaq (%r15,%rdx), %r9; cmpq $256, %r9 ; jae .LBB45_13
+- ntt [mlkem::ntt::ntt] #49: incq %r14; cmpq %rbx, %r14 ; jb .LBB45_9
+- ntt [mlkem::ntt::ntt] #52: addq %r11, %rsi; cmpq $256, %rsi ; jae .LBB45_5
+- ntt [mlkem::ntt::ntt] #54: jae .LBB45_5; cmpq %r10, %rax ; jne .LBB45_8
+- ntt [mlkem::ntt::ntt] #77: addq $4, %rax; cmpq $512, %rax ; jne .LBB45_3
+- ntt_inverse [mlkem::ntt::ntt_inverse] #15: xorl %esi, %esi; cmpq $127, %rax ; ja .LBB44_12
+- ntt_inverse [mlkem::ntt::ntt_inverse] #22: movq %rsi, %r9; cmpq $256, %r9 ; jae .LBB44_13
+- ntt_inverse [mlkem::ntt::ntt_inverse] #25: leaq (%r9,%rdx), %r10; cmpq $256, %r10 ; jae .LBB44_14
+- ntt_inverse [mlkem::ntt::ntt_inverse] #48: incq %r14; cmpq %rbx, %r14 ; jb .LBB44_4
+- ntt_inverse [mlkem::ntt::ntt_inverse] #51: addq %r11, %rsi; cmpq $256, %rsi ; jb .LBB44_2
+- ntt_inverse [mlkem::ntt::ntt_inverse] #54: cmpq $65, %rdx; movq %r11, %rdx ; jb .LBB44_1
+- ntt_inverse [mlkem::ntt::ntt_inverse] #76: addq $4, %rax; cmpq $512, %rax ; jne .LBB44_10
+
+### zero-stores to memory reachable from decaps_768 (wipe evidence)
+- mlkem::hash::absorb_all: {'movq': 1}
+- mlkem::hash::g: {'movq': 53, 'movb': 8}
+- mlkem::hash::keccak::f1600: {'movq': 3}
+- mlkem::hash::shake256: {'movq': 26}
+- mlkem::hash::sponge::Sponge: {'movq': 26}
+- mlkem::kem::decaps_internal: {'movw': 24, 'movb': 136}
+- mlkem::kpke::encrypt: {'movb': 1, 'movw': 88}
+- mlkem::kpke::matrix_entry: {'movq': 54, 'movb': 1}
+- mlkem::kpke::sample_noise: {'movb': 8}
+
+### verdict
+PASS: no unreviewed div/idiv in mlkem code; no conditional branch in any leaf probe
+
+## opt-level=2: mlkem-c5dd8b44279d63f5.s, 90 functions
+
+### div/idiv instructions (all functions)
+- none
+
+### hazmat probes (own code + everything called)
+probe              class  insns  div  jcc  cmov  setcc  callees
+barrett_reduce     leaf       7    0    0     0      0  -
+cbd_eta2           loop      50    0    1     0      2  memcpy, memset
+cbd_eta3           loop      75    0    1     0      4  memcpy, memset
+compress_d1        leaf       7    0    0     0      0  -
+compress_d10       leaf       8    0    0     0      0  -
+compress_d11       leaf       8    0    0     0      0  -
+compress_d4        leaf       8    0    0     0      0  -
+compress_d5        leaf       8    0    0     0      0  -
+csubq              leaf       4    0    0     1      0  -
+ct_eq_1088         loop      40    0    1     0      1  -
+ct_eq_32           loop      18    0    0     0      1  -
+ct_select_32       loop      23    0    0     0      0  -
+decaps_768         loop    4102    0  182    22      3  mlkem::hash::absorb_all, mlkem::hash::sponge::Sponge, mlkem::kem::decaps_internal, mlkem::ntt::ntt_inverse, mlkem::ntt::ntt, mlkem::hash::g, mlkem::hash::shake256, mlkem::kpke::matrix_entry, mlkem::kpke::sample_noise, mlkem::kpke::encrypt, mlkem::encode::byte_decode, mlkem::encode::poly_compress_encode, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, mlkem::hash::keccak::f1600, _RNvNtNtCs7uUmbfRqPp3_4core5slice5index16slice_index_fail, __chkstk, memcpy, memset
+decode12           loop      87    0    6     1      0  _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, memcpy, memset
+decompress_d1      leaf       5    0    0     0      0  -
+fqmul              leaf       9    0    0     0      0  -
+is_zero_mask       leaf      10    0    0     0      1  -
+keccak_f1600       loop     408    0    2     0      0  mlkem::hash::keccak::f1600, memcpy
+message_encode     loop     193    0    9     1      1  mlkem::encode::poly_compress_encode, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic
+montgomery_reduce  leaf       6    0    0     0      0  -
+multiply_ntts      loop     162    0    1     0      0  memcpy, memset
+ntt                loop     258    0   11     7      0  mlkem::ntt::ntt, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, memcpy
+ntt_inverse        loop     316    0   11    11      0  mlkem::ntt::ntt_inverse, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, memcpy
+to_canonical       leaf       5    0    0     0      0  -
+
+### conditional branches in loop probes, for review
+- cbd_eta2 [mlkem::hazmat::cbd_eta2] #39: addb $4, %bl; cmpq $256, %rax ; jne .LBB56_1
+- cbd_eta3 [mlkem::hazmat::cbd_eta3] #62: addq $6, %r14; cmpq $1536, %r14 ; jne .LBB57_1
+- ct_eq_1088 [mlkem::hazmat::ct_eq_1088] #25: addq $64, %rax; cmpq $1136, %rax ; jne .LBB36_1
+- decode12 [mlkem::hazmat::decode12] #25: addl $-12, %eax; cmpq $512, %r8 ; je .LBB59_3
+- decode12 [mlkem::hazmat::decode12] #27: je .LBB59_3; cmpl $12, %eax ; jae .LBB59_2
+- decode12 [mlkem::hazmat::decode12] #29: jae .LBB59_2; cmpq $383, %rdx ; ja .LBB59_11
+- decode12 [mlkem::hazmat::decode12] #37: leal 8(%rax), %ecx; cmpl $3, %eax ; ja .LBB59_8
+- decode12 [mlkem::hazmat::decode12] #39: ja .LBB59_8; cmpq $384, %r9 ; je .LBB59_11
+- decode12 [mlkem::hazmat::decode12] #68: addq $16, %rax; cmpq $264, %rax ; jne .LBB59_4
+- keccak_f1600 [mlkem::hash::keccak::f1600] #254: movq %r14, %rbp; cmpq $24, %r8 ; je .LBB61_5
+- keccak_f1600 [mlkem::hash::keccak::f1600] #389: movq %rdx, 216(%rsp,%rax,8); cmpq $25, %rax ; je .LBB61_4
+- message_encode [mlkem::encode::poly_compress_encode] #28: addq $16, %rax; cmpq $256, %rax ; jne .LBB35_1
+- message_encode [mlkem::encode::poly_compress_encode] #101: addq $8, %rax; cmpq $256, %rax ; jne .LBB35_3
+- message_encode [mlkem::encode::poly_compress_encode] #108: sete %al; cmpl $12, %ecx ; jae .LBB35_5
+- message_encode [mlkem::encode::poly_compress_encode] #110: jae .LBB35_5; testb %al, %al ; je .LBB35_15
+- message_encode [mlkem::encode::poly_compress_encode] #124: movl %ebp, %ecx; cmpq $512, %rbx ; je .LBB35_14
+- message_encode [mlkem::encode::poly_compress_encode] #132: leal (%rcx,%rdx), %ebp; cmpl $8, %ebp ; jb .LBB35_8
+- message_encode [mlkem::encode::poly_compress_encode] #140: incl %ecx; cmpq %rdi, %rax ; je .LBB35_13
+- message_encode [mlkem::encode::poly_compress_encode] #146: addl $-8, %ebp; decl %ecx ; jne .LBB35_11
+- message_encode [mlkem::encode::poly_compress_encode] #163: xorl %eax, %eax; testb %al, %al ; jne .LBB35_7
+- multiply_ntts [mlkem::hazmat::multiply_ntts] #142: addq $8, %r14; cmpq $256, %r14 ; jne .LBB49_1
+- ntt [mlkem::ntt::ntt] #26: movq %rax, %r13; movq 40(%rsp), %rax ; jbe .LBB27_4
+- ntt [mlkem::ntt::ntt] #32: movq %rdx, 48(%rsp); cmpq $127, %rax ; ja .LBB27_16
+- ntt [mlkem::ntt::ntt] #62: movq %rbx, %r12; cmpq $7, %rbp ; jbe .LBB27_9
+- ntt [mlkem::ntt::ntt] #83: movq %rbx, %r11; movq 64(%rsp), %rbx ; jae .LBB27_14
+- ntt [mlkem::ntt::ntt] #90: movq %rbx, %r12; cmpq %rax, %r14 ; jb .LBB27_9
+- ntt [mlkem::ntt::ntt] #157: addq $16, %rbp; addq $-8, %r9 ; jne .LBB27_15
+- ntt [mlkem::ntt::ntt] #161: leaq (%r12,%r13), %r9; cmpq $256, %r9 ; jae .LBB27_11
+- ntt [mlkem::ntt::ntt] #177: incq %r12; cmpq %r12, %r8 ; jne .LBB27_10
+- ntt [mlkem::ntt::ntt] #180: addq %rsi, %rbx; cmpq $256, %rbx ; jae .LBB27_3
+- ntt [mlkem::ntt::ntt] #188: movq 40(%rsp), %rax; cmpq 48(%rsp), %rax ; jne .LBB27_8
+- ntt [mlkem::ntt::ntt] #215: addq $8, %rax; cmpq $256, %rax ; jne .LBB27_5
+- ntt_inverse [mlkem::ntt::ntt_inverse] #84: movq 32(%rsp), %r11; cmpq $127, %r11 ; ja .LBB26_17
+- ntt_inverse [mlkem::ntt::ntt_inverse] #89: movq %r13, %rsi; cmpq $7, %rdi ; jbe .LBB26_4
+- ntt_inverse [mlkem::ntt::ntt_inverse] #105: leaq (%rcx,%r12), %rsi; movq 56(%rsp), %r8 ; jae .LBB26_15
+- ntt_inverse [mlkem::ntt::ntt_inverse] #111: movq %r13, %rsi; cmpq %r15, %r12 ; jb .LBB26_4
+- ntt_inverse [mlkem::ntt::ntt_inverse] #191: addq $8, %r15; cmpq %r15, %r9 ; jne .LBB26_16
+- ntt_inverse [mlkem::ntt::ntt_inverse] #194: decq 32(%rsp); cmpq $256, %rsi ; je .LBB26_18
+- ntt_inverse [mlkem::ntt::ntt_inverse] #197: leaq (%rdx,%rsi), %r9; cmpq $256, %r9 ; jae .LBB26_19
+- ntt_inverse [mlkem::ntt::ntt_inverse] #219: incq %rsi; cmpq %rax, %rsi ; jb .LBB26_5
+- ntt_inverse [mlkem::ntt::ntt_inverse] #236: addq %rax, %rbp; cmpq $256, %r13 ; jb .LBB26_2
+- ntt_inverse [mlkem::ntt::ntt_inverse] #239: cmpq $65, %rdx; movq 48(%rsp), %rdx ; jb .LBB26_1
+- ntt_inverse [mlkem::ntt::ntt_inverse] #260: addq $8, %rax; cmpq $256, %rax ; jne .LBB26_11
+
+### zero-stores to memory reachable from decaps_768 (wipe evidence)
+- mlkem::hash::absorb_all: {'movq': 1}
+- mlkem::hash::g: {'movq': 53, 'movb': 8}
+- mlkem::hash::keccak::f1600: {'movq': 1}
+- mlkem::hash::shake256: {'movq': 26}
+- mlkem::hash::sponge::Sponge: {'movq': 26}
+- mlkem::kem::decaps_internal: {'movw': 24, 'movb': 136}
+- mlkem::kpke::encrypt: {'movb': 1, 'movw': 88}
+- mlkem::kpke::matrix_entry: {'movq': 54, 'movb': 1}
+- mlkem::kpke::sample_noise: {'movb': 8}
+
+### verdict
+PASS: no unreviewed div/idiv in mlkem code; no conditional branch in any leaf probe
+
+## opt-level=3: mlkem-3862381fc6dae878.s, 90 functions
+
+### div/idiv instructions (all functions)
+- none
+
+### hazmat probes (own code + everything called)
+probe              class  insns  div  jcc  cmov  setcc  callees
+barrett_reduce     leaf       7    0    0     0      0  -
+cbd_eta2           loop      50    0    1     0      2  memcpy, memset
+cbd_eta3           loop      75    0    1     0      4  memcpy, memset
+compress_d1        leaf       7    0    0     0      0  -
+compress_d10       leaf       8    0    0     0      0  -
+compress_d11       leaf       8    0    0     0      0  -
+compress_d4        leaf       8    0    0     0      0  -
+compress_d5        leaf       8    0    0     0      0  -
+csubq              leaf       4    0    0     1      0  -
+ct_eq_1088         loop      40    0    1     0      1  -
+ct_eq_32           loop      18    0    0     0      1  -
+ct_select_32       loop      24    0    0     0      0  mlkem::ct::ct_select_bytes
+decaps_768         loop   11080    0  212     4      5  mlkem::hash::absorb_all, mlkem::hash::sponge::Sponge, mlkem::ct::ct_select_bytes, mlkem::kem::decaps_internal, mlkem::ntt::ntt_inverse, mlkem::ntt::ntt, mlkem::hash::g, mlkem::hash::shake256, mlkem::kpke::matrix_entry, mlkem::kpke::encrypt, mlkem::encode::poly_compress_encode, mlkem::encode::poly_decode_decompress, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, mlkem::hash::keccak::f1600, _RNvNtNtCs7uUmbfRqPp3_4core5slice5index16slice_index_fail, __chkstk, memcpy, memset
+decode12           loop     358    0    5     1      0  _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, memcpy, memset
+decompress_d1      leaf       5    0    0     0      0  -
+fqmul              leaf       9    0    0     0      0  -
+is_zero_mask       leaf      10    0    0     0      1  -
+keccak_f1600       loop     368    0    1     0      0  mlkem::hash::keccak::f1600, memcpy
+message_encode     loop     366    0    8     1      1  mlkem::encode::poly_compress_encode, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic
+montgomery_reduce  leaf       6    0    0     0      0  -
+multiply_ntts      loop     162    0    1     0      0  memcpy, memset
+ntt                loop    1108    0    8     0      0  mlkem::ntt::ntt, memcpy
+ntt_inverse        loop    3875    0    7     0      0  mlkem::ntt::ntt_inverse, memcpy
+to_canonical       leaf       5    0    0     0      0  -
+
+### conditional branches in loop probes, for review
+- cbd_eta2 [mlkem::hazmat::cbd_eta2] #39: addb $4, %bl; cmpq $256, %rax ; jne .LBB56_1
+- cbd_eta3 [mlkem::hazmat::cbd_eta3] #62: addq $6, %r14; cmpq $1536, %r14 ; jne .LBB57_1
+- ct_eq_1088 [mlkem::hazmat::ct_eq_1088] #25: addq $64, %rax; cmpq $1136, %rax ; jne .LBB36_1
+- decode12 [mlkem::hazmat::decode12] #28: addl $-12, %eax; cmpq $512, %r8 ; je .LBB59_3
+- decode12 [mlkem::hazmat::decode12] #30: je .LBB59_3; cmpl $12, %eax ; jae .LBB59_2
+- decode12 [mlkem::hazmat::decode12] #32: jae .LBB59_2; cmpq $383, %rdx ; ja .LBB59_9
+- decode12 [mlkem::hazmat::decode12] #40: leal 8(%rax), %ecx; cmpl $3, %eax ; ja .LBB59_6
+- decode12 [mlkem::hazmat::decode12] #42: ja .LBB59_6; cmpq $384, %r9 ; je .LBB59_9
+- keccak_f1600 [mlkem::hash::keccak::f1600] #316: incq %r8; cmpq $26, %r8 ; jne .LBB61_1
+- message_encode [mlkem::encode::poly_compress_encode] #275: addq $8, %rcx; cmpq $256, %rcx ; jne .LBB34_1
+- message_encode [mlkem::encode::poly_compress_encode] #282: sete %al; cmpl $12, %ecx ; jae .LBB34_3
+- message_encode [mlkem::encode::poly_compress_encode] #284: jae .LBB34_3; testb %al, %al ; je .LBB34_13
+- message_encode [mlkem::encode::poly_compress_encode] #298: movl %ebp, %ecx; cmpq $512, %rbx ; je .LBB34_12
+- message_encode [mlkem::encode::poly_compress_encode] #306: leal (%rcx,%rdx), %ebp; cmpl $8, %ebp ; jb .LBB34_6
+- message_encode [mlkem::encode::poly_compress_encode] #314: incl %ecx; cmpq %rdi, %rax ; je .LBB34_11
+- message_encode [mlkem::encode::poly_compress_encode] #320: addl $-8, %ebp; decl %ecx ; jne .LBB34_9
+- message_encode [mlkem::encode::poly_compress_encode] #336: xorl %eax, %eax; testb %al, %al ; jne .LBB34_5
+- multiply_ntts [mlkem::hazmat::multiply_ntts] #142: addq $8, %r14; cmpq $256, %r14 ; jne .LBB49_1
+- ntt [mlkem::ntt::ntt] #54: addq $8, %rax; cmpq $128, %rax ; jne .LBB28_1
+- ntt [mlkem::ntt::ntt] #102: addq $8, %rax; cmpq $64, %rax ; jne .LBB28_3
+- ntt [mlkem::ntt::ntt] #150: addq $16, %rax; cmpq $512, %rax ; jne .LBB28_5
+- ntt [mlkem::ntt::ntt] #934: addq $32, %rdx; cmpq $224, %rdx ; jb .LBB28_7
+- ntt [mlkem::ntt::ntt] #990: addq $16, %rdx; cmpq $240, %rdx ; jb .LBB28_9
+- ntt [mlkem::ntt::ntt] #1026: addq $8, %rdx; cmpq $248, %rdx ; jb .LBB28_11
+- ntt [mlkem::ntt::ntt] #1057: addq $4, %rdx; cmpq $252, %rdx ; jb .LBB28_13
+- ntt [mlkem::ntt::ntt] #1079: addq $8, %rax; cmpq $256, %rax ; jne .LBB28_15
+- ntt_inverse [mlkem::ntt::ntt_inverse] #249: addq $-16, %rax; cmpq $64, %rdx ; jne .LBB27_1
+- ntt_inverse [mlkem::ntt::ntt_inverse] #761: addq $-16, %rax; cmpq $64, %rdx ; jne .LBB27_3
+- ntt_inverse [mlkem::ntt::ntt_inverse] #1849: addq $8, %rax; cmpq $16, %rax ; jne .LBB27_5
+- ntt_inverse [mlkem::ntt::ntt_inverse] #3695: movdqu %xmm4, 256(%rcx,%rax); addq $16, %rax ; jne .LBB27_7
+- ntt_inverse [mlkem::ntt::ntt_inverse] #3755: movdqu %xmm4, 512(%rcx,%rax); addq $16, %rax ; jne .LBB27_9
+- ntt_inverse [mlkem::ntt::ntt_inverse] #3815: movdqu %xmm4, 512(%rcx,%rax); addq $16, %rax ; jne .LBB27_11
+- ntt_inverse [mlkem::ntt::ntt_inverse] #3837: addq $8, %rax; cmpq $256, %rax ; jne .LBB27_13
+
+### zero-stores to memory reachable from decaps_768 (wipe evidence)
+- mlkem::hash::absorb_all: {'movq': 1}
+- mlkem::hash::g: {'movq': 54, 'movb': 64}
+- mlkem::hash::shake256: {'movq': 26}
+- mlkem::hash::sponge::Sponge: {'movq': 26}
+- mlkem::kem::decaps_internal: {'movw': 24, 'movb': 136}
+- mlkem::kpke::encrypt: {'movb': 73, 'movw': 88}
+- mlkem::kpke::matrix_entry: {'movq': 56, 'movb': 1}
+
+### verdict
+PASS: no unreviewed div/idiv in mlkem code; no conditional branch in any leaf probe
+
+## opt-level=s: mlkem-217057de15aa47ba.s, 124 functions
+
+### div/idiv instructions (all functions)
+- _Nt::core::iter::adapters::zip::Zip::slice::iter::IterMut::ChunksExact::ZipImpl::new::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+- core::slice::iter::ChunksExact::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+
+### hazmat probes (own code + everything called)
+probe              class  insns  div  jcc  cmov  setcc  callees
+barrett_reduce     leaf       7    0    0     0      0  -
+cbd_eta2           loop      97    0    6     0      0  mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, memset
+cbd_eta3           loop      97    0    6     0      0  mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, memset
+compress_d1        leaf       7    0    0     0      0  -
+compress_d10       leaf       8    0    0     0      0  -
+compress_d11       leaf       8    0    0     0      0  -
+compress_d4        leaf       8    0    0     0      0  -
+compress_d5        leaf       8    0    0     0      0  -
+csubq              leaf       4    0    0     1      0  -
+ct_eq_1088         loop      18    0    1     0      1  -
+ct_eq_32           loop      18    0    1     0      1  -
+ct_select_32       loop      16    0    1     0      0  -
+decaps_768         loop    2221    0  167     4      1  mlkem::hash::absorb_all, _RINvNtCs7uUmbfRqPp3_4core9panicking13assert_failedjjEB4_, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Squeezer, mlkem::ct::ct_eq_bytes, mlkem::kem::decaps_internal, mlkem::ntt::ntt_inverse, mlkem::ntt::multiply_ntts, mlkem::ntt::ntt, mlkem::hash::g, mlkem::hash::shake256, mlkem::kpke::matrix_entry, mlkem::kpke::sample_noise, mlkem::kpke::encrypt, mlkem::encode::byte_decode, mlkem::encode::byte_encode, mlkem::encode::poly_compress_encode, mlkem::encode::poly_decode_decompress, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, mlkem::hash::keccak::f1600, _RNvNtNtCs7uUmbfRqPp3_4core5slice5index16slice_index_fail, mlkem::hash::Shake128Reader::sample::XofReader::squeeze, __chkstk, memcpy, memset
+decode12           loop     102    0    9     2      0  mlkem::encode::byte_decode, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, memcpy, memset
+decompress_d1      leaf       5    0    0     0      0  -
+fqmul              leaf       9    0    0     0      0  -
+is_zero_mask       leaf      10    0    0     0      1  -
+keccak_f1600       loop     115    0    9     0      0  _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, mlkem::hash::keccak::f1600, memcpy, memset
+message_encode     loop     131    0    8     1      0  mlkem::encode::byte_encode, mlkem::encode::poly_compress_encode, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic
+montgomery_reduce  leaf       6    0    0     0      0  -
+multiply_ntts      loop      69    0    1     0      0  mlkem::ntt::multiply_ntts, memset
+ntt                loop     115    0    7     1      0  mlkem::ntt::ntt, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, memcpy
+ntt_inverse        loop     108    0    7     0      0  mlkem::ntt::ntt_inverse, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, memcpy
+to_canonical       leaf       5    0    0     0      0  -
+
+### conditional branches in loop probes, for review
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #13: andq $-2, %rax; cmpq $2, %rax ; jne .LBB76_12
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #19: shlq $6, %rax; cmpq %rax, %r9 ; jne .LBB76_12
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #41: shrq $3, %rax; cmpq %rsi, %rax ; jae .LBB76_5
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #45: shrq $3, %rcx; cmpq %rsi, %rcx ; jae .LBB76_7
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #60: incq %rbp; cmpq %rbx, %r14 ; jne .LBB76_4
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #69: movq %r10, %r11; cmpq $256, %r10 ; jne .LBB76_3
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #13: andq $-2, %rax; cmpq $2, %rax ; jne .LBB76_12
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #19: shlq $6, %rax; cmpq %rax, %r9 ; jne .LBB76_12
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #41: shrq $3, %rax; cmpq %rsi, %rax ; jae .LBB76_5
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #45: shrq $3, %rcx; cmpq %rsi, %rcx ; jae .LBB76_7
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #60: incq %rbp; cmpq %rbx, %r14 ; jne .LBB76_4
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #69: movq %r10, %r11; cmpq $256, %r10 ; jne .LBB76_3
+- ct_eq_1088 [mlkem::hazmat::ct_eq_1088] #8: orb %r9b, %al; cmpq $1088, %r8 ; jne .LBB52_1
+- ct_eq_32 [mlkem::hazmat::ct_eq_32] #8: orb %r9b, %al; cmpq $32, %r8 ; jne .LBB74_1
+- ct_select_32 [mlkem::hazmat::ct_select_32] #13: incq %r9; cmpq $32, %r9 ; jne .LBB60_1
+- decode12 [mlkem::encode::byte_decode] #10: leal -1(%rbx), %eax; cmpl $11, %eax ; ja .LBB47_15
+- decode12 [mlkem::encode::byte_decode] #15: shlq $5, %rax; cmpq %rax, %r9 ; jne .LBB47_15
+- decode12 [mlkem::encode::byte_decode] #31: xorl %r9d, %r9d; cmpl %ebx, %eax ; jae .LBB47_11
+- decode12 [mlkem::encode::byte_decode] #35: movq %rdi, %rdx; cmovaq %r8, %rdx ; jae .LBB47_14
+- decode12 [mlkem::encode::byte_decode] #46: leal 8(%rax), %ecx; cmpl %ebx, %ecx ; jae .LBB47_10
+- decode12 [mlkem::encode::byte_decode] #52: movl %ecx, %eax; cmpq $1, %r11 ; je .LBB47_14
+- decode12 [mlkem::encode::byte_decode] #63: subl %ebx, %eax; cmpq $512, %r9 ; jne .LBB47_3
+- decode12 [mlkem::encode::byte_decode] #65: jne .LBB47_3; cmpl $12, %ebx ; jne .LBB47_9
+- decode12 [mlkem::encode::byte_decode] #74: addq $2, %rax; cmpq $512, %rax ; jne .LBB47_8
+- keccak_f1600 [mlkem::hash::keccak::f1600] #35: incq %rax; cmpq $5, %rax ; jne .LBB77_2
+- keccak_f1600 [mlkem::hash::keccak::f1600] #47: addq $40, %r8; cmpq $200, %r8 ; jne .LBB77_5
+- keccak_f1600 [mlkem::hash::keccak::f1600] #51: addq $8, %rax; cmpq $5, %rcx ; jne .LBB77_4
+- keccak_f1600 [mlkem::hash::keccak::f1600] #64: addq $8, %rax; cmpq $200, %rax ; jne .LBB77_8
+- keccak_f1600 [mlkem::hash::keccak::f1600] #75: addq %r10, %rcx; cmpq $24, %rcx ; ja .LBB77_18
+- keccak_f1600 [mlkem::hash::keccak::f1600] #79: addq %r10, %rax; cmpq $25, %rax ; jae .LBB77_17
+- keccak_f1600 [mlkem::hash::keccak::f1600] #87: addq $8, %r11; cmpq $40, %r11 ; jne .LBB77_11
+- keccak_f1600 [mlkem::hash::keccak::f1600] #91: addq $40, %rdx; cmpq $5, %r9 ; jne .LBB77_10
+- keccak_f1600 [mlkem::hash::keccak::f1600] #94: xorq %rdi, (%rsi); cmpq $24, %rbp ; jne .LBB77_1
+- message_encode [mlkem::encode::byte_encode] #9: leal -1(%rax), %ecx; cmpl $11, %ecx ; ja .LBB48_9
+- message_encode [mlkem::encode::byte_encode] #13: shlq $5, %rcx; cmpq %rcx, %r9 ; jne .LBB48_9
+- message_encode [mlkem::encode::byte_encode] #30: leal (%rcx,%rax), %ebp; cmpl $8, %ebp ; jb .LBB48_3
+- message_encode [mlkem::encode::byte_encode] #38: incl %ecx; cmpq %rbx, %r10 ; je .LBB48_8
+- message_encode [mlkem::encode::byte_encode] #44: addl $-8, %ebp; decl %ecx ; jne .LBB48_6
+- message_encode [mlkem::encode::byte_encode] #48: movl %ebp, %ecx; cmpq $512, %r14 ; jne .LBB48_4
+- message_encode [mlkem::encode::poly_compress_encode] #13: incq %rax; cmpq $256, %rax ; jne .LBB50_1
+- message_encode [mlkem::encode::poly_compress_encode] #34: incq %rdx; cmpq $256, %rdx ; jne .LBB50_3
+- multiply_ntts [mlkem::ntt::multiply_ntts] #59: addq $2, %r14; cmpq $256, %r14 ; jne .LBB39_1
+- ntt [mlkem::ntt::ntt] #18: cmovaeq %rdx, %rax; cmpq $127, %rdx ; ja .LBB40_13
+- ntt [mlkem::ntt::ntt] #32: leaq (%r15,%r13), %r9; cmpq $256, %r9 ; jae .LBB40_12
+- ntt [mlkem::ntt::ntt] #49: movq %rdi, %rcx; addq %r13, %rcx ; jne .LBB40_4
+- ntt [mlkem::ntt::ntt] #52: addq %r11, %r14; cmpq $256, %r14 ; jae .LBB40_8
+- ntt [mlkem::ntt::ntt] #56: addq %rsi, %rbx; cmpq %rax, %rdx ; jne .LBB40_3
+- ntt [mlkem::ntt::ntt] #63: cmpq $3, %rcx; movq %rax, 40(%rsp) ; ja .LBB40_1
+- ntt [mlkem::ntt::ntt] #75: addq $2, %rax; cmpq $512, %rax ; jne .LBB40_10
+- ntt_inverse [mlkem::ntt::ntt_inverse] #15: xorl %esi, %esi; cmpq $127, %rax ; ja .LBB38_14
+- ntt_inverse [mlkem::ntt::ntt_inverse] #21: movq %rsi, %r14; cmpq $256, %r14 ; je .LBB38_12
+- ntt_inverse [mlkem::ntt::ntt_inverse] #24: leaq (%rdx,%r14), %r9; cmpq $256, %r9 ; jae .LBB38_13
+- ntt_inverse [mlkem::ntt::ntt_inverse] #46: incq %r14; cmpq %rbx, %r14 ; jb .LBB38_4
+- ntt_inverse [mlkem::ntt::ntt_inverse] #49: addq %r10, %rsi; cmpq $256, %rsi ; jb .LBB38_2
+- ntt_inverse [mlkem::ntt::ntt_inverse] #52: cmpq $65, %rdx; movq %r10, %rdx ; jb .LBB38_1
+- ntt_inverse [mlkem::ntt::ntt_inverse] #65: addq $2, %rax; cmpq $512, %rax ; jne .LBB38_10
+
+### zero-stores to memory reachable from decaps_768 (wipe evidence)
+- mlkem::hash::Shake128Reader::sample::XofReader::squeeze: {'movq': 1}
+- mlkem::hash::absorb_all: {'movq': 1}
+- mlkem::hash::g: {'movq': 5, 'movb': 1}
+- mlkem::hash::keccak::f1600: {'movq': 1}
+- mlkem::hash::shake256: {'movq': 1}
+- mlkem::hash::sponge::Sponge: {'movq': 2}
+- mlkem::hash::sponge::Squeezer: {'movq': 1}
+- mlkem::kem::decaps_internal: {'movw': 3, 'movb': 5}
+- mlkem::kpke::encrypt: {'movb': 1, 'movw': 5}
+- mlkem::kpke::matrix_entry: {'movq': 4}
+- mlkem::kpke::sample_noise: {'movb': 1}
+
+### verdict
+PASS: no unreviewed div/idiv in mlkem code; no conditional branch in any leaf probe
+
+## opt-level=z: mlkem-f93ddfda2a738ce5.s, 141 functions
+
+### div/idiv instructions (all functions)
+- core::slice::iter::ChunksExact::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem: 1  -> allowed: core library, slice-length arithmetic (public)
+- mlkem::kem::ek_check: 1  -> reviewed: divw by 384: ek[..384k].chunks_exact(384) computes len/384; ek is the public key
+- mlkem::kpke::encrypt: 1  -> reviewed: divq by 384 of the ek slice length (3rd argument, r8): loop-bound computation for the t-hat decoding loop; ek is the public key
+
+### hazmat probes (own code + everything called)
+probe              class  insns  div  jcc  cmov  setcc  callees
+barrett_reduce     leaf       7    0    0     0      0  -
+cbd_eta2           loop      95    0    5     0      1  mlkem::sample::sample_poly_cbd, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic
+cbd_eta3           loop      95    0    5     0      1  mlkem::sample::sample_poly_cbd, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic
+compress_d1        leaf       7    0    0     0      0  -
+compress_d10       leaf       8    0    0     0      0  -
+compress_d11       leaf       8    0    0     0      0  -
+compress_d4        leaf       8    0    0     0      0  -
+compress_d5        leaf       8    0    0     0      0  -
+csubq              leaf       4    0    0     1      0  -
+ct_eq_1088         loop      40    0    2     0      1  _RINvNtCs7uUmbfRqPp3_4core9panicking13assert_failedjjEB4_, mlkem::ct::ct_eq_bytes, mlkem::ct::is_zero_mask_u32
+ct_eq_32           loop      40    0    2     0      1  _RINvNtCs7uUmbfRqPp3_4core9panicking13assert_failedjjEB4_, mlkem::ct::ct_eq_bytes, mlkem::ct::is_zero_mask_u32
+ct_select_32       loop      18    0    1     0      0  mlkem::ct::ct_select_bytes
+decaps_768         loop    2430    0  125     5      2  core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1sNvNtC5mlkem5field12to_canonica, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuitsENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode13poly_dec, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuitsENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode22poly_dec, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode20poly_com, mlkem::hash::absorb_all, mlkem::zeroize::wipe, mlkem::zeroize::wipe, mlkem::zeroize::wipe, _RINvNtCs7uUmbfRqPp3_4core9panicking13assert_failedjjEB4_, mlkem::sample::sample_poly_cbd, mlkem::poly::Poly::add, core::slice::split_at::mlkem, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Sponge, mlkem::hash::sponge::Squeezer, mlkem::ct::ct_eq_bytes, mlkem::ct::ct_select_bytes, mlkem::ct::is_zero_mask_u32, mlkem::kem::decaps_internal, mlkem::ntt::ntt_inverse, mlkem::ntt::multiply_ntts, mlkem::ntt::ntt, mlkem::hash::g, mlkem::hash::shake256, mlkem::kpke::matrix_entry, mlkem::kpke::sample_noise, mlkem::kpke::encrypt, mlkem::poly::wipe_polys, mlkem::encode::byte_decode, mlkem::encode::byte_encode, mlkem::encode::poly_decode12, mlkem::encode::poly_compress_encode, mlkem::encode::poly_decode_decompress, mlkem::encode::compress, mlkem::sample::sample_poly_cbd, _RNvNtCs7uUmbfRqPp3_4core6result13unwrap_failed, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, _RNvNtCs7uUmbfRqPp3_4core9panicking9panic_fmt, mlkem::hash::keccak::f1600, _RNvNtNtCs7uUmbfRqPp3_4core5slice5index16slice_index_fail, _RNvNtNtCs7uUmbfRqPp3_4core9panicking11panic_const23panic_const_div_by_zero, mlkem::hash::sponge::Sponge, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_decode_decompress::function::FnMut::call_mut, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode::function::FnMut::call_mut, _N::core::slice::index::ops::range::Range::SliceIndex::index_mut::mlkem, _NtN::core::slice::index::ops::range::RangeTo::SliceIndex::index_mut::mlkem, _NtNt::core::slice::index::ops::range::RangeFrom::SliceIndex::index::mlkem, _NtNt::core::slice::index::ops::range::RangeFrom::SliceIndex::index_mut::mlkem, mlkem::hash::Shake128Reader::sample::XofReader::squeeze, core::slice::iter::ChunksExact::iter::adapters::zip::TrustedRandomAccessNoCoerce::size::mlkem, __chkstk
+decode12           loop     132    0    8     2      0  core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuitsENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode13poly_dec, mlkem::encode::byte_decode, mlkem::encode::poly_decode12, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic
+decompress_d1      leaf       5    0    0     0      0  -
+fqmul              leaf       9    0    0     0      0  -
+is_zero_mask       leaf      11    0    0     0      1  mlkem::ct::is_zero_mask_u32
+keccak_f1600       loop     126    0    9     0      0  _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, mlkem::hash::keccak::f1600
+message_encode     loop     192    0    7     0      0  core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1sNvNtC5mlkem5field12to_canonica, core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode20poly_com, mlkem::encode::byte_encode, mlkem::encode::poly_compress_encode, mlkem::encode::compress, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check, _RNvNtCs7uUmbfRqPp3_4core9panicking5panic, core::array::drain::Drain::ops::try_trait::NeverShortCircuit::wrap_mut_1::mlkem::encode::poly_compress_encode::function::FnMut::call_mut
+montgomery_reduce  leaf       6    0    0     0      0  -
+multiply_ntts      loop      67    0    1     0      0  mlkem::ntt::multiply_ntts
+ntt                loop     111    0    6     0      0  mlkem::ntt::ntt, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check
+ntt_inverse        loop     114    0    6     0      0  mlkem::ntt::ntt_inverse, _RNvNtCs7uUmbfRqPp3_4core9panicking18panic_bounds_check
+to_canonical       leaf       5    0    0     0      0  -
+
+### conditional branches in loop probes, for review
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #6: movq 8(%r8), %rax; cmpq %rax, %rcx ; jae .LBB13_2
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #13: andq $-2, %rax; cmpq $2, %rax ; jne .LBB88_8
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #18: shlq $6, %rax; cmpq %rax, %r9 ; jne .LBB88_8
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #29: xorl %r13d, %r13d; cmpq $256, %r13 ; je .LBB88_9
+- cbd_eta2 [mlkem::sample::sample_poly_cbd] #35: xorl %esi, %esi; cmpq %r12, %rbx ; je .LBB88_7
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #6: movq 8(%r8), %rax; cmpq %rax, %rcx ; jae .LBB13_2
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #13: andq $-2, %rax; cmpq $2, %rax ; jne .LBB88_8
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #18: shlq $6, %rax; cmpq %rax, %r9 ; jne .LBB88_8
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #29: xorl %r13d, %r13d; cmpq $256, %r13 ; je .LBB88_9
+- cbd_eta3 [mlkem::sample::sample_poly_cbd] #35: xorl %esi, %esi; cmpq %r12, %rbx ; je .LBB88_7
+- ct_eq_1088 [mlkem::ct::ct_eq_bytes] #4: movq %r9, 64(%rsp); cmpq %r9, %rdx ; jne .LBB39_5
+- ct_eq_1088 [mlkem::ct::ct_eq_bytes] #8: xorl %eax, %eax; cmpq %r9, %rdx ; je .LBB39_4
+- ct_eq_32 [mlkem::ct::ct_eq_bytes] #4: movq %r9, 64(%rsp); cmpq %r9, %rdx ; jne .LBB39_5
+- ct_eq_32 [mlkem::ct::ct_eq_bytes] #8: xorl %eax, %eax; cmpq %r9, %rdx ; je .LBB39_4
+- ct_select_32 [mlkem::ct::ct_select_bytes] #6: xorl %r9d, %r9d; cmpq $32, %r9 ; je .LBB40_3
+- decode12 [core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuitsENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode13poly_dec] #6: xorl %ecx, %ecx; cmpq $256, %rcx ; je .LBB5_3
+- decode12 [mlkem::encode::byte_decode] #11: leal -1(%r10), %eax; cmpl $11, %eax ; ja .LBB57_14
+- decode12 [mlkem::encode::byte_decode] #15: shlq $5, %rax; cmpq %rax, %r9 ; jne .LBB57_14
+- decode12 [mlkem::encode::byte_decode] #32: xorl %ebp, %ebp; cmpq $512, %rbx ; je .LBB57_7
+- decode12 [mlkem::encode::byte_decode] #36: movq %r11, %r15; cmpl %r10d, %eax ; jae .LBB57_6
+- decode12 [mlkem::encode::byte_decode] #38: jae .LBB57_6; cmpq %r9, %r15 ; jae .LBB57_13
+- decode12 [mlkem::encode::byte_decode] #56: jmp .LBB57_3; cmpl $12, %r10d ; jne .LBB57_15
+- decode12 [mlkem::encode::byte_decode] #59: xorl %eax, %eax; cmpq $512, %rax ; je .LBB57_15
+- keccak_f1600 [mlkem::hash::keccak::f1600] #23: xorl %r14d, %r14d; cmpq $24, %r14 ; je .LBB89_23
+- keccak_f1600 [mlkem::hash::keccak::f1600] #31: xorl %eax, %eax; cmpq $5, %rax ; je .LBB89_5
+- keccak_f1600 [mlkem::hash::keccak::f1600] #43: xorl %ecx, %ecx; cmpq $5, %rcx ; je .LBB89_11
+- keccak_f1600 [mlkem::hash::keccak::f1600] #51: xorl %edi, %edi; cmpq $200, %rdi ; je .LBB89_10
+- keccak_f1600 [mlkem::hash::keccak::f1600] #64: xorl %eax, %eax; cmpq $200, %rax ; je .LBB89_14
+- keccak_f1600 [mlkem::hash::keccak::f1600] #78: xorl %r13d, %r13d; cmpq $5, %r13 ; je .LBB89_22
+- keccak_f1600 [mlkem::hash::keccak::f1600] #84: xorl %r8d, %r8d; cmpq $40, %r8 ; je .LBB89_21
+- keccak_f1600 [mlkem::hash::keccak::f1600] #88: addq %rbp, %rcx; cmpq $24, %rcx ; ja .LBB89_25
+- keccak_f1600 [mlkem::hash::keccak::f1600] #92: addq %rbp, %rax; cmpq $25, %rax ; jae .LBB89_24
+- message_encode [core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1sNvNtC5mlkem5field12to_canonica] #6: xorl %ecx, %ecx; cmpq $256, %rcx ; je .LBB1_3
+- message_encode [core::array::_7try_mapINtNtNt3ops9try_trait17NeverShortCircuittENCINvM10wrap_mut_1tNCNvNtC5mlkem6encode20poly_com] #21: xorl %edi, %edi; cmpq $256, %rdi ; je .LBB7_3
+- message_encode [mlkem::encode::byte_encode] #7: leal -1(%rax), %ecx; cmpl $11, %ecx ; ja .LBB58_9
+- message_encode [mlkem::encode::byte_encode] #11: shlq $5, %rcx; cmpq %rcx, %r9 ; jne .LBB58_9
+- message_encode [mlkem::encode::byte_encode] #21: xorl %edi, %edi; cmpq $512, %rsi ; je .LBB58_10
+- message_encode [mlkem::encode::byte_encode] #29: addl %eax, %ecx; cmpl $8, %ecx ; jb .LBB58_3
+- message_encode [mlkem::encode::byte_encode] #31: jb .LBB58_3; cmpq %r9, %r10 ; jae .LBB58_8
+- multiply_ntts [mlkem::ntt::multiply_ntts] #13: leaq anon.ec86220d28c400d7a791f2beafc8410d.46(%rip), %rax; cmpq $256, %r10 ; je .LBB48_3
+- ntt [mlkem::ntt::ntt] #14: movq %rcx, 32(%rsp); cmpq $1, %rdi ; jbe .LBB49_11
+- ntt [mlkem::ntt::ntt] #21: xorl %ebx, %ebx; cmpq $256, %rbx ; jae .LBB49_10
+- ntt [mlkem::ntt::ntt] #23: jae .LBB49_10; cmpq $127, %rax ; ja .LBB49_16
+- ntt [mlkem::ntt::ntt] #30: xorl %r15d, %r15d; cmpq %r15, %r10 ; je .LBB49_9
+- ntt [mlkem::ntt::ntt] #32: je .LBB49_9; cmpq $256, %r9 ; jae .LBB49_15
+- ntt [mlkem::ntt::ntt] #59: xorl %eax, %eax; cmpq $512, %rax ; je .LBB49_14
+- ntt_inverse [mlkem::ntt::ntt_inverse] #13: leaq anon.ec86220d28c400d7a791f2beafc8410d.42(%rip), %r8; cmpq $129, %rdx ; jae .LBB47_11
+- ntt_inverse [mlkem::ntt::ntt_inverse] #19: xorl %edi, %edi; cmpq $255, %rdi ; ja .LBB47_10
+- ntt_inverse [mlkem::ntt::ntt_inverse] #21: ja .LBB47_10; cmpq $127, %rax ; ja .LBB47_17
+- ntt_inverse [mlkem::ntt::ntt_inverse] #27: xorl %r15d, %r15d; cmpq %r15, %r10 ; je .LBB47_9
+- ntt_inverse [mlkem::ntt::ntt_inverse] #30: leaq (%rdi,%r14), %r9; cmpq $255, %r9 ; ja .LBB47_15
+- ntt_inverse [mlkem::ntt::ntt_inverse] #60: xorl %eax, %eax; cmpq $512, %rax ; je .LBB47_14
+
+### zero-stores to memory reachable from decaps_768 (wipe evidence)
+- mlkem::kpke::encrypt: {'movb': 1}
+- mlkem::zeroize::wipe: {'movq': 1}
+- mlkem::zeroize::wipe: {'movw': 1}
+- mlkem::zeroize::wipe: {'movb': 1}
+
+### verdict
+PASS: no unreviewed div/idiv in mlkem code; no conditional branch in any leaf probe
+
+per-probe Intel-syntax assembly (opt-level 3, cargo-show-asm): results/asm/<probe>.s
+overall: PASS at every optimisation level
