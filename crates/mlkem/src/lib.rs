@@ -9,6 +9,7 @@
 //! - `poly`: polynomials in R_q = Z_q[X]/(X^256+1) (§2.3)
 //! - `ntt`: NTT, inverse NTT, multiplication in T_q (§4.3, Alg 9–12)
 //! - `encode`: Compress/Decompress, ByteEncode/ByteDecode (§4.2.1, Alg 3–6)
+//! - `sample`: SampleNTT and SamplePolyCBD (§4.2.2, Alg 7–8)
 //! - `spec` (tests only): literal pseudocode transcriptions used as oracles
 
 #![cfg_attr(not(test), no_std)]
@@ -24,5 +25,6 @@ mod field;
 mod ntt;
 pub mod params;
 mod poly;
+mod sample;
 #[cfg(test)]
 mod spec;

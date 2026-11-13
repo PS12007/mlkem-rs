@@ -200,6 +200,45 @@ pub fn decompress(y: i64, d: u32) -> i64 {
     (2 * a + b) / (2 * b)
 }
 
+/// Algorithm 7 SampleNTT, §4.2.2, reading from a finite byte string that
+/// stands in for the XOF output (lines 1–2 already done by the caller).
+pub fn sample_ntt(stream: &[u8]) -> [i64; N] {
+    let mut a = [0i64; N];
+    let mut j = 0; // 3
+    let mut pos = 0;
+    while j < 256 {
+        // 4
+        let c = &stream[pos..pos + 3]; // 5
+        pos += 3;
+        let d1 = i64::from(c[0]) + 256 * (i64::from(c[1]) % 16); // 6
+        let d2 = i64::from(c[1]) / 16 + 16 * i64::from(c[2]); // 7
+        if d1 < Q {
+            // 8
+            a[j] = d1; // 9
+            j += 1; // 10
+        }
+        if d2 < Q && j < 256 {
+            // 12
+            a[j] = d2; // 13
+            j += 1; // 14
+        }
+    }
+    a // 17
+}
+
+/// Algorithm 8 SamplePolyCBD_η(B), §4.2.2.
+pub fn sample_poly_cbd(eta: usize, bytes: &[u8]) -> [i64; N] {
+    let b = bytes_to_bits(bytes); // 1
+    let mut f = [0i64; N];
+    for i in 0..256 {
+        // 2
+        let x: i64 = (0..eta).map(|j| i64::from(b[2 * i * eta + j])).sum(); // 3
+        let y: i64 = (0..eta).map(|j| i64::from(b[2 * i * eta + eta + j])).sum(); // 4
+        f[i] = m(x - y); // 5
+    }
+    f
+}
+
 /// Textbook multiplication in R_q = Z_q[X]/(X^256 + 1) (§2.3 / §4.3),
 /// O(n^2). Because X^256 = −1, a term X^(i+j) with i+j ≥ 256 wraps round to
 /// X^(i+j−256) with its sign flipped ("negacyclic").
