@@ -219,6 +219,21 @@ def main(label, path, strict=True):
                     ctx = "; ".join(f"{m} {o}".strip() for m, o in insns[max(0, i - 2):i])
                     print(f"- {name} [{readable(f)}] #{i}: {ctx} ; {mn} {ops}")
 
+    # 4. Evidence that the volatile wipes survived optimisation: stores of the
+    #    constant 0 to memory in each mlkem function reachable from Decaps.
+    #    (Without volatile, the optimiser deletes these as dead stores.)
+    print("\n### zero-stores to memory reachable from decaps_768 (wipe evidence)")
+    root = probes.get("decaps_768")
+    if root:
+        for f in sorted(closure(root, funcs), key=readable):
+            if f in funcs and is_ours(readable(f)):
+                counts = {}
+                for mn, ops in funcs[f]:
+                    if mn.startswith("mov") and ops.startswith("$0,") and "(" in ops:
+                        counts[mn] = counts.get(mn, 0) + 1
+                if counts:
+                    print(f"- {readable(f)}: {counts}")
+
     print("\n### verdict")
     word = "FAIL" if strict else "INFO"
     if failures:
