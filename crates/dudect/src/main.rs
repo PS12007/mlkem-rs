@@ -431,24 +431,24 @@ mod app {
         let start = std::time::Instant::now();
         let step = (args.n / 10).max(1);
         let mut i = 0u64;
-        let mut progress = Vec::new();
+        // Progress lines are printed from the sink, which runs between
+        // batches (after the timed loop of a batch has finished), so the
+        // printing never lands inside a measurement. It does disturb caches
+        // once per 10% of the run, equally for both classes.
         measure_many(target.as_mut(), args.n, &mut rng, |c, dt| {
             tests.push(c, dt);
             i += 1;
             if i % step == 0 {
-                progress.push(i);
-            }
-        });
-        for i in progress {
-            if i == args.n {
                 let (idx, t) = tests.max_abs_t();
                 println!(
                     "progress n={i:>10}  max|t| = {t:>8.2}  ({})  elapsed {:.0} s",
                     tests.tests[idx].0,
                     start.elapsed().as_secs_f64()
                 );
+                use std::io::Write;
+                let _ = std::io::stdout().flush();
             }
-        }
+        });
 
         let u = &tests.tests[0].2;
         println!();
