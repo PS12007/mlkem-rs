@@ -60,7 +60,18 @@ foreach ($b in $builds) {
                    '--target-dir', $td, '--', '--emit', 'asm') + $flags.Split(' ')
     $build = & cargo @cargoArgs 2>&1 | ForEach-Object { "$_" }
     if ($LASTEXITCODE -ne 0) { $log += "build failed: $label"; $log += $build; $failed = $true; continue }
-    $s = (Get-ChildItem (Join-Path $td 'release\deps\mlkem-*.s') | Select-Object -First 1).FullName
+    # Search the whole target dir: the layout differs if e.g. a build target
+    # triple is configured (target\<triple>\release\deps).
+    $s = Get-ChildItem -Path $td -Recurse -Filter 'mlkem-*.s' -ErrorAction SilentlyContinue |
+        Select-Object -First 1 -ExpandProperty FullName
+    if (-not $s) {
+        $log += "no assembly file produced for $label; cargo output:"
+        $log += $build
+        $log += (Get-ChildItem -Path $td -Recurse -Depth 3 -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })
+        $failed = $true
+        $log | Select-Object -Last 40 | Write-Host
+        continue
+    }
     $pyArgs = @('-I', (Join-Path $root 'scripts\asm_check.py'))
     if (-not $strict) { $pyArgs += '--info' }
     $pyArgs += @($label, $s)
