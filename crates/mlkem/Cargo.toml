@@ -16,6 +16,11 @@ workspace = true
 # compiled for tests, benchmarks and examples, never into the library.
 [dependencies]
 
+[features]
+# Exposes internal building blocks as separate, non-inlined functions, for
+# the assembly check and the timing harness. Off by default; NOT an API.
+hazmat = []
+
 [dev-dependencies]
 keccak = "0.1"
 ml-kem = "0.3.3"

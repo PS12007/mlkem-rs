@@ -6,7 +6,7 @@
 //! after the other. That is the same as hashing their concatenation (e.g.
 //! G(d ‖ k) or J(z ‖ c)), without needing a heap allocation (`no_std`).
 
-mod keccak;
+pub(crate) mod keccak;
 mod sponge;
 
 use crate::sample::XofReader;

@@ -40,6 +40,8 @@ mod ct;
 mod encode;
 mod field;
 mod hash;
+#[cfg(feature = "hazmat")]
+pub mod hazmat;
 mod kem;
 mod kpke;
 mod ntt;
