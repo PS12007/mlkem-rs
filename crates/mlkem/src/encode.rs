@@ -9,6 +9,7 @@
 
 use crate::field::Q32;
 use crate::params::{N, Q};
+use crate::poly::Poly;
 
 /// ⌊n / q⌋ = (n · M) >> 40 with M = ⌈2^40 / q⌉. The tests check that this is
 /// exact for every n that `compress` can produce (n < 2^23).
@@ -105,6 +106,34 @@ pub(crate) fn byte_decode(d: u32, b: &[u8]) -> [u16; N] {
         }
     }
     f
+}
+
+// ---- Polynomial-level helpers used by K-PKE (§5) ----------------------
+
+/// ByteEncode_12 of a polynomial (Alg 13 lines 19–20). Exact values in
+/// [0, q) are encoded, so the output is canonical.
+pub(crate) fn poly_encode12(p: &Poly, out: &mut [u8]) {
+    byte_encode(12, &p.canonical(), out);
+}
+
+/// ByteDecode_12 into a polynomial. Output coefficients in [0, q).
+pub(crate) fn poly_decode12(b: &[u8]) -> Poly {
+    Poly {
+        coeffs: byte_decode(12, b).map(|c| c as i16),
+    }
+}
+
+/// ByteEncode_d(Compress_d(p)) (Alg 14 lines 22–23, Alg 15 line 7).
+pub(crate) fn poly_compress_encode(p: &Poly, d: u32, out: &mut [u8]) {
+    byte_encode(d, &p.canonical().map(|x| compress(x, d)), out);
+}
+
+/// Decompress_d(ByteDecode_d(b)) (Alg 14 line 20, Alg 15 lines 3–4).
+/// Output coefficients in [0, q).
+pub(crate) fn poly_decode_decompress(d: u32, b: &[u8]) -> Poly {
+    Poly {
+        coeffs: byte_decode(d, b).map(|y| decompress(y, d) as i16),
+    }
 }
 
 #[cfg(test)]
