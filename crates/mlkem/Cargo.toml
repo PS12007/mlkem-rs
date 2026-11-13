@@ -17,4 +17,6 @@ workspace = true
 [dependencies]
 
 [dev-dependencies]
+keccak = "0.1"
 proptest = { version = "1.11.0", default-features = false, features = ["std"] }
+sha3 = "0.10"
