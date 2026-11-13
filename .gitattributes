@@ -1,0 +1,4 @@
+# Keep LF line endings in the repo and in the working copy on every OS, so
+# rustfmt and the test-vector checksums behave the same locally and in CI.
+* text=auto eol=lf
+*.pdf binary
