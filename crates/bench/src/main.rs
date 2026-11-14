@@ -322,7 +322,8 @@ mod app {
         let (mut p1, mut p2) = (poly, poly);
         let b128 = [0x5au8; 128];
         let b384 = [0xa5u8; 384];
-        let mut prims: Vec<(&str, Box<dyn FnMut()>)> = vec![
+        type Prim = (&'static str, Box<dyn FnMut()>);
+        let mut prims: Vec<Prim> = vec![
             (
                 "Keccak-f[1600], mlkem",
                 Box::new(move || mlkem::hazmat::keccak_f1600(black_box(&mut st1))),
