@@ -1092,19 +1092,20 @@ What this shows:
 
 | target | what differs between classes | P-core | E-core |
 |---|---|---|---|
-| `aa-ct-eq` (control) | nothing | 1.5 | 1.8 |
-| `ct-eq` | second input equal vs random (1088 B) | 1.5 | 2.1 |
-| `message-encode` | fixed random w vs random w | 2.0 | 1.6 |
-| `message-encode-zero` | w = 0 vs random | 1.8 | 1.9 |
-| `u-encode-zero` | u = 0 vs random (d = 11) | 1.5 | 1.5 |
-| `aa-decaps-ct` (control) | nothing | 1.7 | 2.3 |
-| `decaps-ct` | valid fixed c vs random c (implicit rejection) | 2.1 | 2.2 |
-| `decaps-valid` | fixed valid c vs fresh valid c | 2.1 | 2.0 |
-| `encaps-m` | fixed m vs random m | 2.7 | 2.6 |
-| `aa-keygen-d` (control) | nothing | 1.4 | 2.2 |
-| `keygen-d` | fixed d vs random d | **4519** | **3921** |
+| `aa-ct-eq` (control) | nothing | 3.0 | 1.9 |
+| `ct-eq` | second input equal vs random (1088 B) | 2.4 | 1.4 |
+| `message-encode` | fixed random w vs random w | 1.4 | 1.8 |
+| `message-encode-zero` | w = 0 vs random | 1.7 | 1.3 |
+| `u-encode-zero` | u = 0 vs random (d = 11) | 1.6 | 1.6 |
+| `aa-decaps-ct` (control) | nothing | 1.9 | 2.9 |
+| `decaps-ct` | valid fixed c vs random c (implicit rejection) | 2.9 | 1.9 |
+| `decaps-valid` | fixed valid c vs fresh valid c | 2.3 | 1.2 |
+| `encaps-m` | fixed m vs random m | 1.3 | 1.7 |
+| `aa-keygen-d` (control) | nothing | 2.2 | 3.6 |
+| `keygen-d` | fixed d vs random d | **4480** | **2500** |
 
-Everything is inside its control's range except `keygen-d`, and that one is
+Every target stays below 4.5 and inside the range the A/A controls reach
+(1.9–3.6), except `keygen-d`, and that one is
 expected.
 
 **KeyGen's timing leak is real, and harmless.** KeyGen computes
@@ -1112,7 +1113,7 @@ expected.
 which is *rejection sampling*: it reads 12-bit candidates and throws away
 those ≥ q, so the number of SHAKE128 blocks it needs varies with ρ. A fixed
 d means a fixed ρ and one fixed running time; random d gives varying ones
-(means 43.1 µs vs 47.9 µs on the P-core). But ρ is **public**: it is the
+(means 39.8 µs vs 44.0 µs on the P-core). But ρ is **public**: it is the
 last 32 bytes of the encapsulation key, so timing reveals something about a
 value everyone already has. FIPS 203 specifies rejection sampling knowing
 this, and phase 4's table lists `sample_ntt` as "not constant time, by
@@ -1172,7 +1173,7 @@ control, which by construction cannot leak, also "leaked".
    followed by a copy) ended up in different cache states, and the E-cores
    made that visible (likely through the L2 they share per cluster of four).
    Fix: copy the whole batch once more with one memcpy and time against the
-   copy. A/A and real targets are now 1.2–3.5 everywhere.
+   copy. A/A and real targets are now 1.2–3.6 everywhere.
 
    **This also changed a result.** Before the fix, the KyberSlash build's
    d = 1 targets showed |t| 11 and 38 on the E-core, and I had them down as
@@ -1189,9 +1190,10 @@ Smaller problems:
   silently overwrote the `$N` parameter, so every run used the same count.
 - The first full run was killed halfway through when the laptop ran low on
   memory. The script now has `-Resume` and rebuilds `summary.txt` from all
-  result files, recording each run's commit. The normal build was measured
-  at commit 6eff2ac and the leaky builds at d250c07 (a script-only change
-  in between).
+  result files, recording each run's commit. The leaky builds were measured
+  at commits 6eff2ac and d250c07 (a script-only change in between). The
+  normal build was measured again at d02f443, after phase 6 changed the
+  sponge code (6.6); the earlier normal-build numbers were similar.
 
 ### 5.7 Interview questions
 
@@ -1219,7 +1221,7 @@ same work as the real test.
 
 **Q4. Your KeyGen "leaks" with |t| over 4000. Is that a vulnerability?**
 No. The time varies because SampleNTT rejection-samples the matrix from ρ,
-and ρ is published in the encapsulation key. KeyGen's A/A control is 1.4,
+and ρ is published in the encapsulation key. KeyGen's A/A control is 2.2 (P) and 3.6 (E),
 so the harness is fine; the dependence is real but on public data, and
 FIPS 203 accepts it. A t-test says *that* the time depends on the input,
 not whether that input is secret.
@@ -1232,3 +1234,189 @@ d = 1 version showed nothing on either, although it was exploited on other
 CPUs. So you avoid variable-latency instructions on secrets by
 construction (checked statically in phase 4), and treat measurements as
 evidence, not proof.
+
+---
+
+## Phase 6: Performance, compared with RustCrypto's ml-kem
+
+Code: `crates/bench` (the `mlkem-bench` binary), `scripts/bench.ps1`, and
+one optimisation in `hash/sponge.rs`. Results: `results/bench/` —
+`baseline-cpu*.txt` (before the optimisation) and `current-cpu*.txt`.
+
+### 6.1 Why no benchmark framework
+
+The usual tool is `criterion`. I wrote ~400 lines instead, for three
+reasons: no new dependencies or downloads (the comparison crate `ml-kem` was
+already a dev-dependency for the cross-check tests), the timer and CPU
+pinning already existed in the timing tester and are reused (`#[path]`
+include of `crates/dudect/src/platform.rs`), and every line can be
+explained. What I give up: criterion's bootstrap confidence intervals,
+outlier classification and regression tracking between runs.
+
+### 6.2 Method
+
+- **Same inputs for both implementations.** 64 random (d, z, m) triples,
+  cycled. KeyGen's time depends on the seed (rejection sampling, see 5.4),
+  so two implementations timed on different seeds would not be comparable.
+- **Check before timing.** For every input, both implementations must give
+  byte-identical ek, dk, ciphertext and shared secret. Otherwise the
+  benchmark could be timing two different computations.
+- **Every call timed separately** with LFENCE-serialised RDTSC; overhead
+  about 40 ticks, under 0.2% of the fastest operation. For the building
+  blocks (0.35–1.5 µs), blocks of 100 calls are timed and divided, so the
+  timer overhead and granularity do not distort them.
+- **Alternating order** (A B C, C B A, ...) over 20 rounds of 500 calls,
+  after one discarded warm-up round. Turbo, temperature and power budget
+  drift over seconds; alternating spreads that drift evenly.
+- **Median, with 5th and 95th percentiles.** The mean is pulled up by
+  interrupts; the median is not. 10 000 calls per entry.
+- **Pinned** to cpu 2 (P-core) and cpu 20 (E-core), high priority. Both are
+  reported, because they are different microarchitectures.
+- Both crates built by the same compiler (rustc 1.99.1), release profile,
+  default target CPU (no `-C target-cpu=native`, so no AVX2 for either).
+
+### 6.3 What is compared, and why there are two ml-kem rows
+
+The two APIs store keys differently, and that matters:
+
+- **mlkem** (this crate) keeps keys as **bytes**. Every Encaps decodes t̂ from
+  ek and computes H(ek) (FIPS 203 Alg 17 line 1); every Decaps decodes ŝ and
+  t̂ from dk.
+- **ml-kem** parses a key once into an object that holds the decoded
+  polynomials **and caches H(ek)**. Per call it skips all of that.
+
+So `ml-kem/bytes` is also timed: it parses the key from bytes in every call,
+like mlkem. That variant is charged slightly *more* than mlkem, because its
+parsers also run the FIPS 203 §7 input checks, which mlkem runs once in
+`from_bytes`. A fair comparison lies between the two ml-kem rows.
+
+### 6.4 Results (P-core, cpu 2, medians in µs)
+
+| | KeyGen mlkem | ml-kem | Encaps mlkem | ml-kem | ml-kem/bytes | Decaps mlkem | ml-kem | ml-kem/bytes |
+|---|---|---|---|---|---|---|---|---|
+| ML-KEM-512 | 25.7 | 21.8 | 31.1 | 21.6 | 24.4 | 40.0 | 27.8 | 31.2 |
+| ML-KEM-768 | 42.1 | 38.8 | 49.2 | 38.7 | 43.1 | 60.5 | 47.5 | 52.4 |
+| ML-KEM-1024 | 65.3 | 62.7 | 73.3 | 62.3 | 68.1 | 87.8 | 73.7 | 80.3 |
+
+Ratios mlkem / ml-kem: KeyGen 1.04–1.18; Encaps and Decaps 1.18–1.44
+against the cached objects, **1.08–1.28 against ml-kem/bytes**. The E-core
+(cpu 20) shows the same pattern, 1.06–1.41 (`current-cpu20.txt`).
+
+In plain numbers: ML-KEM-768 does about 20 000 encapsulations or 16 500
+decapsulations per second on one P-core.
+
+Building blocks (P-core): Keccak-f[1600] 350 ns, **the same as RustCrypto's
+`keccak` crate (352 ns)**; NTT 830 ns; inverse NTT 1036 ns; one MultiplyNTTs
+420 ns; CBD 406 ns (η = 2) and 705 ns (η = 3); ByteDecode_12 374 ns.
+
+The gap is largest for ML-KEM-512. Its η = 3 CBD is slower, but that adds
+only about 0.6 µs per operation, so it does not explain the gap; I have not
+pinned the rest down (see 6.5).
+
+### 6.5 Where the time goes (an estimate, not a profile)
+
+Without a profiler (none installed, and installing one breaks the
+no-big-downloads rule), I estimated ML-KEM-768 Encaps from the building
+blocks times the number of calls the algorithm makes:
+
+| part | count | µs |
+|---|---|---|
+| Keccak-f: H(ek) 9, G 1, SampleNTT 9 × 3, PRF 7 | 44 | 15.4 |
+| NTT (ŷ) | 3 | 2.5 |
+| inverse NTT (u, v) | 4 | 4.1 |
+| MultiplyNTTs (Âᵀŷ: 9, t̂ᵀŷ: 3) | 12 | 5.0 |
+| SamplePolyCBD (y, e1, e2) | 7 | 2.8 |
+| ByteDecode_12 (t̂) | 3 | 1.1 |
+| **sum** | | **30.9** of 49.2 measured |
+
+(SampleNTT typically needs 3 SHAKE128 blocks: 168 bytes give 112
+candidates, of which 3329/4096 ≈ 81% are accepted, so 256 coefficients need
+about 2.8 blocks.)
+
+So roughly 18 µs is "glue": SampleNTT's parsing loop, Compress/ByteEncode
+of u and v, additions, reductions, and copying 512-byte polynomials. The
+same accounting for ml-kem, *assuming* its building blocks cost the same as
+ours (verified only for Keccak-f), leaves about 12 µs. Most of the gap is there,
+plus H(ek) and decoding (about 4 µs), which ml-kem caches. Keccak, the
+biggest single cost, is not the difference.
+
+### 6.6 The optimisation: squeezing whole lanes
+
+The first measurement (`baseline-*`) showed mlkem 1.13–1.52× slower. The
+sponge's `squeeze` produced output **one byte at a time**, with a branch
+and a shift per byte. SampleNTT alone squeezes 27 × 168 = 4536 bytes per
+ML-KEM-768 Encaps. I added a fast path: at a lane boundary, copy whole
+8-byte lanes (`u64::to_le_bytes`), and fall back to bytes only for an
+unaligned start or a tail shorter than 8 bytes.
+
+- Effect: ML-KEM-768 KeyGen 46.1 → 42.1 µs, Encaps 53.2 → 49.2, Decaps
+  65.0 → 60.5 (7–9%), similar for the other sets.
+- Correctness: the existing tests compare the sponge with the `sha3` crate
+  for every input length across three block boundaries, and for squeezes in
+  random-sized chunks (which hit both paths); I also ran the hash tests with
+  20 000 proptest cases, and the ACVP vectors still pass.
+- Constant time: the branches depend only on the position and length,
+  which are public. The assembly check passes at every optimisation level
+  after the change, and the normal-build timing tests were re-run on the
+  new code (`results/dudect/normal/`).
+
+**Not done, on purpose:** caching H(ek) and the decoded key inside the key
+types (as ml-kem does) would remove ~4 µs per Encaps, but it changes the API
+from "a key is checked bytes" to "a key is a parsed object", and the bytes
+version maps one-to-one onto FIPS 203. SIMD (AVX2) NTTs, as in the
+optimised C implementations, would be the next big step and are out of
+scope for a from-scratch learning project. CBD still extracts one bit at a
+time, written exactly like Algorithm 8.
+
+### 6.7 What went wrong
+
+- **A clippy failure got committed.** I piped `cargo clippy` into `head`,
+  which hides its exit code, so the commit went ahead. Fixed in the next
+  commit. Lesson: never pipe a gate's output when its exit code matters.
+- **An identical result looked suspicious.** Our Keccak-f and the reference
+  crate first measured exactly 864 ticks each. Timing single 350 ns calls
+  includes the timer overhead and its granularity, so I switched the
+  building blocks to blocks of 100 calls. They still matched (806 vs 812):
+  the result was real, and the method is better.
+- **The first comparison was unfair** in a way that flattered ml-kem: its
+  key objects cache work that our byte-based API redoes on every call. The
+  `ml-kem/bytes` row was added to show the size of that effect (about 10%).
+- **Building the crate while the timing tester ran** would have added noise
+  to the dudect measurements, so measurements and builds were never run at
+  the same time.
+
+### 6.8 Interview questions
+
+**Q1. How did you make sure the benchmark is fair?**
+Same inputs for both, outputs checked byte-identical before timing, same
+compiler and flags, alternating order to spread drift, medians over 10 000
+calls, pinned cores, and both P-core and E-core. And I measured ml-kem two
+ways, because its API caches work that mine repeats on every call.
+
+**Q2. Why the median and not the mean?**
+Timing has a long right tail: interrupts and context switches add tens of
+microseconds now and then. A few of those move the mean a lot and the
+median hardly at all. The 5th and 95th percentiles are reported to show the
+spread.
+
+**Q3. Your implementation is 10–40% slower than RustCrypto's. Why?**
+Not in hashing: our Keccak-f is as fast as theirs. About 4 µs per Encaps is
+H(ek) and key decoding that they cache in the key object. The rest is glue
+code around the building blocks. My estimate from building-block timings
+explains 31 of 49 µs for ML-KEM-768 Encaps; the remainder is parsing,
+encoding and copying. A profiler would be the next step.
+
+**Q4. You optimised the sponge. How do you know you did not break it or
+make it leak?**
+It is tested against the reference SHA-3 implementation for every length
+across block boundaries and for random squeeze chunk sizes, plus the
+official vectors. Its new branches depend only on positions and lengths,
+which are public; the assembly check still passes at every level, and the
+timing tests were re-run on the new build.
+
+**Q5. What would make it much faster?**
+Vectorising the NTT and base multiplication with AVX2 (16 coefficients per
+instruction), a 4-way parallel Keccak for SampleNTT and PRF (they are
+independent), caching the parsed key, and avoiding copies of whole
+polynomials. Each is a trade against readability, which is the point of
+this project.
