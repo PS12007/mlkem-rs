@@ -9,7 +9,19 @@
 A from-scratch Rust implementation of ML-KEM (NIST FIPS 203, the
 standardised post-quantum key-encapsulation mechanism, formerly Kyber),
 plus a statistical timing-leak tester (dudect method). It targets Windows
-with the MSVC toolchain.
+with the MSVC toolchain, and WebAssembly.
+
+The library (`crates/mlkem`) has no runtime dependencies: field arithmetic,
+NTT, Keccak/SHA-3 and the KEM are all written by hand. It passes all 240
+NIST ACVP test vectors and is cross-checked byte for byte against
+RustCrypto's `ml-kem`.
+
+| crate | what it is |
+|---|---|
+| `crates/mlkem` | the library: ML-KEM-512/768/1024 |
+| `crates/dudect` | `mlkem-dudect`, the timing-leak tester (Windows, x86-64) |
+| `crates/bench` | `mlkem-bench`, benchmarks against RustCrypto's `ml-kem` |
+| `crates/wasm` | `mlkem-wasm`, the library as a WebAssembly module |
 
 Status: all seven planned phases are done. See [LEARNING.md](LEARNING.md)
 for what each phase covers and why.
@@ -26,8 +38,27 @@ and the Visual Studio C++ build tools.
 
 ```
 cargo test
-cargo clippy --all-targets -- -D warnings
+cargo clippy --workspace --all-targets -- -D warnings
 ```
+
+## Reproducing the results
+
+Every number in this README comes from a script in `scripts/` whose raw
+output, with date, commit and compiler, is committed under `results/`.
+Run them with `powershell -ExecutionPolicy Bypass -File scripts\<name>`.
+
+| result | script | output | time |
+|---|---|---|---|
+| constant-time assembly check, x86-64 (CI) | `asm-check.ps1` | `results/asm-check.txt`, `results/asm/` | a few min |
+| constant-time instruction check, WASM (CI) | `wasm-check.ps1` | `results/wasm-check.txt` | ~1 min |
+| 100 000-case property tests | `extended-proptest.ps1` | `results/extended-proptest.txt` | ~4 min |
+| timing-leak tests, native | `dudect.ps1` | `results/dudect/` | ~30 min |
+| timing-leak tests, WASM in Node | `wasm-dudect.ps1` | `results/wasm/dudect/` | ~7 min |
+| benchmarks vs `ml-kem` | `bench.ps1` | `results/bench/` | ~1 min |
+| WASM benchmarks in Node | `wasm-bench.ps1` | `results/wasm/bench-cpu*.txt` | ~2 min |
+
+The timing scripts pin to logical CPUs 2 (a P-core) and 20 (an E-core) of
+an i7-14700HX; pass `-Cpus` for another machine.
 
 ## Timing-leak test (dudect)
 
