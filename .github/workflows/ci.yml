@@ -34,3 +34,16 @@ jobs:
       - name: Constant-time assembly check
         shell: pwsh
         run: ./scripts/asm-check.ps1 -SkipShowAsm
+      # WebAssembly (phase 7): the same constant-time rules on the wasm32
+      # instructions (with a positive control that must be caught), and all
+      # ACVP vectors run against the .wasm module in Node (preinstalled on
+      # the runner).
+      - name: Install the wasm32 target
+        run: rustup target add wasm32-unknown-unknown
+      - name: Constant-time instruction check (WebAssembly)
+        shell: pwsh
+        run: ./scripts/wasm-check.ps1
+      - name: ACVP vectors in WebAssembly (Node)
+        run: |
+          cargo build --release -p mlkem-wasm --target wasm32-unknown-unknown
+          node scripts/wasm/acvp.mjs target/wasm32-unknown-unknown/release/mlkem_wasm.wasm
