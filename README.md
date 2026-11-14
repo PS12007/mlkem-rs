@@ -11,7 +11,7 @@ standardised post-quantum key-encapsulation mechanism, formerly Kyber),
 plus a statistical timing-leak tester (dudect method). It targets Windows
 with the MSVC toolchain.
 
-Status: work in progress, built in phases. See [LEARNING.md](LEARNING.md)
+Status: all seven planned phases are done. See [LEARNING.md](LEARNING.md)
 for what each phase covers and why.
 
 ## Reference
@@ -82,14 +82,42 @@ time `ml-kem` doing that work too, and they are the closer comparison:
 this crate is 8–28% slower than they are. Its Keccak-f[1600] is as fast as
 RustCrypto's `keccak` crate (350 vs 352 ns). The E-core shows the same ratios.
 
+## WebAssembly
+
+`crates/wasm` builds a 58 KB `no_std` module with a plain C ABI (no
+wasm-bindgen), so JavaScript can call it directly. See
+[LEARNING.md phase 7](LEARNING.md).
+
+```
+cargo build --release -p mlkem-wasm --target wasm32-unknown-unknown
+node scripts/wasm/acvp.mjs target/wasm32-unknown-unknown/release/mlkem_wasm.wasm
+```
+
+- **Correct:** all 240 NIST ACVP cases pass in Node 24 (run in CI).
+- **Constant-time instructions:** `scripts/wasm-check.ps1` applies the x86
+  rules to the WASM output at every optimisation level, and requires that a
+  deliberately leaky build is caught (run in CI). Note: LLVM keeps
+  `x / constant` as a real `i32.div_u` for WASM, where x86 gets a multiply.
+- **Timing, measured on V8's machine code** (`scripts/wasm-dudect.ps1`): the
+  normal build shows no leak on either core (max |t| 0.9–2.8, A/A controls
+  included). The leaky early-exit build is caught on both cores (|t| 46, 57),
+  and the leaky KyberSlash build only on the E-core (|t| 713), as natively.
+- **Speed:** ML-KEM-768 KeyGen / Encaps / Decaps take 95 / 113 / 147 µs on
+  the P-core under V8's normal tiering (2.3–2.4× native), and 236 / 279 /
+  321 µs under its baseline compiler only.
+
+The module exports FIPS 203's `_internal` functions, so the caller must
+supply the random seeds from `crypto.getRandomValues`.
+
 ## Limitations
 
 - **Not audited**, and not reviewed by anyone but its author.
-- **Constant time is checked only for x86-64 Windows (MSVC) release
-  builds**: statically at every optimisation level (`scripts/asm-check.ps1`,
-  run in CI) and by measurement on one CPU model. Debug builds add branches
-  on secret data (overflow checks, `debug_assert!`). Other targets, including
-  WASM and ARM, are unchecked.
+- **Constant time is checked only for x86-64 Windows (MSVC) and wasm32
+  release builds**: statically at every optimisation level
+  (`scripts/asm-check.ps1`, `scripts/wasm-check.ps1`, both run in CI), and
+  by measurement on one CPU model (natively, and in Node/V8 for WASM).
+  Debug builds add branches on secret data (overflow checks,
+  `debug_assert!`). ARM and other WASM engines are unchecked.
 - **The timing tests are statistical.** They can miss leaks that are smaller
   than what 10⁶–10⁷ samples resolve, or that show up only on other CPUs.
   This laptop did not reveal KyberSlash on d = 1 dividends at all.

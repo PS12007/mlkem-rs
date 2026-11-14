@@ -1420,3 +1420,201 @@ instruction), a 4-way parallel Keccak for SampleNTT and PRF (they are
 independent), caching the parsed key, and avoiding copies of whole
 polynomials. Each is a trade against readability, which is the point of
 this project.
+
+---
+
+## Phase 7: WebAssembly
+
+Code: `crates/wasm` (the `mlkem-wasm` cdylib), `scripts/wasm/*.mjs` (Node),
+`scripts/wasm-check.ps1` + `scripts/wasm_check.py`, `scripts/wasm-bench.ps1`,
+`scripts/wasm-dudect.ps1`. Results: `results/wasm-check.txt`,
+`results/wasm/`. No downloads: the wasm32 target, Node 24 and nothing else.
+
+### 7.1 Why WebAssembly is its own constant-time question
+
+WASM is a portable instruction set. A browser or Node does not run it
+directly: its engine (V8 here) **compiles it again** into x86 or ARM machine
+code, with its own compiler and its own choices. So there are three layers,
+each of which can break constant time:
+
+1. our Rust source;
+2. LLVM's compilation of it to WASM instructions (checked statically, 7.3);
+3. V8's compilation of WASM to machine code, at run time, possibly twice
+   (Liftoff, a fast baseline compiler, then TurboFan, an optimising one,
+   for hot code). Nothing in the repository can see this machine code, so it
+   is checked by measuring (7.5).
+
+### 7.2 The module: no wasm-bindgen
+
+`crates/wasm` is `no_std`, has no allocator and no dependencies other than
+`mlkem`. It exports plain `extern "C"` functions taking pointers into the
+module's linear memory: `mlkem_768_keygen(d, z, ek_out, dk_out)`,
+`mlkem_768_encaps(ek, m, c_out, k_out) -> i32`, `mlkem_768_decaps(dk, c,
+k_out) -> i32`, the key checks, and lengths, for each parameter set.
+JavaScript writes inputs at or above the exported `__heap_base`, calls the
+function, and reads the outputs. A panic traps (`unreachable`). The module
+is 58 KB.
+
+**Randomness.** A bare WASM module has no RNG. The exports are FIPS 203's
+`_internal` functions, so the caller supplies d, z, m and must take them from
+`crypto.getRandomValues`. That is why §6 says not to offer `_internal`
+functions to applications: a real binding would draw the seeds itself.
+
+**Alternative:** wasm-bindgen generates the JavaScript glue and handles
+`Uint8Array` conversion. It is the normal choice for a product; it was not
+used because it adds dependencies, a download (the `wasm-bindgen` CLI), and
+glue code that is not ours to explain.
+
+**Correctness:** `scripts/wasm/acvp.mjs` runs all 240 NIST ACVP cases
+against the `.wasm` in Node, with the same case counts as the Rust test.
+All pass. To check that this test can fail, a copy with one expected byte
+flipped failed all 75 KeyGen cases. CI runs it.
+
+### 7.3 The instruction check, and a finding about division
+
+`scripts/wasm-check.ps1` builds the crate for wasm32 at every optimisation
+level, emits LLVM's textual WASM assembly, and applies the x86 rules
+(`wasm_check.py`): no division (`i32/i64.div_*`, `rem_*`) in our code, and no
+conditional control flow (`br_if`, `if`, `br_table`) in any leaf function or
+anything it calls. `select` (WASM's cmov) is reported but allowed.
+
+**Finding: LLVM's WASM backend keeps division by a constant.** On x86,
+`x / 3329` compiles to a multiply and shift. For wasm32 it stays
+`i32.div_u` (checked with a two-line probe): the backend treats division as
+cheap and leaves it to the engine. So code like the KyberSlash reference
+`/ q`, which happened to be safe in many native builds, is a real division
+in WASM, at every optimisation level. Our Compress uses an explicit multiply
+(`× ⌈2^40/q⌉ >> 40`), so it does not matter here. But it shows again that
+"the compiler will optimise the division away" is not a security argument.
+
+Results (`results/wasm-check.txt`): PASS at opt-levels 0 (without debug
+checks), 1, 2, 3, s and z. Three functions contain reviewed divisions
+`/ 384` and `% 384`: `chunks_exact(384)` loop bounds over the 384k-byte key
+parts, where k is the public parameter, so all public lengths. The debug
+build with overflow checks has branches in leaf functions, as on x86, and is
+reported as information only.
+
+**Positive control:** the script also builds `leaky-kyberslash` and requires
+the checker to flag the division in Compress. It does, otherwise the script
+fails. (It also flags a branch: WASM division traps on a zero divisor, and
+because the leaky divisor is hidden behind `black_box`, Rust adds a
+divide-by-zero check.)
+
+### 7.4 Speed (Node 24, V8 13.6)
+
+Medians in µs, `scripts/wasm-bench.ps1`, same method as phase 6:
+
+| P-core (cpu 2) | KeyGen | Encaps | Decaps | vs native |
+|---|---|---|---|---|
+| ML-KEM-512, default tiering | 59.5 | 71.1 | 90.3 | 2.3× |
+| ML-KEM-768, default tiering | 95.4 | 112.6 | 146.6 | 2.3–2.4× |
+| ML-KEM-1024, default tiering | 147.2 | 188.9 | 229.4 | 2.3–2.6× |
+| ML-KEM-768, Liftoff only | 236.2 | 278.7 | 321.1 | 5.3–5.7× |
+
+On the E-core, ML-KEM-768 takes 162 / 180 / 217 µs (default tiering).
+About 7 000 decapsulations per second on one P-core, in JavaScript's
+runtime.
+
+Why slower than native: I did not profile V8's output. Plausible reasons are
+that TurboFan's register allocation and instruction selection are weaker
+than LLVM's, and that WASM's 128-bit SIMD was not enabled (but our native
+build uses no explicit SIMD either). Liftoff makes no attempt to optimise,
+which is the point of a baseline compiler: it compiles fast, so code starts
+quickly.
+
+Note on method: pinning a whole Node process to one CPU also pins V8's
+background compiler and garbage-collector threads to it. That is a likely
+reason why the P-core 95th percentiles are wide (about 1.8× the median).
+The medians are stable between runs.
+
+### 7.5 Timing leaks in the code V8 actually runs
+
+`scripts/wasm/dudect.mjs` ports the phase 5 tester to JavaScript: same
+classes, batching, normalising copy, A/A controls, Welch t-test with 100
+crops. The timer is `process.hrtime.bigint()` (100 ns resolution on Windows),
+which is coarse but fine for operations of 1.5 µs and 170 µs. A warm-up runs
+first, so V8 has tiered up to TurboFan. Targets: ML-KEM-768 Decaps
+(`decaps-ct`, 2·10⁵ samples) and ByteEncode_11(Compress_11(u))
+(`u-encode-zero`, 10⁶ samples, exported only with the `probes` feature).
+
+| build, target | P-core | E-core | A/A P / E |
+|---|---|---|---|
+| normal, `decaps-ct` | 1.9 | 0.9 | 2.7 / 2.8 |
+| normal, `u-encode-zero` | 1.3 | 1.5 | 1.0 / 1.2 |
+| leaky-early-exit, `decaps-ct` | **46** | **57** | 1.6 / 2.4 |
+| leaky-kyberslash, `u-encode-zero` | 1.8 | **713** | 2.2 / 1.9 |
+
+The same picture as native (5.3–5.4):
+- The normal build shows nothing on either core.
+- The early-exit leak survives into WASM and V8's machine code.
+- **The KyberSlash division leaks through V8 too, and again only on the
+  E-core**: a random u takes 148 ns longer per polynomial than u = 0
+  (1931 vs 1783 ns). That is evidently V8 compiling `i32.div_u` with an
+  unknown divisor to the hardware `div` (inferred from the timing; V8's
+  machine code was not inspected), whose latency on Gracemont depends on
+  the operands. So
+  WASM code inherits the timing behaviour of the CPU it ends up on, and a web
+  page cannot choose which core it runs on.
+
+Not tested: Liftoff-compiled code under the timing test (it runs only until
+tier-up), other engines (SpiderMonkey, JavaScriptCore, wasmtime) and other
+CPUs. Each compiles WASM differently.
+
+### 7.6 Design decisions and alternatives
+
+- **Plain C ABI over wasm-bindgen**: no dependencies, everything visible;
+  the cost is manual pointer handling in JavaScript (7.2).
+- **Node rather than a browser**: scriptable, already installed, and the
+  same V8 engine as Chrome. Browsers also coarsen `performance.now()` (to
+  tens of microseconds or more, as a Spectre mitigation), which would make the timing test much
+  slower to converge, though not impossible (attackers average too).
+- **Exporting `_internal` functions**: needed for the ACVP vectors and keeps
+  the module RNG-free; a production binding would hide them.
+- **The `probes` feature** exports one internal function only for the timing
+  test, as `hazmat` does natively. It is off by default.
+
+### 7.7 What went wrong
+
+- **`__heap_base` was not exported.** Node could not find free memory to put
+  inputs in. This toolchain's linker does not export it by default, so `build.rs`
+  passes `--export=__heap_base` to the linker, for wasm32 targets only.
+- I expected the division finding (7.3) the other way round: I assumed LLVM
+  would strength-reduce constant division on every target. Checking the
+  instructions instead of assuming was what found it.
+
+### 7.8 Interview questions
+
+**Q1. Your code is constant time on x86. Why isn't that enough for WASM?**
+Because the WASM is compiled twice more: by LLVM to WASM instructions and by
+the engine to machine code at run time. I checked the first statically (no
+division, no branches in leaf functions, at every optimisation level, with a
+positive control) and the second by running the timing test inside Node
+against the code V8 generated.
+
+**Q2. What did you find about division in WASM?**
+LLVM keeps `x / constant` as a real `i32.div_u` for wasm32, where on x86 it
+becomes a multiply. V8 then emits a hardware `div`. With the deliberately
+leaky build, the timing test detected it at |t| = 713 on an E-core and not at
+all on a P-core, exactly as with native code. So in WASM a KyberSlash-style
+division is a leak on every optimisation level, on CPUs with a variable
+divider.
+
+**Q3. How does JavaScript call your WASM without wasm-bindgen?**
+The module exports functions taking i32 pointers into its linear memory.
+JavaScript gets the memory as an ArrayBuffer, writes inputs above
+`__heap_base` (exported by the linker), calls the function, and reads the
+outputs back. There is no allocator in the module, so the caller manages that
+memory.
+
+**Q4. Where does randomness come from?**
+Nowhere inside the module. The caller passes the seeds d, z and m, which must
+come from `crypto.getRandomValues`. That is FIPS 203's `_internal` interface,
+fine for test vectors, but a real binding should generate them itself so a
+caller cannot pass weak or repeated seeds.
+
+**Q5. How fast is it, and why the two numbers?**
+ML-KEM-768 Decaps takes 147 µs in Node under normal tiering, 2.4× native;
+with V8's baseline compiler only it is 321 µs, 5.3×. V8 first compiles
+quickly with Liftoff and re-compiles hot functions with TurboFan, so
+short-lived code runs at the slower speed. Both are reported because a page
+that runs a single key exchange may never reach TurboFan.
