@@ -1,33 +1,33 @@
 # mlkem-dudect summary (rebuilt from results/dudect/*/*.txt)
-date:    2026-11-13 18:33:04 -05:00
+date:    2026-11-13 21:11:10 -05:00
 rustc:   rustc 1.99.1 (58cf8f9c3 2026-10-13)
 script:  scripts/dudect.ps1 -N 1000000 -NCheap 10000000 -Cpus 2,20
 
 thresholds: max|t| < 4.5 no leak detected; 4.5-10 possible; >= 10 leak
 
 build       target                  cpu          n     max|t| at                   verdict           commit
-normal      aa-ct-eq                  2   10000000       1.49 below p96.1527       no leak detected  6eff2ac
-normal      ct-eq                     2   10000000       1.53 below p99.0382       no leak detected  6eff2ac
-normal      message-encode            2   10000000       2.02 below p6.6967        no leak detected  6eff2ac
-normal      message-encode-zero       2   10000000       1.82 below p24.2142       no leak detected  6eff2ac
-normal      u-encode-zero             2   10000000       1.47 below p50.0000       no leak detected  6eff2ac
-normal      aa-decaps-ct              2    1000000       1.73 below p6.6967        no leak detected  6eff2ac
-normal      decaps-ct                 2    1000000       2.07 below p92.3053       no leak detected  6eff2ac
-normal      decaps-valid              2    1000000       2.12 below p99.3199       no leak detected  6eff2ac
-normal      encaps-m                  2    1000000       2.67 below p99.7423       no leak detected  6eff2ac
-normal      aa-keygen-d               2    1000000       1.44 below p99.1026       no leak detected  6eff2ac
-normal      keygen-d                  2    1000000    4519.04 below p67.0123       LEAK              6eff2ac
-normal      aa-ct-eq                 20   10000000       1.75 below p6.6967        no leak detected  6eff2ac
-normal      ct-eq                    20   10000000       2.14 below p73.2057       no leak detected  6eff2ac
-normal      message-encode           20   10000000       1.55 below p84.6107       no leak detected  6eff2ac
-normal      message-encode-zero      20   10000000       1.92 below p29.2893       no leak detected  6eff2ac
-normal      u-encode-zero            20   10000000       1.52 below p24.2142       no leak detected  6eff2ac
-normal      aa-decaps-ct             20    1000000       2.32 below p89.1181       no leak detected  6eff2ac
-normal      decaps-ct                20    1000000       2.24 below p98.5421       no leak detected  6eff2ac
-normal      decaps-valid             20    1000000       1.98 below p18.7748       no leak detected  6eff2ac
-normal      encaps-m                 20    1000000       2.64 below p89.1181       no leak detected  6eff2ac
-normal      aa-keygen-d              20    1000000       2.20 below p97.7903       no leak detected  6eff2ac
-normal      keygen-d                 20    1000000    3921.44 below p50.0000       LEAK              6eff2ac
+normal      aa-ct-eq                  2   10000000       3.03 below p88.3371       no leak detected  d02f443
+normal      ct-eq                     2   10000000       2.37 below p98.8158       no leak detected  d02f443
+normal      message-encode            2   10000000       1.39 below p46.4113       no leak detected  d02f443
+normal      message-encode-zero       2   10000000       1.69 below p53.3484       no leak detected  d02f443
+normal      u-encode-zero             2   10000000       1.56 below p99.8178       no leak detected  d02f443
+normal      aa-decaps-ct              2    1000000       1.94 below p62.1071       no leak detected  d02f443
+normal      decaps-ct                 2    1000000       2.93 below p18.7748       no leak detected  d02f443
+normal      decaps-valid              2    1000000       2.34 below p96.1527       no leak detected  d02f443
+normal      encaps-m                  2    1000000       1.30 below p99.8953       no leak detected  d02f443
+normal      aa-keygen-d               2    1000000       2.22 below p99.2711       no leak detected  d02f443
+normal      keygen-d                  2    1000000    4479.77 below p71.2825       LEAK              d02f443
+normal      aa-ct-eq                 20   10000000       1.90 below p71.2825       no leak detected  d02f443
+normal      ct-eq                    20   10000000       1.44 below p42.5651       no leak detected  d02f443
+normal      message-encode           20   10000000       1.79 below p98.4375       no leak detected  d02f443
+normal      message-encode-zero      20   10000000       1.30 below p97.7903       no leak detected  d02f443
+normal      u-encode-zero            20   10000000       1.59 below p95.5806       no leak detected  d02f443
+normal      aa-decaps-ct             20    1000000       2.91 below p87.5000       no leak detected  d02f443
+normal      decaps-ct                20    1000000       1.85 uncropped            no leak detected  d02f443
+normal      decaps-valid             20    1000000       1.18 uncropped            no leak detected  d02f443
+normal      encaps-m                 20    1000000       1.65 below p98.7309       no leak detected  d02f443
+normal      aa-keygen-d              20    1000000       3.55 below p99.4476       no leak detected  d02f443
+normal      keygen-d                 20    1000000    2500.28 below p85.6413       LEAK              d02f443
 kyberslash  aa-message-encode-zero    2   10000000       1.29 below p29.2893       no leak detected  6eff2ac
 kyberslash  message-encode-zero       2   10000000       2.98 below p6.6967        no leak detected  6eff2ac
 kyberslash  message-encode            2   10000000       1.17 below p99.9023       no leak detected  d250c07
@@ -44,4 +44,4 @@ early-exit  decaps-ct                20    1000000     201.60 below p6.6967     
 early-exit  decaps-valid             20    1000000       2.76 below p91.1612       no leak detected  d250c07
 
 * = measured with uncommitted changes present
-wall time of this invocation: 12.5 min
+wall time of this invocation: 16.1 min
