@@ -21,3 +21,7 @@ mlkem = { path = "../mlkem" }
 # Pass-through switch, so the WASM timing test can be validated against a
 # deliberately leaky build (see LEARNING.md phase 7). Never for real use.
 leaky-early-exit = ["mlkem/leaky-early-exit"]
+leaky-kyberslash = ["mlkem/leaky-kyberslash"]
+# Exports one internal building block (ByteEncode_11(Compress_11(u)), the
+# KyberSlash1 site) for the WASM timing test. Off by default; not an API.
+probes = ["mlkem/hazmat"]

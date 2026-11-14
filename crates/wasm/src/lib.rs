@@ -199,3 +199,19 @@ exports!(
     mlkem_1024_dk_len,
     mlkem_1024_ct_len
 );
+
+/// Timing-test probe (feature `probes`): ByteEncode_11(Compress_11(u)) of
+/// one polynomial, the KyberSlash1 site, as `mlkem::hazmat::u_encode_d11`.
+///
+/// # Safety
+/// u points to 256 i16 coefficients (512 bytes, 2-byte aligned) in [0, q);
+/// out to 352 writable bytes.
+#[cfg(feature = "probes")]
+#[allow(unsafe_code)]
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn mlkem_probe_u_encode_d11(u: *const i16, out: *mut u8) {
+    // SAFETY: the caller follows the contract above.
+    let u = unsafe { &*(u as *const [i16; 256]) };
+    // SAFETY: as above.
+    unsafe { arr_mut::<352>(out) }.copy_from_slice(&mlkem::hazmat::u_encode_d11(u));
+}
