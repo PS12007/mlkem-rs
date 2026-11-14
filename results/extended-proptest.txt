@@ -1,25 +1,69 @@
 # extended property-test run
-date:    2026-11-13 03:11:13 -05:00
-commit:  2a4acceffcd0dbfc84383117ae987f0a1664d576
+date:    2026-11-13 23:38:13 -05:00
+commit:  23e2da3b8192605cd713159d8227f41e854f1ec4
 rustc:   rustc 1.99.1 (58cf8f9c3 2026-10-13)
 cpu:     Intel(R) Core(TM) i7-14700HX
 command: PROPTEST_CASES=100000 cargo test --workspace --no-fail-fast
 
-    Finished `test` profile [optimized + debuginfo] target(s) in 0.08s
-     Running unittests src\lib.rs (target\debug\deps\mlkem-0735225f647baf02.exe)
+   Compiling typenum v1.20.1
+   Compiling cfg-if v1.0.5
+   Compiling cmov v0.5.4
+   Compiling autocfg v1.5.1
+   Compiling rand_core v0.10.1
+   Compiling getrandom v0.3.4
+   Compiling version_check v0.9.5
+   Compiling zerocopy v0.8.63
+   Compiling sponge-cursor v0.1.0
+   Compiling zmij v1.0.23
+   Compiling serde_core v1.0.229
+   Compiling keccak v0.1.6
+   Compiling serde_json v1.0.154
+   Compiling mlkem v0.1.0 (C:\-CS\mlkem-rs\crates\mlkem)
+   Compiling memchr v2.8.3
+   Compiling unarray v0.1.4
+   Compiling itoa v1.0.19
+   Compiling regex-syntax v0.8.11
+   Compiling bitflags v2.13.2
+   Compiling mlkem-wasm v0.1.0 (C:\-CS\mlkem-rs\crates\wasm)
+   Compiling keccak v0.2.2
+   Compiling ctutils v0.4.2
+   Compiling num-traits v0.2.19
+   Compiling generic-array v0.14.7
+   Compiling hybrid-array v0.4.15
+   Compiling mlkem-dudect v0.1.0 (C:\-CS\mlkem-rs\crates\dudect)
+   Compiling rand_core v0.9.5
+   Compiling rand_xorshift v0.4.0
+   Compiling rand v0.9.5
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.2.2
+   Compiling digest v0.10.7
+   Compiling module-lattice v0.2.3
+   Compiling sha3 v0.10.9
+   Compiling digest v0.11.3
+   Compiling kem v0.3.0
+   Compiling sha3 v0.12.0
+   Compiling shake v0.1.0
+   Compiling ml-kem v0.3.3
+   Compiling mlkem-bench v0.1.0 (C:\-CS\mlkem-rs\crates\bench)
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.9.0
+   Compiling proptest v1.11.0
+    Finished `test` profile [optimized + debuginfo] target(s) in 47.95s
+     Running unittests src\lib.rs (target\debug\deps\mlkem-473a456c83b8891e.exe)
 
-running 38 tests
+running 39 tests
 test ct::tests::eq_and_select_basic ... ok
 test ct::tests::is_zero_mask_edges ... ok
-test encode::tests::decompress_exhaustive_vs_spec_and_round_trip ... ok
 test encode::tests::compress_exhaustive_vs_spec ... ok
-test field::tests::barrett_reduce_exhaustive ... ok
+test encode::tests::decompress_exhaustive_vs_spec_and_round_trip ... ok
 test field::tests::fqmul_matches_integer_math ... ok
-test hash::keccak::tests::zero_state_matches_reference_crate ... ok
 test field::tests::r_inv_is_inverse ... ok
-test hash::tests::known_answers ... ok
 test field::tests::to_canonical_and_csubq_exhaustive ... ok
+test hash::keccak::tests::zero_state_matches_reference_crate ... ok
+test hash::tests::known_answers ... ok
 test ntt::tests::extreme_inputs_do_not_overflow ... ok
+test field::tests::barrett_reduce_exhaustive ... ok
 test hash::keccak::tests::round_constants ... ok
 test ntt::tests::tables_match_appendix_a ... ok
 test ntt::tests::zeta_is_primitive_256th_root ... ok
@@ -27,38 +71,39 @@ test params::tests::sizes_match_table_3 ... ok
 test rng::tests::os_rng_produces_varying_output ... ok
 test sample::tests::last_d2_is_dropped ... ok
 test sample::tests::rejects_out_of_range_values ... ok
+test zeroize::tests::wipes_everything ... ok
 test encode::tests::magic_division_is_exact ... ok
 test hash::tests::every_length_across_block_boundaries ... ok
 test ct::tests::is_zero_mask_matches_eq ... ok
 test ct::tests::ct_eq_matches_slice_eq ... ok
 test hash::keccak::tests::matches_reference_crate ... ok
 test field::tests::montgomery_reduce_exhaustive ... ok
-test sample::tests::cbd_matches_spec ... ok
 test encode::tests::decode_arbitrary_bytes_matches_spec ... ok
+test sample::tests::cbd_matches_spec ... ok
 test ntt::tests::ntt_round_trip ... ok
-test hash::tests::sample_ntt_with_real_xof ... ok
-test hash::tests::fips203_wrappers ... ok
 test encode::tests::encode_matches_spec_and_round_trips ... ok
-test hash::tests::chunked_squeeze_matches_reference ... ok
+test hash::tests::sample_ntt_with_real_xof ... ok
 test ntt::tests::ntt_inverse_matches_spec ... ok
-test ntt::tests::ntt_matches_spec ... ok
+test hash::tests::fips203_wrappers ... ok
 test ntt::tests::multiply_ntts_matches_spec ... ok
-test hash::tests::split_input_matches_reference ... ok
+test hash::tests::chunked_squeeze_matches_reference ... ok
+test ntt::tests::ntt_matches_spec ... ok
 test sample::tests::sample_ntt_matches_spec ... ok
+test hash::tests::split_input_matches_reference ... ok
 test ntt::tests::ntt_multiplication_equals_schoolbook ... ok
 test kpke::tests::encrypt_decrypt_round_trip ... ok
 
-test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.72s
+test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 27.57s
 
-     Running tests\acvp.rs (target\debug\deps\acvp-a849648b9a31a2da.exe)
+     Running tests\acvp.rs (target\debug\deps\acvp-99987859166b774c.exe)
 
 running 2 tests
 test acvp_keygen ... ok
 test acvp_encap_decap ... ok
 
-test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
 
-     Running tests\crosscheck.rs (target\debug\deps\crosscheck-69fe3d83af5a5c7f.exe)
+     Running tests\crosscheck.rs (target\debug\deps\crosscheck-f1387c307f40e482.exe)
 
 running 3 tests
 test crosscheck_1024 has been running for over 60 seconds
@@ -68,29 +113,51 @@ test crosscheck_512 ... ok
 test crosscheck_768 ... ok
 test crosscheck_1024 ... ok
 
-test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 174.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 220.76s
 
-     Running tests\props.rs (target\debug\deps\props-dae25f37d33a75b3.exe)
+     Running tests\props.rs (target\debug\deps\props-b171e7ecc08ff202.exe)
 
 running 7 tests
 test rng_failure_is_reported ... ok
-test public_api_round_trip_with_os_rng ... ok
 test wrong_lengths_are_type_check_failures ... ok
+test public_api_round_trip_with_os_rng ... ok
 test ek_with_out_of_range_coefficient_rejected ... ok
 test dk_with_inconsistent_hash_rejected ... ok
 test decaps_recovers_shared_secret ... ok
 test modified_ciphertext_is_implicitly_rejected ... ok
 
-test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 36.79s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 57.79s
+
+     Running unittests src\main.rs (target\debug\deps\mlkem_bench-246ff7e81a8c4cf9.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\main.rs (target\debug\deps\mlkem_dudect-bd302390e128943c.exe)
+
+running 4 tests
+test stats::tests::crop_points_and_percentiles ... ok
+test stats::tests::welch_known_value ... ok
+test stats::tests::identical_classes_give_small_t ... ok
+test stats::tests::welford_is_numerically_stable ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\mlkem_wasm-28df2a87f6a5a90b.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
    Doc-tests mlkem
 
 running 1 test
 test crates\mlkem\src\lib.rs - (line 5) ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
 
-all doctests ran in 0.47s; merged doctests compilation took 0.38s
+all doctests ran in 1.89s; merged doctests compilation took 1.53s
 
 exit code: 0
-wall time: 234.3 s
+wall time: 358.8 s

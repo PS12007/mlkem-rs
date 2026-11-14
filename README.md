@@ -51,7 +51,7 @@ Run them with `powershell -ExecutionPolicy Bypass -File scripts\<name>`.
 |---|---|---|---|
 | constant-time assembly check, x86-64 (CI) | `asm-check.ps1` | `results/asm-check.txt`, `results/asm/` | a few min |
 | constant-time instruction check, WASM (CI) | `wasm-check.ps1` | `results/wasm-check.txt` | ~1 min |
-| 100 000-case property tests | `extended-proptest.ps1` | `results/extended-proptest.txt` | ~4 min |
+| 100 000-case property tests | `extended-proptest.ps1` | `results/extended-proptest.txt` | ~6 min |
 | timing-leak tests, native | `dudect.ps1` | `results/dudect/` | ~30 min |
 | timing-leak tests, WASM in Node | `wasm-dudect.ps1` | `results/wasm/dudect/` | ~7 min |
 | benchmarks vs `ml-kem` | `bench.ps1` | `results/bench/` | ~1 min |
