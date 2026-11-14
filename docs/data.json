@@ -1,0 +1,3085 @@
+{
+ "dudect": [
+  {
+   "platform": "native",
+   "build": "early-exit",
+   "target": "aa-decaps-ct",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 2.66,
+   "progress": [
+    [
+     100000,
+     2.22
+    ],
+    [
+     200000,
+     1.38
+    ],
+    [
+     300000,
+     1.48
+    ],
+    [
+     400000,
+     2.04
+    ],
+    [
+     500000,
+     1.72
+    ],
+    [
+     600000,
+     2.31
+    ],
+    [
+     700000,
+     2.59
+    ],
+    [
+     800000,
+     2.67
+    ],
+    [
+     900000,
+     2.76
+    ],
+    [
+     1000000,
+     2.66
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/early-exit/aa-decaps-ct-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "early-exit",
+   "target": "aa-decaps-ct",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 3.51,
+   "progress": [
+    [
+     100000,
+     2.24
+    ],
+    [
+     200000,
+     2.73
+    ],
+    [
+     300000,
+     2.47
+    ],
+    [
+     400000,
+     2.47
+    ],
+    [
+     500000,
+     2.82
+    ],
+    [
+     600000,
+     2.55
+    ],
+    [
+     700000,
+     2.78
+    ],
+    [
+     800000,
+     2.72
+    ],
+    [
+     900000,
+     3.2
+    ],
+    [
+     1000000,
+     3.51
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/early-exit/aa-decaps-ct-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "early-exit",
+   "target": "decaps-ct",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 659.9,
+   "progress": [
+    [
+     100000,
+     237.14
+    ],
+    [
+     200000,
+     333.37
+    ],
+    [
+     300000,
+     408.5
+    ],
+    [
+     400000,
+     474.7
+    ],
+    [
+     500000,
+     518.68
+    ],
+    [
+     600000,
+     518.68
+    ],
+    [
+     700000,
+     518.69
+    ],
+    [
+     800000,
+     567.28
+    ],
+    [
+     900000,
+     616.42
+    ],
+    [
+     1000000,
+     659.9
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/early-exit/decaps-ct-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "early-exit",
+   "target": "decaps-ct",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 201.6,
+   "progress": [
+    [
+     100000,
+     58.12
+    ],
+    [
+     200000,
+     76.03
+    ],
+    [
+     300000,
+     97.49
+    ],
+    [
+     400000,
+     122.7
+    ],
+    [
+     500000,
+     136.4
+    ],
+    [
+     600000,
+     155.91
+    ],
+    [
+     700000,
+     163.26
+    ],
+    [
+     800000,
+     179.67
+    ],
+    [
+     900000,
+     187.93
+    ],
+    [
+     1000000,
+     201.6
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/early-exit/decaps-ct-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "early-exit",
+   "target": "decaps-valid",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 2.46,
+   "progress": [
+    [
+     100000,
+     2.66
+    ],
+    [
+     200000,
+     1.37
+    ],
+    [
+     300000,
+     1.76
+    ],
+    [
+     400000,
+     1.59
+    ],
+    [
+     500000,
+     1.91
+    ],
+    [
+     600000,
+     2.28
+    ],
+    [
+     700000,
+     2.27
+    ],
+    [
+     800000,
+     2.12
+    ],
+    [
+     900000,
+     2.01
+    ],
+    [
+     1000000,
+     2.46
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/early-exit/decaps-valid-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "early-exit",
+   "target": "decaps-valid",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 2.76,
+   "progress": [
+    [
+     100000,
+     2.12
+    ],
+    [
+     200000,
+     1.73
+    ],
+    [
+     300000,
+     1.9
+    ],
+    [
+     400000,
+     1.66
+    ],
+    [
+     500000,
+     1.5
+    ],
+    [
+     600000,
+     1.44
+    ],
+    [
+     700000,
+     1.83
+    ],
+    [
+     800000,
+     2.21
+    ],
+    [
+     900000,
+     2.88
+    ],
+    [
+     1000000,
+     2.76
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/early-exit/decaps-valid-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "kyberslash",
+   "target": "aa-message-encode-zero",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.29,
+   "progress": [
+    [
+     1000000,
+     1.52
+    ],
+    [
+     2000000,
+     2.47
+    ],
+    [
+     3000000,
+     2.06
+    ],
+    [
+     4000000,
+     2.14
+    ],
+    [
+     5000000,
+     1.81
+    ],
+    [
+     6000000,
+     1.66
+    ],
+    [
+     7000000,
+     1.58
+    ],
+    [
+     8000000,
+     1.21
+    ],
+    [
+     9000000,
+     1.52
+    ],
+    [
+     10000000,
+     1.29
+    ]
+   ],
+   "commit": "6eff2ac",
+   "source": "results/dudect/kyberslash/aa-message-encode-zero-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "kyberslash",
+   "target": "aa-message-encode-zero",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 3.14,
+   "progress": [
+    [
+     1000000,
+     2.62
+    ],
+    [
+     2000000,
+     3.3
+    ],
+    [
+     3000000,
+     2.44
+    ],
+    [
+     4000000,
+     2.3
+    ],
+    [
+     5000000,
+     2.55
+    ],
+    [
+     6000000,
+     2.53
+    ],
+    [
+     7000000,
+     2.42
+    ],
+    [
+     8000000,
+     2.35
+    ],
+    [
+     9000000,
+     2.69
+    ],
+    [
+     10000000,
+     3.14
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/kyberslash/aa-message-encode-zero-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "kyberslash",
+   "target": "message-encode",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.17,
+   "progress": [
+    [
+     1000000,
+     1.78
+    ],
+    [
+     2000000,
+     1.46
+    ],
+    [
+     3000000,
+     1.87
+    ],
+    [
+     4000000,
+     1.89
+    ],
+    [
+     5000000,
+     1.8
+    ],
+    [
+     6000000,
+     1.25
+    ],
+    [
+     7000000,
+     1.37
+    ],
+    [
+     8000000,
+     1.45
+    ],
+    [
+     9000000,
+     1.33
+    ],
+    [
+     10000000,
+     1.17
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/kyberslash/message-encode-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "kyberslash",
+   "target": "message-encode",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.81,
+   "progress": [
+    [
+     1000000,
+     2.05
+    ],
+    [
+     2000000,
+     1.67
+    ],
+    [
+     3000000,
+     1.84
+    ],
+    [
+     4000000,
+     1.81
+    ],
+    [
+     5000000,
+     1.81
+    ],
+    [
+     6000000,
+     1.81
+    ],
+    [
+     7000000,
+     1.81
+    ],
+    [
+     8000000,
+     1.81
+    ],
+    [
+     9000000,
+     1.81
+    ],
+    [
+     10000000,
+     1.81
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/kyberslash/message-encode-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "kyberslash",
+   "target": "message-encode-zero",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 2.98,
+   "progress": [
+    [
+     1000000,
+     2.33
+    ],
+    [
+     2000000,
+     1.78
+    ],
+    [
+     3000000,
+     2.3
+    ],
+    [
+     4000000,
+     2.61
+    ],
+    [
+     5000000,
+     2.13
+    ],
+    [
+     6000000,
+     2.17
+    ],
+    [
+     7000000,
+     2.04
+    ],
+    [
+     8000000,
+     2.43
+    ],
+    [
+     9000000,
+     3.08
+    ],
+    [
+     10000000,
+     2.98
+    ]
+   ],
+   "commit": "6eff2ac",
+   "source": "results/dudect/kyberslash/message-encode-zero-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "kyberslash",
+   "target": "message-encode-zero",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 2.44,
+   "progress": [
+    [
+     1000000,
+     1.4
+    ],
+    [
+     2000000,
+     1.59
+    ],
+    [
+     3000000,
+     1.64
+    ],
+    [
+     4000000,
+     1.55
+    ],
+    [
+     5000000,
+     1.89
+    ],
+    [
+     6000000,
+     2.2
+    ],
+    [
+     7000000,
+     2.3
+    ],
+    [
+     8000000,
+     2.46
+    ],
+    [
+     9000000,
+     2.36
+    ],
+    [
+     10000000,
+     2.44
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/kyberslash/message-encode-zero-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "kyberslash",
+   "target": "u-encode-zero",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 2.6,
+   "progress": [
+    [
+     1000000,
+     2.72
+    ],
+    [
+     2000000,
+     3.24
+    ],
+    [
+     3000000,
+     3.18
+    ],
+    [
+     4000000,
+     2.52
+    ],
+    [
+     5000000,
+     2.41
+    ],
+    [
+     6000000,
+     1.91
+    ],
+    [
+     7000000,
+     2.32
+    ],
+    [
+     8000000,
+     2.93
+    ],
+    [
+     9000000,
+     2.67
+    ],
+    [
+     10000000,
+     2.6
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/kyberslash/u-encode-zero-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "kyberslash",
+   "target": "u-encode-zero",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 19856.77,
+   "progress": [
+    [
+     1000000,
+     16665.58
+    ],
+    [
+     2000000,
+     25301.99
+    ],
+    [
+     3000000,
+     17926.11
+    ],
+    [
+     4000000,
+     16382.92
+    ],
+    [
+     5000000,
+     17409.39
+    ],
+    [
+     6000000,
+     19727.57
+    ],
+    [
+     7000000,
+     20997.01
+    ],
+    [
+     8000000,
+     22659.96
+    ],
+    [
+     9000000,
+     21447.53
+    ],
+    [
+     10000000,
+     19856.77
+    ]
+   ],
+   "commit": "d250c07",
+   "source": "results/dudect/kyberslash/u-encode-zero-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "aa-ct-eq",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 3.03,
+   "progress": [
+    [
+     1000000,
+     2.2
+    ],
+    [
+     2000000,
+     2.66
+    ],
+    [
+     3000000,
+     2.6
+    ],
+    [
+     4000000,
+     2.42
+    ],
+    [
+     5000000,
+     1.95
+    ],
+    [
+     6000000,
+     2.07
+    ],
+    [
+     7000000,
+     2.13
+    ],
+    [
+     8000000,
+     2.49
+    ],
+    [
+     9000000,
+     2.65
+    ],
+    [
+     10000000,
+     3.03
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/aa-ct-eq-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "aa-ct-eq",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.9,
+   "progress": [
+    [
+     1000000,
+     2.36
+    ],
+    [
+     2000000,
+     1.37
+    ],
+    [
+     3000000,
+     1.7
+    ],
+    [
+     4000000,
+     1.69
+    ],
+    [
+     5000000,
+     1.5
+    ],
+    [
+     6000000,
+     2.31
+    ],
+    [
+     7000000,
+     2.26
+    ],
+    [
+     8000000,
+     2.03
+    ],
+    [
+     9000000,
+     1.74
+    ],
+    [
+     10000000,
+     1.9
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/aa-ct-eq-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "aa-decaps-ct",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.94,
+   "progress": [
+    [
+     100000,
+     2.0
+    ],
+    [
+     200000,
+     2.34
+    ],
+    [
+     300000,
+     3.11
+    ],
+    [
+     400000,
+     1.77
+    ],
+    [
+     500000,
+     1.83
+    ],
+    [
+     600000,
+     2.68
+    ],
+    [
+     700000,
+     2.68
+    ],
+    [
+     800000,
+     2.25
+    ],
+    [
+     900000,
+     2.23
+    ],
+    [
+     1000000,
+     1.94
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/aa-decaps-ct-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "aa-decaps-ct",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 2.91,
+   "progress": [
+    [
+     100000,
+     4.24
+    ],
+    [
+     200000,
+     2.75
+    ],
+    [
+     300000,
+     2.29
+    ],
+    [
+     400000,
+     2.35
+    ],
+    [
+     500000,
+     2.49
+    ],
+    [
+     600000,
+     2.01
+    ],
+    [
+     700000,
+     2.15
+    ],
+    [
+     800000,
+     2.51
+    ],
+    [
+     900000,
+     2.61
+    ],
+    [
+     1000000,
+     2.91
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/aa-decaps-ct-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "aa-keygen-d",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 2.22,
+   "progress": [
+    [
+     100000,
+     2.18
+    ],
+    [
+     200000,
+     2.03
+    ],
+    [
+     300000,
+     1.55
+    ],
+    [
+     400000,
+     1.62
+    ],
+    [
+     500000,
+     1.53
+    ],
+    [
+     600000,
+     2.5
+    ],
+    [
+     700000,
+     2.08
+    ],
+    [
+     800000,
+     2.37
+    ],
+    [
+     900000,
+     2.29
+    ],
+    [
+     1000000,
+     2.22
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/aa-keygen-d-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "aa-keygen-d",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 3.55,
+   "progress": [
+    [
+     100000,
+     2.28
+    ],
+    [
+     200000,
+     2.11
+    ],
+    [
+     300000,
+     3.81
+    ],
+    [
+     400000,
+     3.73
+    ],
+    [
+     500000,
+     2.84
+    ],
+    [
+     600000,
+     2.72
+    ],
+    [
+     700000,
+     2.78
+    ],
+    [
+     800000,
+     2.97
+    ],
+    [
+     900000,
+     3.22
+    ],
+    [
+     1000000,
+     3.55
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/aa-keygen-d-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "ct-eq",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 2.37,
+   "progress": [
+    [
+     1000000,
+     2.68
+    ],
+    [
+     2000000,
+     2.87
+    ],
+    [
+     3000000,
+     2.41
+    ],
+    [
+     4000000,
+     1.54
+    ],
+    [
+     5000000,
+     2.13
+    ],
+    [
+     6000000,
+     1.93
+    ],
+    [
+     7000000,
+     2.33
+    ],
+    [
+     8000000,
+     2.21
+    ],
+    [
+     9000000,
+     2.34
+    ],
+    [
+     10000000,
+     2.37
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/ct-eq-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "ct-eq",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.44,
+   "progress": [
+    [
+     1000000,
+     1.82
+    ],
+    [
+     2000000,
+     1.91
+    ],
+    [
+     3000000,
+     1.78
+    ],
+    [
+     4000000,
+     1.46
+    ],
+    [
+     5000000,
+     1.5
+    ],
+    [
+     6000000,
+     1.4
+    ],
+    [
+     7000000,
+     1.9
+    ],
+    [
+     8000000,
+     1.54
+    ],
+    [
+     9000000,
+     1.35
+    ],
+    [
+     10000000,
+     1.44
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/ct-eq-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "decaps-ct",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 2.93,
+   "progress": [
+    [
+     100000,
+     1.93
+    ],
+    [
+     200000,
+     2.33
+    ],
+    [
+     300000,
+     2.44
+    ],
+    [
+     400000,
+     1.81
+    ],
+    [
+     500000,
+     2.16
+    ],
+    [
+     600000,
+     2.72
+    ],
+    [
+     700000,
+     3.41
+    ],
+    [
+     800000,
+     2.84
+    ],
+    [
+     900000,
+     2.62
+    ],
+    [
+     1000000,
+     2.93
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/decaps-ct-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "decaps-ct",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.85,
+   "progress": [
+    [
+     100000,
+     1.33
+    ],
+    [
+     200000,
+     2.03
+    ],
+    [
+     300000,
+     1.74
+    ],
+    [
+     400000,
+     1.66
+    ],
+    [
+     500000,
+     1.56
+    ],
+    [
+     600000,
+     1.61
+    ],
+    [
+     700000,
+     1.85
+    ],
+    [
+     800000,
+     2.25
+    ],
+    [
+     900000,
+     2.28
+    ],
+    [
+     1000000,
+     1.85
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/decaps-ct-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "decaps-valid",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 2.34,
+   "progress": [
+    [
+     100000,
+     2.21
+    ],
+    [
+     200000,
+     2.43
+    ],
+    [
+     300000,
+     2.33
+    ],
+    [
+     400000,
+     2.03
+    ],
+    [
+     500000,
+     2.78
+    ],
+    [
+     600000,
+     2.41
+    ],
+    [
+     700000,
+     2.61
+    ],
+    [
+     800000,
+     2.27
+    ],
+    [
+     900000,
+     2.13
+    ],
+    [
+     1000000,
+     2.34
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/decaps-valid-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "decaps-valid",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.18,
+   "progress": [
+    [
+     100000,
+     2.34
+    ],
+    [
+     200000,
+     1.87
+    ],
+    [
+     300000,
+     1.5
+    ],
+    [
+     400000,
+     1.79
+    ],
+    [
+     500000,
+     2.13
+    ],
+    [
+     600000,
+     2.18
+    ],
+    [
+     700000,
+     2.89
+    ],
+    [
+     800000,
+     3.62
+    ],
+    [
+     900000,
+     3.45
+    ],
+    [
+     1000000,
+     1.18
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/decaps-valid-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "encaps-m",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.3,
+   "progress": [
+    [
+     100000,
+     2.41
+    ],
+    [
+     200000,
+     2.43
+    ],
+    [
+     300000,
+     1.74
+    ],
+    [
+     400000,
+     2.12
+    ],
+    [
+     500000,
+     2.41
+    ],
+    [
+     600000,
+     2.08
+    ],
+    [
+     700000,
+     2.62
+    ],
+    [
+     800000,
+     2.54
+    ],
+    [
+     900000,
+     1.2
+    ],
+    [
+     1000000,
+     1.3
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/encaps-m-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "encaps-m",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.65,
+   "progress": [
+    [
+     100000,
+     1.24
+    ],
+    [
+     200000,
+     1.62
+    ],
+    [
+     300000,
+     1.62
+    ],
+    [
+     400000,
+     1.61
+    ],
+    [
+     500000,
+     1.65
+    ],
+    [
+     600000,
+     1.65
+    ],
+    [
+     700000,
+     1.65
+    ],
+    [
+     800000,
+     1.65
+    ],
+    [
+     900000,
+     1.65
+    ],
+    [
+     1000000,
+     1.65
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/encaps-m-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "keygen-d",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 4479.77,
+   "progress": [
+    [
+     100000,
+     1429.24
+    ],
+    [
+     200000,
+     2011.84
+    ],
+    [
+     300000,
+     2465.96
+    ],
+    [
+     400000,
+     2841.76
+    ],
+    [
+     500000,
+     3171.06
+    ],
+    [
+     600000,
+     3478.19
+    ],
+    [
+     700000,
+     3747.52
+    ],
+    [
+     800000,
+     4012.87
+    ],
+    [
+     900000,
+     4253.63
+    ],
+    [
+     1000000,
+     4479.77
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/keygen-d-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "keygen-d",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 2500.28,
+   "progress": [
+    [
+     100000,
+     1574.79
+    ],
+    [
+     200000,
+     2236.17
+    ],
+    [
+     300000,
+     2657.53
+    ],
+    [
+     400000,
+     3082.21
+    ],
+    [
+     500000,
+     3461.93
+    ],
+    [
+     600000,
+     3798.78
+    ],
+    [
+     700000,
+     4104.34
+    ],
+    [
+     800000,
+     4395.65
+    ],
+    [
+     900000,
+     2306.83
+    ],
+    [
+     1000000,
+     2500.28
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/keygen-d-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "message-encode",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.39,
+   "progress": [
+    [
+     1000000,
+     1.71
+    ],
+    [
+     2000000,
+     1.78
+    ],
+    [
+     3000000,
+     1.52
+    ],
+    [
+     4000000,
+     1.78
+    ],
+    [
+     5000000,
+     1.38
+    ],
+    [
+     6000000,
+     1.62
+    ],
+    [
+     7000000,
+     1.35
+    ],
+    [
+     8000000,
+     1.16
+    ],
+    [
+     9000000,
+     1.33
+    ],
+    [
+     10000000,
+     1.39
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/message-encode-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "message-encode",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.79,
+   "progress": [
+    [
+     1000000,
+     1.24
+    ],
+    [
+     2000000,
+     1.81
+    ],
+    [
+     3000000,
+     2.23
+    ],
+    [
+     4000000,
+     2.07
+    ],
+    [
+     5000000,
+     1.99
+    ],
+    [
+     6000000,
+     2.42
+    ],
+    [
+     7000000,
+     2.5
+    ],
+    [
+     8000000,
+     2.38
+    ],
+    [
+     9000000,
+     2.42
+    ],
+    [
+     10000000,
+     1.79
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/message-encode-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "message-encode-zero",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.69,
+   "progress": [
+    [
+     1000000,
+     1.44
+    ],
+    [
+     2000000,
+     1.16
+    ],
+    [
+     3000000,
+     1.59
+    ],
+    [
+     4000000,
+     1.41
+    ],
+    [
+     5000000,
+     1.14
+    ],
+    [
+     6000000,
+     1.03
+    ],
+    [
+     7000000,
+     1.23
+    ],
+    [
+     8000000,
+     1.5
+    ],
+    [
+     9000000,
+     1.68
+    ],
+    [
+     10000000,
+     1.69
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/message-encode-zero-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "message-encode-zero",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.3,
+   "progress": [
+    [
+     1000000,
+     1.9
+    ],
+    [
+     2000000,
+     1.84
+    ],
+    [
+     3000000,
+     1.23
+    ],
+    [
+     4000000,
+     1.61
+    ],
+    [
+     5000000,
+     1.34
+    ],
+    [
+     6000000,
+     1.06
+    ],
+    [
+     7000000,
+     1.45
+    ],
+    [
+     8000000,
+     1.37
+    ],
+    [
+     9000000,
+     1.29
+    ],
+    [
+     10000000,
+     1.3
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/message-encode-zero-cpu20.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "u-encode-zero",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.56,
+   "progress": [
+    [
+     1000000,
+     2.24
+    ],
+    [
+     2000000,
+     1.47
+    ],
+    [
+     3000000,
+     1.85
+    ],
+    [
+     4000000,
+     1.88
+    ],
+    [
+     5000000,
+     1.39
+    ],
+    [
+     6000000,
+     1.45
+    ],
+    [
+     7000000,
+     1.67
+    ],
+    [
+     8000000,
+     1.6
+    ],
+    [
+     9000000,
+     1.2
+    ],
+    [
+     10000000,
+     1.56
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/u-encode-zero-cpu2.txt"
+  },
+  {
+   "platform": "native",
+   "build": "normal",
+   "target": "u-encode-zero",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.59,
+   "progress": [
+    [
+     1000000,
+     2.31
+    ],
+    [
+     2000000,
+     2.29
+    ],
+    [
+     3000000,
+     3.18
+    ],
+    [
+     4000000,
+     3.18
+    ],
+    [
+     5000000,
+     2.17
+    ],
+    [
+     6000000,
+     2.03
+    ],
+    [
+     7000000,
+     2.29
+    ],
+    [
+     8000000,
+     1.41
+    ],
+    [
+     9000000,
+     1.42
+    ],
+    [
+     10000000,
+     1.59
+    ]
+   ],
+   "commit": "d02f443",
+   "source": "results/dudect/normal/u-encode-zero-cpu20.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "early-exit",
+   "target": "aa-decaps-ct",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.61,
+   "progress": [
+    [
+     20000,
+     2.53
+    ],
+    [
+     40000,
+     1.42
+    ],
+    [
+     60000,
+     1.85
+    ],
+    [
+     80000,
+     1.9
+    ],
+    [
+     100000,
+     2.6
+    ],
+    [
+     120000,
+     1.78
+    ],
+    [
+     140000,
+     1.82
+    ],
+    [
+     160000,
+     1.82
+    ],
+    [
+     180000,
+     1.64
+    ],
+    [
+     200000,
+     1.61
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/early-exit/aa-decaps-ct-cpu2.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "early-exit",
+   "target": "aa-decaps-ct",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 2.36,
+   "progress": [
+    [
+     20000,
+     1.65
+    ],
+    [
+     40000,
+     1.65
+    ],
+    [
+     60000,
+     1.95
+    ],
+    [
+     80000,
+     1.45
+    ],
+    [
+     100000,
+     1.5
+    ],
+    [
+     120000,
+     1.52
+    ],
+    [
+     140000,
+     1.61
+    ],
+    [
+     160000,
+     1.8
+    ],
+    [
+     180000,
+     2.1
+    ],
+    [
+     200000,
+     2.36
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/early-exit/aa-decaps-ct-cpu20.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "early-exit",
+   "target": "decaps-ct",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 45.73,
+   "progress": [
+    [
+     20000,
+     13.18
+    ],
+    [
+     40000,
+     20.98
+    ],
+    [
+     60000,
+     24.23
+    ],
+    [
+     80000,
+     25.19
+    ],
+    [
+     100000,
+     30.31
+    ],
+    [
+     120000,
+     32.03
+    ],
+    [
+     140000,
+     32.43
+    ],
+    [
+     160000,
+     32.36
+    ],
+    [
+     180000,
+     39.79
+    ],
+    [
+     200000,
+     45.73
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/early-exit/decaps-ct-cpu2.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "early-exit",
+   "target": "decaps-ct",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 57.45,
+   "progress": [
+    [
+     20000,
+     22.78
+    ],
+    [
+     40000,
+     47.89
+    ],
+    [
+     60000,
+     62.77
+    ],
+    [
+     80000,
+     73.43
+    ],
+    [
+     100000,
+     86.96
+    ],
+    [
+     120000,
+     48.63
+    ],
+    [
+     140000,
+     54.85
+    ],
+    [
+     160000,
+     53.01
+    ],
+    [
+     180000,
+     55.75
+    ],
+    [
+     200000,
+     57.45
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/early-exit/decaps-ct-cpu20.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "kyberslash",
+   "target": "aa-u-encode-zero",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 2.16,
+   "progress": [
+    [
+     100000,
+     1.99
+    ],
+    [
+     200000,
+     1.45
+    ],
+    [
+     300000,
+     1.42
+    ],
+    [
+     400000,
+     0.93
+    ],
+    [
+     500000,
+     1.21
+    ],
+    [
+     600000,
+     1.97
+    ],
+    [
+     700000,
+     2.29
+    ],
+    [
+     800000,
+     2.43
+    ],
+    [
+     900000,
+     2.49
+    ],
+    [
+     1000000,
+     2.16
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/kyberslash/aa-u-encode-zero-cpu2.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "kyberslash",
+   "target": "aa-u-encode-zero",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.85,
+   "progress": [
+    [
+     100000,
+     0.81
+    ],
+    [
+     200000,
+     0.58
+    ],
+    [
+     300000,
+     0.71
+    ],
+    [
+     400000,
+     1.36
+    ],
+    [
+     500000,
+     1.46
+    ],
+    [
+     600000,
+     1.84
+    ],
+    [
+     700000,
+     1.18
+    ],
+    [
+     800000,
+     1.74
+    ],
+    [
+     900000,
+     1.64
+    ],
+    [
+     1000000,
+     1.85
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/kyberslash/aa-u-encode-zero-cpu20.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "kyberslash",
+   "target": "u-encode-zero",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.79,
+   "progress": [
+    [
+     100000,
+     1.83
+    ],
+    [
+     200000,
+     1.91
+    ],
+    [
+     300000,
+     2.38
+    ],
+    [
+     400000,
+     2.01
+    ],
+    [
+     500000,
+     1.9
+    ],
+    [
+     600000,
+     2.11
+    ],
+    [
+     700000,
+     1.98
+    ],
+    [
+     800000,
+     1.58
+    ],
+    [
+     900000,
+     1.71
+    ],
+    [
+     1000000,
+     1.79
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/kyberslash/u-encode-zero-cpu2.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "kyberslash",
+   "target": "u-encode-zero",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 713.19,
+   "progress": [
+    [
+     100000,
+     248.37
+    ],
+    [
+     200000,
+     363.24
+    ],
+    [
+     300000,
+     367.77
+    ],
+    [
+     400000,
+     447.13
+    ],
+    [
+     500000,
+     522.7
+    ],
+    [
+     600000,
+     572.01
+    ],
+    [
+     700000,
+     625.7
+    ],
+    [
+     800000,
+     647.38
+    ],
+    [
+     900000,
+     689.56
+    ],
+    [
+     1000000,
+     713.19
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/kyberslash/u-encode-zero-cpu20.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "normal",
+   "target": "aa-decaps-ct",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 2.69,
+   "progress": [
+    [
+     20000,
+     1.68
+    ],
+    [
+     40000,
+     2.04
+    ],
+    [
+     60000,
+     2.34
+    ],
+    [
+     80000,
+     2.58
+    ],
+    [
+     100000,
+     3.12
+    ],
+    [
+     120000,
+     2.85
+    ],
+    [
+     140000,
+     2.8
+    ],
+    [
+     160000,
+     2.52
+    ],
+    [
+     180000,
+     2.88
+    ],
+    [
+     200000,
+     2.69
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/normal/aa-decaps-ct-cpu2.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "normal",
+   "target": "aa-decaps-ct",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 2.75,
+   "progress": [
+    [
+     20000,
+     1.59
+    ],
+    [
+     40000,
+     2.0
+    ],
+    [
+     60000,
+     2.37
+    ],
+    [
+     80000,
+     2.53
+    ],
+    [
+     100000,
+     1.94
+    ],
+    [
+     120000,
+     1.91
+    ],
+    [
+     140000,
+     2.38
+    ],
+    [
+     160000,
+     2.59
+    ],
+    [
+     180000,
+     2.92
+    ],
+    [
+     200000,
+     2.75
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/normal/aa-decaps-ct-cpu20.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "normal",
+   "target": "aa-u-encode-zero",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.01,
+   "progress": [
+    [
+     100000,
+     1.15
+    ],
+    [
+     200000,
+     1.72
+    ],
+    [
+     300000,
+     1.17
+    ],
+    [
+     400000,
+     1.26
+    ],
+    [
+     500000,
+     1.67
+    ],
+    [
+     600000,
+     1.71
+    ],
+    [
+     700000,
+     1.18
+    ],
+    [
+     800000,
+     1.0
+    ],
+    [
+     900000,
+     1.48
+    ],
+    [
+     1000000,
+     1.01
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/normal/aa-u-encode-zero-cpu2.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "normal",
+   "target": "aa-u-encode-zero",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.22,
+   "progress": [
+    [
+     100000,
+     0.95
+    ],
+    [
+     200000,
+     1.32
+    ],
+    [
+     300000,
+     1.33
+    ],
+    [
+     400000,
+     1.52
+    ],
+    [
+     500000,
+     1.3
+    ],
+    [
+     600000,
+     1.06
+    ],
+    [
+     700000,
+     1.37
+    ],
+    [
+     800000,
+     2.05
+    ],
+    [
+     900000,
+     1.63
+    ],
+    [
+     1000000,
+     1.22
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/normal/aa-u-encode-zero-cpu20.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "normal",
+   "target": "decaps-ct",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.9,
+   "progress": [
+    [
+     20000,
+     2.16
+    ],
+    [
+     40000,
+     2.55
+    ],
+    [
+     60000,
+     2.77
+    ],
+    [
+     80000,
+     2.11
+    ],
+    [
+     100000,
+     1.8
+    ],
+    [
+     120000,
+     1.7
+    ],
+    [
+     140000,
+     2.18
+    ],
+    [
+     160000,
+     2.29
+    ],
+    [
+     180000,
+     2.06
+    ],
+    [
+     200000,
+     1.9
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/normal/decaps-ct-cpu2.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "normal",
+   "target": "decaps-ct",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 0.91,
+   "progress": [
+    [
+     20000,
+     1.56
+    ],
+    [
+     40000,
+     1.99
+    ],
+    [
+     60000,
+     2.39
+    ],
+    [
+     80000,
+     1.93
+    ],
+    [
+     100000,
+     1.74
+    ],
+    [
+     120000,
+     1.08
+    ],
+    [
+     140000,
+     1.08
+    ],
+    [
+     160000,
+     0.99
+    ],
+    [
+     180000,
+     0.93
+    ],
+    [
+     200000,
+     0.91
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/normal/decaps-ct-cpu20.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "normal",
+   "target": "u-encode-zero",
+   "cpu": 2,
+   "core": "P",
+   "maxT": 1.33,
+   "progress": [
+    [
+     100000,
+     1.15
+    ],
+    [
+     200000,
+     1.21
+    ],
+    [
+     300000,
+     1.35
+    ],
+    [
+     400000,
+     1.55
+    ],
+    [
+     500000,
+     1.62
+    ],
+    [
+     600000,
+     1.48
+    ],
+    [
+     700000,
+     1.3
+    ],
+    [
+     800000,
+     1.6
+    ],
+    [
+     900000,
+     1.65
+    ],
+    [
+     1000000,
+     1.33
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/normal/u-encode-zero-cpu2.txt"
+  },
+  {
+   "platform": "wasm",
+   "build": "normal",
+   "target": "u-encode-zero",
+   "cpu": 20,
+   "core": "E",
+   "maxT": 1.5,
+   "progress": [
+    [
+     100000,
+     2.18
+    ],
+    [
+     200000,
+     2.66
+    ],
+    [
+     300000,
+     2.64
+    ],
+    [
+     400000,
+     2.66
+    ],
+    [
+     500000,
+     2.11
+    ],
+    [
+     600000,
+     1.73
+    ],
+    [
+     700000,
+     1.78
+    ],
+    [
+     800000,
+     1.7
+    ],
+    [
+     900000,
+     1.77
+    ],
+    [
+     1000000,
+     1.5
+    ]
+   ],
+   "commit": "d45a713",
+   "source": "results/wasm/dudect/normal/u-encode-zero-cpu20.txt"
+  }
+ ],
+ "bench": {
+  "native": [
+   {
+    "set": "ML-KEM-512",
+    "op": "KeyGen",
+    "impl": "mlkem",
+    "us": 25.67
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "KeyGen",
+    "impl": "ml-kem",
+    "us": 21.77
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Encaps",
+    "impl": "mlkem",
+    "us": 31.12
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Encaps",
+    "impl": "ml-kem",
+    "us": 21.6
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Encaps",
+    "impl": "ml-kem/bytes",
+    "us": 24.45
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Decaps",
+    "impl": "mlkem",
+    "us": 39.96
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Decaps",
+    "impl": "ml-kem",
+    "us": 27.83
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Decaps",
+    "impl": "ml-kem/bytes",
+    "us": 31.24
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "KeyGen",
+    "impl": "mlkem",
+    "us": 42.07
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "KeyGen",
+    "impl": "ml-kem",
+    "us": 38.76
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Encaps",
+    "impl": "mlkem",
+    "us": 49.22
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Encaps",
+    "impl": "ml-kem",
+    "us": 38.74
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Encaps",
+    "impl": "ml-kem/bytes",
+    "us": 43.14
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Decaps",
+    "impl": "mlkem",
+    "us": 60.5
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Decaps",
+    "impl": "ml-kem",
+    "us": 47.46
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Decaps",
+    "impl": "ml-kem/bytes",
+    "us": 52.42
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "KeyGen",
+    "impl": "mlkem",
+    "us": 65.26
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "KeyGen",
+    "impl": "ml-kem",
+    "us": 62.66
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Encaps",
+    "impl": "mlkem",
+    "us": 73.34
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Encaps",
+    "impl": "ml-kem",
+    "us": 62.32
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Encaps",
+    "impl": "ml-kem/bytes",
+    "us": 68.14
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Decaps",
+    "impl": "mlkem",
+    "us": 87.82
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Decaps",
+    "impl": "ml-kem",
+    "us": 73.68
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Decaps",
+    "impl": "ml-kem/bytes",
+    "us": 80.25
+   }
+  ],
+  "baseline": [
+   {
+    "set": "ML-KEM-512",
+    "op": "KeyGen",
+    "impl": "mlkem",
+    "us": 28.32
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "KeyGen",
+    "impl": "ml-kem",
+    "us": 22.21
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Encaps",
+    "impl": "mlkem",
+    "us": 33.95
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Encaps",
+    "impl": "ml-kem",
+    "us": 22.36
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Decaps",
+    "impl": "mlkem",
+    "us": 42.46
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Decaps",
+    "impl": "ml-kem",
+    "us": 28.19
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "KeyGen",
+    "impl": "mlkem",
+    "us": 46.06
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "KeyGen",
+    "impl": "ml-kem",
+    "us": 38.79
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Encaps",
+    "impl": "mlkem",
+    "us": 53.21
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Encaps",
+    "impl": "ml-kem",
+    "us": 39.32
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Decaps",
+    "impl": "mlkem",
+    "us": 65.0
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Decaps",
+    "impl": "ml-kem",
+    "us": 47.92
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "KeyGen",
+    "impl": "mlkem",
+    "us": 72.6
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "KeyGen",
+    "impl": "ml-kem",
+    "us": 64.03
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Encaps",
+    "impl": "mlkem",
+    "us": 79.98
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Encaps",
+    "impl": "ml-kem",
+    "us": 62.94
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Decaps",
+    "impl": "mlkem",
+    "us": 94.83
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Decaps",
+    "impl": "ml-kem",
+    "us": 74.73
+   }
+  ],
+  "wasm": [
+   {
+    "set": "ML-KEM-512",
+    "op": "KeyGen",
+    "tier": "default",
+    "us": 59.5
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Encaps",
+    "tier": "default",
+    "us": 71.1
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Decaps",
+    "tier": "default",
+    "us": 90.3
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "KeyGen",
+    "tier": "default",
+    "us": 95.4
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Encaps",
+    "tier": "default",
+    "us": 112.6
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Decaps",
+    "tier": "default",
+    "us": 146.6
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "KeyGen",
+    "tier": "default",
+    "us": 147.2
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Encaps",
+    "tier": "default",
+    "us": 188.9
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Decaps",
+    "tier": "default",
+    "us": 229.4
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "KeyGen",
+    "tier": "liftoff",
+    "us": 145.6
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Encaps",
+    "tier": "liftoff",
+    "us": 169.0
+   },
+   {
+    "set": "ML-KEM-512",
+    "op": "Decaps",
+    "tier": "liftoff",
+    "us": 230.5
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "KeyGen",
+    "tier": "liftoff",
+    "us": 236.2
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Encaps",
+    "tier": "liftoff",
+    "us": 278.7
+   },
+   {
+    "set": "ML-KEM-768",
+    "op": "Decaps",
+    "tier": "liftoff",
+    "us": 321.1
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "KeyGen",
+    "tier": "liftoff",
+    "us": 355.8
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Encaps",
+    "tier": "liftoff",
+    "us": 385.5
+   },
+   {
+    "set": "ML-KEM-1024",
+    "op": "Decaps",
+    "tier": "liftoff",
+    "us": 538.4
+   }
+  ],
+  "keccakNs": {
+   "mlkem": 350,
+   "rustcrypto": 352
+  }
+ },
+ "sources": {
+  "bench": "results/bench/current-cpu2.txt",
+  "baseline": "results/bench/baseline-cpu2.txt",
+  "wasmBench": "results/wasm/bench-cpu2.txt"
+ }
+}

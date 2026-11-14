@@ -23,6 +23,9 @@ RustCrypto's `ml-kem`.
 | `crates/bench` | `mlkem-bench`, benchmarks against RustCrypto's `ml-kem` |
 | `crates/wasm` | `mlkem-wasm`, the library as a WebAssembly module |
 
+**Website, with a live in-browser demo:** https://ps12007.github.io/mlkem-rs/
+(source in `docs/`, rebuilt from `results/` by `scripts/build-site.ps1`).
+
 Status: all seven planned phases are done. See [LEARNING.md](LEARNING.md)
 for what each phase covers and why.
 

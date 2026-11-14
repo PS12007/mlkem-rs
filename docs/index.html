@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mlkem-rs — a post-quantum key exchange, built from scratch</title>
+<meta name="description" content="ML-KEM (FIPS 203) written from scratch in Rust, checked for timing leaks with a home-made dudect tester, and running live in your browser as WebAssembly.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Martian+Mono:wght@300;400;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f3efe6'/%3E%3Cg fill='%231b1a17'%3E%3Crect x='2' y='2' width='3' height='3'/%3E%3Crect x='6.5' y='2' width='3' height='3' opacity='.4'/%3E%3Crect x='11' y='2' width='3' height='3' opacity='.7'/%3E%3Crect x='2' y='6.5' width='3' height='3' opacity='.25'/%3E%3Crect x='11' y='6.5' width='3' height='3' opacity='.9'/%3E%3Crect x='2' y='11' width='3' height='3' opacity='.6'/%3E%3Crect x='6.5' y='11' width='3' height='3'/%3E%3C/g%3E%3Crect x='6.5' y='6.5' width='3' height='3' fill='%23d9411e'/%3E%3C/svg%3E">
+</head>
+<body>
+<div class="margin-rule" aria-hidden="true"></div>
+
+<header class="strip">
+  <span>LAB NOTEBOOK</span>
+  <span class="dim">mlkem-rs · NIST FIPS 203 · Rust → x86-64 &amp; WebAssembly</span>
+  <a href="https://github.com/PS12007/mlkem-rs">source ↗</a>
+</header>
+
+<main>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="hero-text">
+    <p class="kicker reveal" style="--d:0">entry 01 — the claim</p>
+    <h1 class="reveal" style="--d:1">A post-quantum key exchange, <em>built from scratch</em>, then cross-examined with a stopwatch.</h1>
+    <p class="lede reveal" style="--d:2">
+      ML-KEM is the algorithm NIST standardised in 2024 to replace the key exchange that quantum computers will break.
+      This is my implementation: every line of the math and the hashing written by hand in Rust,
+      verified against the official test vectors, and then <span class="hl">timed millions of times</span>
+      to check it never gives a secret away through how long it takes.
+    </p>
+    <dl class="facts reveal" style="--d:3">
+      <div><dt>240<span>/240</span></dt><dd>NIST ACVP vectors pass</dd></div>
+      <div><dt>0</dt><dd>runtime dependencies</dd></div>
+      <div><dt>52</dt><dd>timing experiments committed</dd></div>
+      <div><dt>58<span>KB</span></dt><dd>WebAssembly, running below</dd></div>
+    </dl>
+  </div>
+
+  <figure class="specimen reveal" style="--d:2">
+    <div class="specimen-head">
+      <span>FIG. 1 — specimen</span>
+      <button id="regen" class="btn-ghost" type="button">↻ new key</button>
+    </div>
+    <canvas id="lattice" width="960" height="400" aria-label="Visualisation of a freshly generated ML-KEM-768 public key: 768 coefficients modulo 3329, drawn as shaded cells"></canvas>
+    <figcaption>
+      <p>This is <strong>a real ML-KEM-768 public key</strong>, generated in your browser <span id="gen-age">just now</span> by the same Rust code, compiled to WebAssembly.
+      Three polynomials of 256 coefficients each, every one a number mod 3329. Darker means larger.
+      Under them, ρ: the 32-byte seed the matrix is rebuilt from.</p>
+      <p class="readout" id="hover-readout">hover a cell →</p>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ================= 1. HANDSHAKE ================= -->
+<section class="sec" id="handshake">
+  <header class="sec-head">
+    <span class="sec-no">§1</span>
+    <h2>The handshake, live</h2>
+    <p>Alice wants to agree on a secret with Bob over a line anyone can listen to. Press the steps in order. Everything runs locally in your browser.</p>
+  </header>
+
+  <div class="demo">
+    <div class="party" id="alice">
+      <h3>Alice</h3>
+      <button class="step" id="b-keygen" type="button"><b>1</b> KeyGen</button>
+      <div class="field"><label>public key ek <span class="len">1184 B</span></label><div class="hex" id="h-ek">—</div></div>
+      <div class="field"><label>secret key dk <span class="len">2400 B · never leaves Alice</span></label><div class="hex secret" id="h-dk">—</div></div>
+      <button class="step" id="b-decaps" type="button" disabled><b>3</b> Decaps</button>
+      <div class="field key"><label>Alice's shared secret</label><div class="hex k" id="h-ka">—</div></div>
+    </div>
+
+    <div class="wire" aria-hidden="true">
+      <div class="wire-line"></div>
+      <span class="packet" id="p-ek">ek →</span>
+      <span class="packet back" id="p-ct">← c</span>
+      <p class="wire-note">the public line<br>(Eve sees everything here)</p>
+    </div>
+
+    <div class="party" id="bob">
+      <h3>Bob</h3>
+      <button class="step" id="b-encaps" type="button" disabled><b>2</b> Encaps</button>
+      <div class="field"><label>ciphertext c <span class="len">1088 B</span></label><div class="hex" id="h-ct">—</div></div>
+      <label class="tamper"><input type="checkbox" id="tamper"> <span>let Eve flip one bit of c on the way</span></label>
+      <div class="field key"><label>Bob's shared secret</label><div class="hex k" id="h-kb">—</div></div>
+    </div>
+  </div>
+  <div class="verdict" id="verdict" role="status" aria-live="polite"></div>
+  <p class="aside" id="timing-note"></p>
+</section>
+
+<!-- ================= 2. STOPWATCH ================= -->
+<section class="sec" id="stopwatch">
+  <header class="sec-head">
+    <span class="sec-no">§2</span>
+    <h2>Why a stopwatch is a weapon</h2>
+    <p>Correct output is not enough. If the code takes even a few nanoseconds longer for some secret values, an attacker who can time it, and averages over thousands of tries, can work the secret out.</p>
+  </header>
+
+  <div class="versus">
+    <article class="code-card bad">
+      <h4>KyberSlash <span>(Kyber reference C, before the 2024 fix)</span></h4>
+<pre><code><b>// compress a secret coefficient x</b>
+t = ((x &lt;&lt; d) + KYBER_Q/2) <mark>/ KYBER_Q</mark>;</code></pre>
+      <p class="asm">→ some compilers &amp; WebAssembly: <code><mark>div</mark></code></p>
+      <p>Depending on compiler and platform, this became a hardware divide. On many CPUs it finishes faster for some numbers than others, and <em>x</em> here is secret. Researchers recovered keys from it.</p>
+    </article>
+    <article class="code-card good">
+      <h4>This crate</h4>
+<pre><code>n = (x &lt;&lt; d) + 1664
+(n * 660 565 714) <b>&gt;&gt; 40</b></code></pre>
+      <p class="asm">→ WebAssembly: <code>i64.mul · i64.add · i64.shr_u</code></p>
+      <p>The same result, ⌊n / 3329⌋, from a multiply and a shift, whose time does not depend on the numbers. Proven equal for every possible input by a test.</p>
+    </article>
+  </div>
+  <p class="aside">A script reads the compiled instructions, x86 and WebAssembly, at every optimisation level, and fails the build if a division or a secret-dependent branch appears. One surprise: for WebAssembly, the compiler keeps even <code>x / 3329</code> as a real division, while on x86 it quietly turns it into a multiply.</p>
+</section>
+
+<!-- ================= 3. RULER ================= -->
+<section class="sec" id="ruler-sec">
+  <header class="sec-head">
+    <span class="sec-no">§3</span>
+    <h2>Every measurement, on one ruler</h2>
+    <p>The tester runs an operation millions of times with two kinds of input (one fixed, one random) and asks whether the two timing distributions differ. The answer is Welch's <em>t</em>: under 4.5, nothing detected; over 10, a leak. Each mark below is one committed experiment.</p>
+  </header>
+  <div class="legend">
+    <span><i class="dot ok"></i> normal build</span>
+    <span><i class="dot ctrl"></i> A/A control (cannot leak)</span>
+    <span><i class="dot leak"></i> deliberately leaky build</span>
+    <span><i class="dot pub"></i> KeyGen (depends on a public value)</span>
+  </div>
+  <div id="ruler" class="chart" role="img" aria-label="Log-scale ruler of max |t| for all 52 timing experiments"></div>
+  <p class="readout" id="ruler-readout">hover a mark for details</p>
+  <p class="aside">The leaky builds are broken on purpose, to prove the instrument can actually see a leak. The red marks on the far right are leaks it caught. The red marks on the left are honest misses: KyberSlash only shows on this laptop's efficiency cores (the same binary reads 2.6 on a performance core and 19 857 on an efficiency core), and its one-bit variant was not detectable on either. A test that passes is evidence, not proof.</p>
+</section>
+
+<!-- ================= 4. GROWTH ================= -->
+<section class="sec" id="growth-sec">
+  <header class="sec-head">
+    <span class="sec-no">§4</span>
+    <h2>Leaks grow. Noise doesn't.</h2>
+    <p>A real difference between the classes makes <em>t</em> grow like √n as measurements pile up. Noise wanders around and stays low. These curves are the tester's own progress lines from the committed runs.</p>
+  </header>
+  <div id="growth" class="chart" role="img" aria-label="Max |t| against number of measurements for five runs"></div>
+  <p class="aside">The KyberSlash run is already past 10 000 after its first million samples and then levels off instead of following √n. I have not investigated why. Drift in the CPU over the run is a guess, not a measurement.</p>
+</section>
+
+<!-- ================= 5. LIES ================= -->
+<section class="sec" id="lies">
+  <header class="sec-head">
+    <span class="sec-no">§5</span>
+    <h2>Four times the instrument lied</h2>
+    <p>The hardest part was not the cryptography. Four times, the tester reported a leak in code that had none. Each was caught by an <strong>A/A control</strong>: the same experiment with identical data in both classes, which by construction cannot leak. When the control "leaks" too, the harness is the culprit.</p>
+  </header>
+  <ol class="timeline">
+    <li><span class="t-val">|t| ≈ 122</span><h4>Inputs prepared differently per class</h4><p>Copying a cached input vs. writing fresh random bytes just before starting the clock: the stores were still draining. Fix: identical preparation and a memory fence.</p></li>
+    <li><span class="t-val">false leak</span><h4>An <code>if class == 0</code> before timing</h4><p>Equal work on both paths, but the branch predictor's history differed per class, and that shifted the timed code's own loop predictions.</p></li>
+    <li><span class="t-val">false leak</span><h4>Branch-free select, still not enough</h4><p>Cache and store-buffer state still differed. Fix: the canonical dudect batching. Generate every input first, then time them in a loop with no class-dependent code at all.</p></li>
+    <li><span class="t-val">|t| ≈ 19</span><h4>Only on the efficiency cores</h4><p>At ten million samples, correct code "leaked" on the E-cores. The A/A control said 1.8, but it was skipping the random-number work. Once it did exactly the same work, it showed |t| ≈ 11 as well. Fix: copy each batch once more with one memcpy before timing. Lesson: a control is only valid if it does exactly the same work.</p></li>
+  </ol>
+  <p class="aside">Values from the development notes (LEARNING.md §5.6); those builds were fixed, not kept.</p>
+</section>
+
+<!-- ================= 6. SPEED ================= -->
+<section class="sec" id="speed">
+  <header class="sec-head">
+    <span class="sec-no">§6</span>
+    <h2>How fast</h2>
+    <p>ML-KEM-768 on one performance core of an i7-14700HX, median of 10 000 calls, against RustCrypto's <code>ml-kem</code>. Same inputs for both, outputs checked identical before timing.</p>
+  </header>
+  <div id="bars" class="chart" role="img" aria-label="Median microseconds for KeyGen, Encaps and Decaps"></div>
+  <div class="mini-bench">
+    <button id="b-bench" class="btn-ghost" type="button">▶ time Decaps in <em>your</em> browser</button>
+    <span id="bench-out" class="readout"></span>
+  </div>
+  <p class="aside" id="speed-note"></p>
+</section>
+
+<!-- ================= 7. CHECKS ================= -->
+<section class="sec" id="checks">
+  <header class="sec-head">
+    <span class="sec-no">§7</span>
+    <h2>How it's checked</h2>
+  </header>
+  <ul class="checks">
+    <li><b>240</b> official NIST ACVP vectors, natively and as WebAssembly in Node</li>
+    <li><b>byte-for-byte</b> cross-check against RustCrypto's implementation, on random inputs</li>
+    <li><b>100 000</b> property-test cases per property, including literal transcriptions of the spec's pseudocode</li>
+    <li><b>7 × 2</b> optimisation levels × targets scanned for divisions and secret branches (x86-64, wasm32), in CI</li>
+    <li><b>52</b> timing experiments, each next to an A/A control, on two kinds of CPU core, natively and inside V8</li>
+  </ul>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p><strong>Educational code. Not audited. Do not use in production.</strong> For real systems use a maintained, audited library.</p>
+  <p>Every number on this page is generated from the raw results committed in the repository (<code>scripts/site_data.py</code> → <code>data.json</code>). The full story, decisions and mistakes: <a href="https://github.com/PS12007/mlkem-rs/blob/main/LEARNING.md">LEARNING.md</a>.</p>
+  <p class="dim">mlkem-rs · MIT · <a href="https://github.com/PS12007/mlkem-rs">github.com/PS12007/mlkem-rs</a></p>
+</footer>
+
+<div class="tip" id="tip" role="tooltip"></div>
+<script src="app.js" type="module"></script>
+</body>
+</html>
