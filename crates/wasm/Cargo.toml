@@ -1,0 +1,23 @@
+[package]
+name = "mlkem-wasm"
+version = "0.1.0"
+description = "WebAssembly exports of the mlkem crate (plain extern \"C\", no wasm-bindgen). Educational, not audited."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+mlkem = { path = "../mlkem" }
+
+[features]
+# Pass-through switch, so the WASM timing test can be validated against a
+# deliberately leaky build (see LEARNING.md phase 7). Never for real use.
+leaky-early-exit = ["mlkem/leaky-early-exit"]
