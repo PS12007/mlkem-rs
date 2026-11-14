@@ -349,6 +349,7 @@ mod app {
         let poly: [i16; 256] = core::array::from_fn(|i| ((i * 1337) % 3329) as i16);
         let (mut p1, mut p2) = (poly, poly);
         let b128 = [0x5au8; 128];
+        let b192 = [0x3cu8; 192];
         let b384 = [0xa5u8; 384];
         type Prim = (&'static str, Box<dyn FnMut()>);
         let mut prims: Vec<Prim> = vec![
@@ -381,6 +382,12 @@ mod app {
                 "SamplePolyCBD, eta = 2",
                 Box::new(move || {
                     black_box(mlkem::hazmat::cbd_eta2(black_box(&b128)));
+                }),
+            ),
+            (
+                "SamplePolyCBD, eta = 3 (ML-KEM-512 only)",
+                Box::new(move || {
+                    black_box(mlkem::hazmat::cbd_eta3(black_box(&b192)));
                 }),
             ),
             (
