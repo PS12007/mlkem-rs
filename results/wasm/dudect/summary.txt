@@ -1,0 +1,24 @@
+# mlkem WebAssembly dudect summary (Node v24.16.0)
+date:    2026-11-13 22:37:35 -05:00
+commit:  d45a713880840367d5913e849dc95174d7d0665f
+script:  scripts/wasm-dudect.ps1 -NDecaps 200000 -NEncode 1000000 -Cpus 2,20
+
+thresholds: max|t| < 4.5 no leak detected; 4.5-10 possible; >= 10 leak
+
+build       target              cpu         n     max|t| at                   verdict
+normal      aa-decaps-ct          2    200000       2.69 below p64.6447       no leak detected
+normal      decaps-ct             2    200000       1.90 below p6.6967        no leak detected
+normal      aa-u-encode-zero      2   1000000       1.01 below p99.5513       no leak detected
+normal      u-encode-zero         2   1000000       1.33 below p97.0843       no leak detected
+normal      aa-decaps-ct         20    200000       2.75 uncropped            no leak detected
+normal      decaps-ct            20    200000       0.91 below p99.8798       no leak detected
+normal      aa-u-encode-zero     20   1000000       1.22 below p99.4476       no leak detected
+normal      u-encode-zero        20   1000000       1.50 below p29.2893       no leak detected
+early-exit  aa-decaps-ct          2    200000       1.61 below p34.0246       no leak detected
+early-exit  decaps-ct             2    200000      45.73 below p12.9449       LEAK
+early-exit  aa-decaps-ct         20    200000       2.36 below p96.4103       no leak detected
+early-exit  decaps-ct            20    200000      57.45 below p24.2142       LEAK
+kyberslash  aa-u-encode-zero      2   1000000       2.16 below p98.8158       no leak detected
+kyberslash  u-encode-zero         2   1000000       1.79 below p97.4617       no leak detected
+kyberslash  aa-u-encode-zero     20   1000000       1.85 below p99.8953       no leak detected
+kyberslash  u-encode-zero        20   1000000     713.19 below p50.0000       LEAK

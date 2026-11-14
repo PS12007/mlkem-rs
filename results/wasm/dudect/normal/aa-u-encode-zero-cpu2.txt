@@ -1,0 +1,27 @@
+# scripts/wasm-dudect.ps1 run
+build:   normal (--features probes)
+commit:  d45a713880840367d5913e849dc95174d7d0665f
+rustc:   rustc 1.99.1 (58cf8f9c3 2026-10-13), wasm32-unknown-unknown, release
+command: start /affinity 4 /high node scripts/wasm/dudect.mjs normal.wasm aa-u-encode-zero 1000000
+wall:    4.1 s
+
+progress n=   100000  max|t| =     1.15  (below p99.5513)  elapsed 0 s
+progress n=   200000  max|t| =     1.72  (below p99.5513)  elapsed 1 s
+progress n=   300000  max|t| =     1.17  (below p99.7238)  elapsed 1 s
+progress n=   400000  max|t| =     1.26  (below p99.5513)  elapsed 1 s
+progress n=   500000  max|t| =     1.67  (below p99.5513)  elapsed 2 s
+progress n=   600000  max|t| =     1.71  (below p99.5513)  elapsed 2 s
+progress n=   700000  max|t| =     1.18  (below p99.5513)  elapsed 3 s
+progress n=   800000  max|t| =     1.00  (below p99.3199)  elapsed 3 s
+progress n=   900000  max|t| =     1.48  (below p99.4079)  elapsed 3 s
+progress n=  1000000  max|t| =     1.01  (below p99.5513)  elapsed 4 s
+
+# mlkem WebAssembly dudect (Node v24.16.0, V8 13.6.233.17-node.49)
+target:        aa-u-encode-zero  (A/A CONTROL: both classes receive identical data)
+description:   ByteEncode_11(Compress_11(u)), the KyberSlash1 site. class 0: u = 0; class 1: random u in [0, q)
+v8 flags:      (none: default tiering)
+timer:         process.hrtime.bigint() (QueryPerformanceCounter on Windows)
+measurements:  1000000 (+ 10000 warm-up + 10000 calibration)
+uncropped means: class 0 = 1369.8 ns, class 1 = 1374.1 ns (n0 500079, n1 499921)
+max |t| = 1.01 (below p99.5513)
+verdict: no leak detected (max |t| < 4.5)

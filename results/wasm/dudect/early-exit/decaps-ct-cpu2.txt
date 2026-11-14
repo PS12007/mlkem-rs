@@ -1,0 +1,27 @@
+# scripts/wasm-dudect.ps1 run
+build:   early-exit (--features probes,leaky-early-exit)
+commit:  d45a713880840367d5913e849dc95174d7d0665f
+rustc:   rustc 1.99.1 (58cf8f9c3 2026-10-13), wasm32-unknown-unknown, release
+command: start /affinity 4 /high node scripts/wasm/dudect.mjs early-exit.wasm decaps-ct 200000
+wall:    35.9 s
+
+progress n=    20000  max|t| =    13.18  (below p12.9449)  elapsed 3 s
+progress n=    40000  max|t| =    20.98  (below p50.0000)  elapsed 7 s
+progress n=    60000  max|t| =    24.23  (below p12.9449)  elapsed 10 s
+progress n=    80000  max|t| =    25.19  (below p50.0000)  elapsed 14 s
+progress n=   100000  max|t| =    30.31  (below p50.0000)  elapsed 18 s
+progress n=   120000  max|t| =    32.03  (below p50.0000)  elapsed 21 s
+progress n=   140000  max|t| =    32.43  (below p50.0000)  elapsed 25 s
+progress n=   160000  max|t| =    32.36  (below p12.9449)  elapsed 28 s
+progress n=   180000  max|t| =    39.79  (below p12.9449)  elapsed 31 s
+progress n=   200000  max|t| =    45.73  (below p12.9449)  elapsed 35 s
+
+# mlkem WebAssembly dudect (Node v24.16.0, V8 13.6.233.17-node.49)
+target:        decaps-ct
+description:   ML-KEM-768 Decaps, one fixed key. class 0: one fixed VALID ciphertext; class 1: random bytes (implicit rejection)
+v8 flags:      (none: default tiering)
+timer:         process.hrtime.bigint() (QueryPerformanceCounter on Windows)
+measurements:  200000 (+ 2000 warm-up + 2000 calibration)
+uncropped means: class 0 = 171660.5 ns, class 1 = 170608.1 ns (n0 100149, n1 99851)
+max |t| = 45.73 (below p12.9449)
+verdict: LEAK (max |t| >= 10): timing depends on the input class
