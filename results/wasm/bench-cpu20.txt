@@ -1,0 +1,39 @@
+# scripts/wasm-bench.ps1
+date:    2026-11-13 22:34:25 -05:00
+commit:  31d42bbaf3cd182ff06abd91814c3cb32cdd4500
+rustc:   rustc 1.99.1 (58cf8f9c3 2026-10-13), wasm32-unknown-unknown, release
+wasm:    58662 bytes
+cpu:     Intel(R) Core(TM) i7-14700HX, pinned to logical CPU 20 (start /affinity 100000 /high)
+
+# mlkem WebAssembly benchmark (Node)
+node:     v24.16.0, V8 13.6.233.17-node.49
+v8 flags: (none: default tiering)
+method:   64 random inputs; 20 rounds x 500 calls after 1 warm-up round
+
+param set    op       median us      p5 us     p95 us      ops/s        n
+ML-KEM-512   KeyGen       96.70      92.70     103.00      10341    10000
+ML-KEM-512   Encaps      116.50     111.80     126.30       8584    10000
+ML-KEM-512   Decaps      147.10     139.70     157.40       6798    10000
+ML-KEM-768   KeyGen      161.80     154.40     172.30       6180    10000
+ML-KEM-768   Encaps      179.80     176.20     193.10       5562    10000
+ML-KEM-768   Decaps      217.40     208.00     228.10       4600    10000
+ML-KEM-1024  KeyGen      230.90     221.50     243.00       4331    10000
+ML-KEM-1024  Encaps      265.30     254.90     276.00       3769    10000
+ML-KEM-1024  Decaps      315.50     304.00     335.40       3170    10000
+
+# mlkem WebAssembly benchmark (Node)
+node:     v24.16.0, V8 13.6.233.17-node.49
+v8 flags: --liftoff-only
+method:   64 random inputs; 20 rounds x 500 calls after 1 warm-up round
+
+param set    op       median us      p5 us     p95 us      ops/s        n
+ML-KEM-512   KeyGen      206.60     197.80     226.20       4840    10000
+ML-KEM-512   Encaps      240.30     224.40     257.90       4161    10000
+ML-KEM-512   Decaps      298.40     289.20     316.40       3351    10000
+ML-KEM-768   KeyGen      351.60     336.20     373.00       2844    10000
+ML-KEM-768   Encaps      413.70     391.80     441.00       2417    10000
+ML-KEM-768   Decaps      488.90     458.40     527.40       2045    10000
+ML-KEM-1024  KeyGen      469.70     353.80     722.80       2129    10000
+ML-KEM-1024  Encaps      472.00     422.70     559.10       2119    10000
+ML-KEM-1024  Decaps      530.00     470.20     669.90       1887    10000
+
