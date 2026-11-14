@@ -1,0 +1,21 @@
+[package]
+name = "mlkem-bench"
+version = "0.1.0"
+description = "Benchmarks mlkem against RustCrypto's ml-kem (Windows, x86-64). No benchmark framework: see LEARNING.md phase 6."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+# hazmat: for timing the building blocks (NTT, Keccak-f, ...) separately.
+mlkem = { path = "../mlkem", features = ["hazmat"] }
+# The comparison target: the same version the cross-check tests use, so no
+# new download. Only this benchmark binary links it, never the library.
+ml-kem = "0.3.3"
+# Reference Keccak-f[1600] (already in the lockfile via the dev-dependencies).
+keccak = "0.1"

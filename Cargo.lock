@@ -229,6 +229,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "mlkem-bench"
+version = "0.1.0"
+dependencies = [
+ "keccak 0.1.6",
+ "ml-kem",
+ "mlkem",
+]
+
+[[package]]
 name = "mlkem-dudect"
 version = "0.1.0"
 dependencies = [
