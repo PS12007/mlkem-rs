@@ -45,8 +45,9 @@ fn main() {
 #[cfg(windows)]
 mod app {
     use crate::platform;
-    use ml_kem::Decapsulate;
     use ml_kem::array::Array;
+    #[allow(deprecated)]
+    use ml_kem::{Decapsulate, ExpandedKeyEncoding, KeyExport};
     use mlkem::RandomSource;
     use std::hint::black_box;
 
@@ -60,18 +61,29 @@ mod app {
 
     /// One operation of one implementation: `call(i)` runs it on input i.
     struct Bench<'a> {
-        name: String,
+        name: &'static str,
         call: Box<dyn FnMut(usize) + 'a>,
     }
 
-    /// Time `pair` (ours, theirs) alternately; returns ticks per call.
-    fn measure(pair: &mut [Bench; 2], rounds: usize, samples: usize) -> [Vec<u64>; 2] {
-        let mut out = [Vec::new(), Vec::new()];
+    fn bench<'a>(name: &'static str, call: impl FnMut(usize) + 'a) -> Bench<'a> {
+        Bench {
+            name,
+            call: Box::new(call),
+        }
+    }
+
+    /// Time the benches in alternating order (A B C, C B A, A B C, ...), so
+    /// slow drift affects all of them equally. Round 0 is a warm-up.
+    /// Returns ticks per call, per bench.
+    fn measure(benches: &mut [Bench], rounds: usize, samples: usize) -> Vec<Vec<u64>> {
+        let mut out = vec![Vec::new(); benches.len()];
         for round in 0..=rounds {
-            // ABBA order: 0,1 then 1,0 then 0,1 ...
-            let order = if round % 2 == 0 { [0, 1] } else { [1, 0] };
+            let mut order: Vec<usize> = (0..benches.len()).collect();
+            if round % 2 == 1 {
+                order.reverse();
+            }
             for which in order {
-                let b = &mut pair[which];
+                let b = &mut benches[which];
                 for s in 0..samples {
                     let i = (round * samples + s) % INPUTS;
                     let t0 = platform::ticks();
@@ -90,10 +102,22 @@ mod app {
         sorted[((sorted.len() - 1) as f64 * p).round() as usize]
     }
 
+    // Implementations compared, per operation:
+    //   mlkem         this crate, through its public API. Keys are stored as
+    //                 bytes, so every call decodes them, and Encaps hashes
+    //                 H(ek) (FIPS 203 Alg 17 line 1) every time.
+    //   ml-kem        RustCrypto, with its parsed key objects (decoded
+    //                 polynomials and H(ek) cached inside the key).
+    //   ml-kem/bytes  RustCrypto, but parsing the key from bytes in every
+    //                 call, like mlkem does. Its parsers also run the FIPS
+    //                 203 §7 key checks, which mlkem does once, in
+    //                 `from_bytes`, so this variant is charged a bit MORE
+    //                 than mlkem. The fair comparison lies between the two.
     macro_rules! param_set {
         ($ours:ident, $theirs:ty, $label:literal, $inp:expr, $rows:expr, $rounds:expr, $samples:expr, $hz:expr) => {{
             use mlkem::$ours as ours;
             type Dk = ml_kem::DecapsulationKey<$theirs>;
+            type Ek = ml_kem::EncapsulationKey<$theirs>;
             let inp: &Inputs = $inp;
             let seed = |i: usize| {
                 let mut s = [0u8; 64];
@@ -107,10 +131,14 @@ mod app {
                 .map(|i| ours::generate_internal(&inp.d[i], &inp.z[i]))
                 .collect();
             let their_dks: Vec<Dk> = (0..INPUTS).map(|i| Dk::from_seed(seed(i))).collect();
-            let their_eks: Vec<_> = their_dks
+            let their_eks: Vec<Ek> = their_dks
                 .iter()
                 .map(|dk| dk.encapsulation_key().clone())
                 .collect();
+            let their_ek_bytes: Vec<_> = their_eks.iter().map(|ek| ek.to_bytes()).collect();
+            #[allow(deprecated)]
+            let their_dk_bytes: Vec<_> =
+                their_dks.iter().map(|dk| dk.to_expanded_bytes()).collect();
             let our_cts: Vec<_> = (0..INPUTS)
                 .map(|i| our_keys[i].0.encapsulate_internal(&inp.m[i]).0)
                 .collect();
@@ -122,8 +150,14 @@ mod app {
                 })
                 .collect();
             for i in 0..INPUTS {
-                if our_cts[i].as_bytes()[..] != their_cts[i][..] {
-                    return Err(format!("{}: ciphertexts differ on input {i}", $label));
+                if our_cts[i].as_bytes()[..] != their_cts[i][..]
+                    || our_keys[i].0.as_bytes()[..] != their_ek_bytes[i][..]
+                    || our_keys[i].1.as_bytes()[..] != their_dk_bytes[i][..]
+                {
+                    return Err(format!(
+                        "{}: keys or ciphertexts differ on input {i}",
+                        $label
+                    ));
                 }
                 let (k1, k2) = (
                     our_keys[i].1.decapsulate(&our_cts[i]),
@@ -134,74 +168,65 @@ mod app {
                 }
             }
 
-            let mut ops: Vec<(&str, [Bench; 2])> = vec![
+            let mut ops: Vec<(&str, Vec<Bench>)> = vec![
                 (
                     "KeyGen",
-                    [
-                        Bench {
-                            name: "mlkem".into(),
-                            call: Box::new(|i| {
-                                black_box(ours::generate_internal(&inp.d[i], &inp.z[i]));
-                            }),
-                        },
-                        Bench {
-                            name: "ml-kem".into(),
-                            call: Box::new(|i| {
-                                black_box(Dk::from_seed(seed(i)));
-                            }),
-                        },
+                    vec![
+                        bench("mlkem", |i| {
+                            black_box(ours::generate_internal(&inp.d[i], &inp.z[i]));
+                        }),
+                        bench("ml-kem", |i| {
+                            black_box(Dk::from_seed(seed(i)));
+                        }),
                     ],
                 ),
                 (
                     "Encaps",
-                    [
-                        Bench {
-                            name: "mlkem".into(),
-                            call: Box::new(|i| {
-                                black_box(our_keys[i].0.encapsulate_internal(&inp.m[i]));
-                            }),
-                        },
-                        Bench {
-                            name: "ml-kem".into(),
-                            call: Box::new(|i| {
-                                black_box(
-                                    their_eks[i].encapsulate_deterministic(&Array::from(inp.m[i])),
-                                );
-                            }),
-                        },
+                    vec![
+                        bench("mlkem", |i| {
+                            black_box(our_keys[i].0.encapsulate_internal(&inp.m[i]));
+                        }),
+                        bench("ml-kem", |i| {
+                            black_box(
+                                their_eks[i].encapsulate_deterministic(&Array::from(inp.m[i])),
+                            );
+                        }),
+                        bench("ml-kem/bytes", |i| {
+                            let ek = Ek::new(&their_ek_bytes[i]).unwrap();
+                            black_box(ek.encapsulate_deterministic(&Array::from(inp.m[i])));
+                        }),
                     ],
                 ),
                 (
                     "Decaps",
-                    [
-                        Bench {
-                            name: "mlkem".into(),
-                            call: Box::new(|i| {
-                                black_box(our_keys[i].1.decapsulate(&our_cts[i]));
-                            }),
-                        },
-                        Bench {
-                            name: "ml-kem".into(),
-                            call: Box::new(|i| {
-                                black_box(their_dks[i].decapsulate(&their_cts[i]));
-                            }),
-                        },
+                    vec![
+                        bench("mlkem", |i| {
+                            black_box(our_keys[i].1.decapsulate(&our_cts[i]));
+                        }),
+                        bench("ml-kem", |i| {
+                            black_box(their_dks[i].decapsulate(&their_cts[i]));
+                        }),
+                        bench("ml-kem/bytes", |i| {
+                            #[allow(deprecated)]
+                            let dk = Dk::from_expanded_bytes(&their_dk_bytes[i]).unwrap();
+                            black_box(dk.decapsulate(&their_cts[i]));
+                        }),
                     ],
                 ),
             ];
-            for (op, pair) in &mut ops {
-                let t = measure(pair, $rounds, $samples);
-                let mut med = [0f64; 2];
-                for w in 0..2 {
+            for (op, benches) in &mut ops {
+                let t = measure(benches, $rounds, $samples);
+                let mut med = Vec::new();
+                for (w, b) in benches.iter().enumerate() {
                     let mut v = t[w].clone();
                     v.sort_unstable();
                     let us = |x: u64| x as f64 / $hz * 1e6;
-                    med[w] = us(pct(&v, 0.5));
+                    med.push(us(pct(&v, 0.5)));
                     $rows.push(format!(
-                        "{:<12} {:<7} {:<7} {:>10.2} {:>10.2} {:>10.2} {:>10.0} {:>8}",
+                        "{:<12} {:<7} {:<13} {:>10.2} {:>10.2} {:>10.2} {:>10.0} {:>8}",
                         $label,
                         op,
-                        pair[w].name,
+                        b.name,
                         med[w],
                         us(pct(&v, 0.05)),
                         us(pct(&v, 0.95)),
@@ -209,13 +234,16 @@ mod app {
                         v.len()
                     ));
                 }
-                $rows.push(format!(
-                    "{:<12} {:<7} {:<7} ratio mlkem / ml-kem (medians) = {:.2}",
-                    $label,
-                    op,
-                    "",
-                    med[0] / med[1]
-                ));
+                for w in 1..benches.len() {
+                    $rows.push(format!(
+                        "{:<12} {:<7} {:<13} ratio mlkem / {} (medians) = {:.2}",
+                        $label,
+                        op,
+                        "",
+                        benches[w].name,
+                        med[0] / med[w]
+                    ));
+                }
             }
         }};
     }
@@ -269,7 +297,7 @@ mod app {
         println!();
 
         let mut rows = vec![format!(
-            "{:<12} {:<7} {:<7} {:>10} {:>10} {:>10} {:>10} {:>8}",
+            "{:<12} {:<7} {:<13} {:>10} {:>10} {:>10} {:>10} {:>8}",
             "param set", "op", "impl", "median us", "p5 us", "p95 us", "ops/s", "n"
         )];
         param_set!(

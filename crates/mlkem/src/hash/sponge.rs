@@ -97,14 +97,38 @@ pub(crate) struct Squeezer<const RATE: usize> {
 impl<const RATE: usize> Squeezer<RATE> {
     /// FIPS 202 Alg 8 steps 7–10. Calls may use any sizes: the output is one
     /// continuous stream.
-    pub(crate) fn squeeze(&mut self, out: &mut [u8]) {
-        for o in out {
+    pub(crate) fn squeeze(&mut self, mut out: &mut [u8]) {
+        loop {
             if self.pos == RATE {
+                if out.is_empty() {
+                    return; // permute lazily: only when more output is needed
+                }
                 f1600(&mut self.state);
                 self.pos = 0;
             }
+            // Fast path (phase 6): at a lane boundary, copy whole 8-byte
+            // lanes. SampleNTT squeezes 168-byte blocks, and PRF 128 or 192
+            // bytes, so almost all output goes through here. Positions and
+            // lengths are public, so these branches leak nothing.
+            if self.pos % 8 == 0 {
+                let lanes = ((RATE - self.pos) / 8).min(out.len() / 8);
+                let (head, rest) = core::mem::take(&mut out).split_at_mut(8 * lanes);
+                for (chunk, lane) in head.chunks_exact_mut(8).zip(&self.state[self.pos / 8..]) {
+                    chunk.copy_from_slice(&lane.to_le_bytes());
+                }
+                self.pos += 8 * lanes;
+                out = rest;
+                if lanes > 0 {
+                    continue;
+                }
+            }
+            // Slow path: one byte (unaligned position, or a tail < 8 bytes).
+            let Some((o, rest)) = core::mem::take(&mut out).split_first_mut() else {
+                return;
+            };
             *o = (self.state[self.pos / 8] >> (8 * (self.pos % 8))) as u8;
             self.pos += 1;
+            out = rest;
         }
     }
 }
