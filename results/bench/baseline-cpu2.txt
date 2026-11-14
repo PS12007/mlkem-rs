@@ -1,0 +1,53 @@
+# scripts/bench.ps1 run, label 'baseline'
+date:    2026-11-13 20:49:45 -05:00
+commit:  ff86e7201b1eb46ff9363d6782e036e034506a58
+rustc:   rustc 1.99.1 (58cf8f9c3 2026-10-13)
+profile: release (opt-level 3), default target CPU (no -C target-cpu=native)
+command: mlkem-bench --cpu 2 --rounds 20 --samples 500
+wall:    18 s
+
+# mlkem-bench
+cpu:        Intel(R) Core(TM) i7-14700HX
+scheduling: pinned to logical CPU 2 (running on 2); process HIGH_PRIORITY_CLASS ok; thread TIME_CRITICAL ok
+timer:      RDTSC with LFENCE; TSC = 2304.0 MHz
+method:     64 random inputs shared by both implementations (outputs checked equal); 20 timed rounds x 500 calls per implementation, alternating ABBA, after 1 warm-up round
+compared:   ml-kem 0.3.3 (RustCrypto), same compiler and profile
+
+param set    op      impl     median us      p5 us     p95 us      ops/s        n
+ML-KEM-512   KeyGen  mlkem        28.32      27.68      31.74      35315    10000
+ML-KEM-512   KeyGen  ml-kem       22.21      21.21      25.12      45030    10000
+ML-KEM-512   KeyGen          ratio mlkem / ml-kem (medians) = 1.28
+ML-KEM-512   Encaps  mlkem        33.95      33.03      37.22      29456    10000
+ML-KEM-512   Encaps  ml-kem       22.36      21.16      25.00      44729    10000
+ML-KEM-512   Encaps          ratio mlkem / ml-kem (medians) = 1.52
+ML-KEM-512   Decaps  mlkem        42.46      42.00      46.17      23552    10000
+ML-KEM-512   Decaps  ml-kem       28.19      27.23      30.58      35475    10000
+ML-KEM-512   Decaps          ratio mlkem / ml-kem (medians) = 1.51
+ML-KEM-768   KeyGen  mlkem        46.06      45.29      47.47      21710    10000
+ML-KEM-768   KeyGen  ml-kem       38.79      37.41      40.85      25779    10000
+ML-KEM-768   KeyGen          ratio mlkem / ml-kem (medians) = 1.19
+ML-KEM-768   Encaps  mlkem        53.21      52.50      54.76      18792    10000
+ML-KEM-768   Encaps  ml-kem       39.32      37.76      41.46      25429    10000
+ML-KEM-768   Encaps          ratio mlkem / ml-kem (medians) = 1.35
+ML-KEM-768   Decaps  mlkem        65.00      64.25      68.09      15384    10000
+ML-KEM-768   Decaps  ml-kem       47.92      46.39      50.27      20870    10000
+ML-KEM-768   Decaps          ratio mlkem / ml-kem (medians) = 1.36
+ML-KEM-1024  KeyGen  mlkem        72.60      71.44      76.12      13774    10000
+ML-KEM-1024  KeyGen  ml-kem       64.03      61.49      67.47      15618    10000
+ML-KEM-1024  KeyGen          ratio mlkem / ml-kem (medians) = 1.13
+ML-KEM-1024  Encaps  mlkem        79.98      79.04      83.48      12503    10000
+ML-KEM-1024  Encaps  ml-kem       62.94      60.89      66.44      15888    10000
+ML-KEM-1024  Encaps          ratio mlkem / ml-kem (medians) = 1.27
+ML-KEM-1024  Decaps  mlkem        94.83      93.77      98.75      10545    10000
+ML-KEM-1024  Decaps  ml-kem       74.73      72.21      78.45      13382    10000
+ML-KEM-1024  Decaps          ratio mlkem / ml-kem (medians) = 1.27
+
+building blocks (median over 10000 blocks of 100 calls, after warm-up):
+function                                             ns      ticks
+Keccak-f[1600], mlkem                               350        806
+Keccak-f[1600], keccak 0.1 crate (RustCrypto)        353        812
+NTT                                                 819       1888
+inverse NTT                                        1036       2386
+MultiplyNTTs (one polynomial pair)                  424        978
+SamplePolyCBD, eta = 2                              409        942
+ByteDecode_12 (one polynomial)                      374        863
