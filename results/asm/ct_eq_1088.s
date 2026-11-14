@@ -5,7 +5,7 @@ mlkem::hazmat::ct_eq_1088:
 	pxor xmm0, xmm0
 	mov eax, 48
 	pxor xmm1, xmm1
-.LBB36_1:
+.LBB37_1:
 	movdqu xmm2, xmmword ptr [rcx + rax - 48]
 	movdqu xmm3, xmmword ptr [rcx + rax - 32]
 	movdqu xmm4, xmmword ptr [rcx + rax - 16]
@@ -26,7 +26,7 @@ mlkem::hazmat::ct_eq_1088:
 	por xmm1, xmm3
 	add rax, 64
 	cmp rax, 1136
-	jne .LBB36_1
+	jne .LBB37_1
 	por xmm1, xmm0
 	pxor xmm0, xmm0
 	pcmpeqb xmm0, xmm1

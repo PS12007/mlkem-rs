@@ -238,7 +238,7 @@ mlkem::encode::poly_compress_encode:
 	pxor xmm1, xmm1
 	movdqa xmm2, xmmword ptr [rip + __xmm@0000000013afb7690000000013afb769]
 	movdqa xmm3, xmmword ptr [rip + __xmm@0000007ff6282a800000007ff6282a80]
-.LBB34_1:
+.LBB35_1:
 	movdqa xmm7, xmmword ptr [rsp + 2*rcx + 32]
 	movdqa xmm6, xmm7
 	punpcklwd xmm6, xmm1
@@ -299,17 +299,17 @@ mlkem::encode::poly_compress_encode:
 	movdqu xmmword ptr [rsp + 2*rcx + 544], xmm5
 	add rcx, 8
 	cmp rcx, 256
-	jne .LBB34_1
+	jne .LBB35_1
 	lea ecx, [rdx - 1]
 	mov eax, edx
 	shl rax, 5
 	cmp r9, rax
 	sete al
 	cmp ecx, 12
-	jae .LBB34_3
+	jae .LBB35_3
 	test al, al
-	je .LBB34_13
-.LBB34_5:
+	je .LBB35_13
+.LBB35_5:
 	mov r10d, -1
 	mov ecx, edx
 	shl r10d, cl
@@ -319,13 +319,13 @@ mlkem::encode::poly_compress_encode:
 	xor ecx, ecx
 	xor edi, edi
 	xor ebx, ebx
-	jmp .LBB34_7
-.LBB34_6:
+	jmp .LBB35_7
+.LBB35_6:
 	add rbx, 2
 	mov ecx, ebp
 	cmp rbx, 512
-	je .LBB34_12
-.LBB34_7:
+	je .LBB35_12
+.LBB35_7:
 	mov eax, esi
 	movzx esi, word ptr [rsp + rbx + 544]
 	and esi, r10d
@@ -333,24 +333,24 @@ mlkem::encode::poly_compress_encode:
 	or esi, eax
 	lea ebp, [rcx + rdx]
 	cmp ebp, 8
-	jb .LBB34_6
+	jb .LBB35_6
 	cmp rdi, r9
 	mov rax, r9
 	cmova rax, rdi
 	add ecx, r11d
 	shr ecx, 3
 	inc ecx
-.LBB34_9:
+.LBB35_9:
 	cmp rax, rdi
-	je .LBB34_11
+	je .LBB35_11
 	mov byte ptr [r8 + rdi], sil
 	inc rdi
 	shr esi, 8
 	add ebp, -8
 	dec ecx
-	jne .LBB34_9
-	jmp .LBB34_6
-.LBB34_12:
+	jne .LBB35_9
+	jmp .LBB35_6
+.LBB35_12:
 	movaps xmm6, xmmword ptr [rsp + 1056]
 	movaps xmm7, xmmword ptr [rsp + 1072]
 	movaps xmm8, xmmword ptr [rsp + 1088]
@@ -363,18 +363,18 @@ mlkem::encode::poly_compress_encode:
 	pop rdi
 	pop rsi
 	ret
-.LBB34_3:
+.LBB35_3:
 	xor eax, eax
 	test al, al
-	jne .LBB34_5
-.LBB34_13:
-	lea rcx, [rip + anon.cc8941bcbf02e25ec4f0f024fc8c8e42.51]
-	lea r8, [rip + anon.cc8941bcbf02e25ec4f0f024fc8c8e42.52]
+	jne .LBB35_5
+.LBB35_13:
+	lea rcx, [rip + anon.bcdc364150e6b6d4e7eb0dd3f005f22e.53]
+	lea r8, [rip + anon.bcdc364150e6b6d4e7eb0dd3f005f22e.54]
 	mov edx, 71
 	call core::panicking::panic
 	ud2
-.LBB34_11:
-	lea r8, [rip + anon.cc8941bcbf02e25ec4f0f024fc8c8e42.53]
+.LBB35_11:
+	lea r8, [rip + anon.bcdc364150e6b6d4e7eb0dd3f005f22e.55]
 	mov rcx, rax
 	mov rdx, r9
 	call core::panicking::panic_bounds_check

@@ -1,4 +1,4 @@
-
+ `release` profile [optimized] target(s) in 2.92s
 mlkem::hazmat::barrett_reduce:
 	movsx eax, cx
 	imul eax, eax, 20159

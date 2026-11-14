@@ -1,0 +1,65 @@
+# scripts/bench.ps1 run, label 'current'
+date:    2026-11-13 20:54:20 -05:00
+commit:  c1af53c56d53d48b3b1ca348c9b2a5d578ce7884
+rustc:   rustc 1.99.1 (58cf8f9c3 2026-10-13)
+profile: release (opt-level 3), default target CPU (no -C target-cpu=native)
+command: mlkem-bench --cpu 20 --rounds 20 --samples 500
+wall:    31.7 s
+
+# mlkem-bench
+cpu:        Intel(R) Core(TM) i7-14700HX
+scheduling: pinned to logical CPU 20 (running on 20); process HIGH_PRIORITY_CLASS ok; thread TIME_CRITICAL ok
+timer:      RDTSC with LFENCE; TSC = 2304.0 MHz
+method:     64 random inputs shared by both implementations (outputs checked equal); 20 timed rounds x 500 calls per implementation, alternating ABBA, after 1 warm-up round
+compared:   ml-kem 0.3.3 (RustCrypto), same compiler and profile
+
+param set    op      impl           median us      p5 us     p95 us      ops/s        n
+ML-KEM-512   KeyGen  mlkem              41.49      41.00      46.30      24103    10000
+ML-KEM-512   KeyGen  ml-kem             33.46      32.44      36.33      29882    10000
+ML-KEM-512   KeyGen                ratio mlkem / ml-kem (medians) = 1.24
+ML-KEM-512   Encaps  mlkem              47.06      46.62      52.73      21249    10000
+ML-KEM-512   Encaps  ml-kem             33.09      32.12      34.79      30222    10000
+ML-KEM-512   Encaps  ml-kem/bytes       37.95      36.93      43.90      26352    10000
+ML-KEM-512   Encaps                ratio mlkem / ml-kem (medians) = 1.42
+ML-KEM-512   Encaps                ratio mlkem / ml-kem/bytes (medians) = 1.24
+ML-KEM-512   Decaps  mlkem              58.58      57.73      66.40      17071    10000
+ML-KEM-512   Decaps  ml-kem             43.06      42.03      48.27      23223    10000
+ML-KEM-512   Decaps  ml-kem/bytes       48.51      47.50      54.63      20614    10000
+ML-KEM-512   Decaps                ratio mlkem / ml-kem (medians) = 1.36
+ML-KEM-512   Decaps                ratio mlkem / ml-kem/bytes (medians) = 1.21
+ML-KEM-768   KeyGen  mlkem              65.92      65.30      73.20      15171    10000
+ML-KEM-768   KeyGen  ml-kem             58.56      57.15      65.25      17076    10000
+ML-KEM-768   KeyGen                ratio mlkem / ml-kem (medians) = 1.13
+ML-KEM-768   Encaps  mlkem              75.65      74.75      85.91      13219    10000
+ML-KEM-768   Encaps  ml-kem             58.81      57.44      65.58      17003    10000
+ML-KEM-768   Encaps  ml-kem/bytes       65.92      64.52      73.52      15170    10000
+ML-KEM-768   Encaps                ratio mlkem / ml-kem (medians) = 1.29
+ML-KEM-768   Encaps                ratio mlkem / ml-kem/bytes (medians) = 1.15
+ML-KEM-768   Decaps  mlkem              91.23      89.71     101.53      10961    10000
+ML-KEM-768   Decaps  ml-kem             72.54      71.10      81.22      13785    10000
+ML-KEM-768   Decaps  ml-kem/bytes       80.65      79.19      89.06      12400    10000
+ML-KEM-768   Decaps                ratio mlkem / ml-kem (medians) = 1.26
+ML-KEM-768   Decaps                ratio mlkem / ml-kem/bytes (medians) = 1.13
+ML-KEM-1024  KeyGen  mlkem             103.81     102.30     114.90       9633    10000
+ML-KEM-1024  KeyGen  ml-kem             94.53      92.28     106.59      10579    10000
+ML-KEM-1024  KeyGen                ratio mlkem / ml-kem (medians) = 1.10
+ML-KEM-1024  Encaps  mlkem             113.50     112.44     126.04       8810    10000
+ML-KEM-1024  Encaps  ml-kem             94.12      91.93     105.39      10625    10000
+ML-KEM-1024  Encaps  ml-kem/bytes      103.88     101.66     116.66       9626    10000
+ML-KEM-1024  Encaps                ratio mlkem / ml-kem (medians) = 1.21
+ML-KEM-1024  Encaps                ratio mlkem / ml-kem/bytes (medians) = 1.09
+ML-KEM-1024  Decaps  mlkem             134.54     132.13     149.66       7433    10000
+ML-KEM-1024  Decaps  ml-kem            113.31     111.03     126.21       8826    10000
+ML-KEM-1024  Decaps  ml-kem/bytes      124.02     121.74     138.80       8063    10000
+ML-KEM-1024  Decaps                ratio mlkem / ml-kem (medians) = 1.19
+ML-KEM-1024  Decaps                ratio mlkem / ml-kem/bytes (medians) = 1.08
+
+building blocks (median over 10000 blocks of 100 calls, after warm-up):
+function                                             ns      ticks
+Keccak-f[1600], mlkem                               592       1365
+Keccak-f[1600], keccak 0.1 crate (RustCrypto)        595       1370
+NTT                                                1052       2423
+inverse NTT                                        1510       3480
+MultiplyNTTs (one polynomial pair)                  754       1737
+SamplePolyCBD, eta = 2                              792       1825
+ByteDecode_12 (one polynomial)                      652       1502

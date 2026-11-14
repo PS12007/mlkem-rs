@@ -16,7 +16,7 @@ mlkem::hash::keccak::f1600:
 	sub rsp, 456
 	mov rdi, rcx
 	lea rcx, [rsp + 264]
-	lea rdx, [rip + anon.cc8941bcbf02e25ec4f0f024fc8c8e42.57]
+	lea rdx, [rip + anon.bcdc364150e6b6d4e7eb0dd3f005f22e.59]
 	mov r8d, 192
 	call memcpy
 	mov rax, qword ptr [rdi]
@@ -62,7 +62,7 @@ mlkem::hash::keccak::f1600:
 	mov qword ptr [rsp + 56], r8
 	mov rdi, r10
 	mov r8d, 2
-.LBB61_1:
+.LBB63_1:
 	mov qword ptr [rsp + 136], rbp
 	mov qword ptr [rsp + 192], rdi
 	mov qword ptr [rsp + 200], rdx
@@ -322,7 +322,7 @@ mlkem::hash::keccak::f1600:
 	mov qword ptr [rsp + 72], r10
 	inc r8
 	cmp r8, 26
-	jne .LBB61_1
+	jne .LBB63_1
 	mov r8, qword ptr [rsp + 208]
 	mov qword ptr [r8 + 120], rax
 	mov rax, qword ptr [rsp + 88]

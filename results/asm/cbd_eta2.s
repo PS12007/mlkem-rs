@@ -12,7 +12,7 @@ mlkem::hazmat::cbd_eta2:
 	xor edx, edx
 	call memset
 	xor eax, eax
-.LBB56_1:
+.LBB58_1:
 	mov rcx, rax
 	shr rcx
 	mov edx, ebx
@@ -40,7 +40,7 @@ mlkem::hazmat::cbd_eta2:
 	inc rax
 	add bl, 4
 	cmp rax, 256
-	jne .LBB56_1
+	jne .LBB58_1
 	lea rdx, [rsp + 32]
 	mov r8d, 512
 	mov rcx, rsi

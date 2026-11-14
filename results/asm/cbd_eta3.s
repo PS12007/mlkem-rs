@@ -14,7 +14,7 @@ mlkem::hazmat::cbd_eta3:
 	mov rcx, rbx
 	xor edx, edx
 	call memset
-.LBB57_1:
+.LBB59_1:
 	lea rax, [r14 + 3]
 	mov rcx, r14
 	shr rcx, 3
@@ -63,7 +63,7 @@ mlkem::hazmat::cbd_eta3:
 	add rbx, 2
 	add r14, 6
 	cmp r14, 1536
-	jne .LBB57_1
+	jne .LBB59_1
 	lea rdx, [rsp + 32]
 	mov r8d, 512
 	mov rcx, rsi

@@ -18,11 +18,11 @@ mlkem::hazmat::decode12:
 	xor eax, eax
 	xor edx, edx
 	xor r8d, r8d
-	jmp .LBB59_1
-.LBB59_6:
+	jmp .LBB61_1
+.LBB61_6:
 	mov rdx, r9
 	mov eax, ecx
-.LBB59_2:
+.LBB61_2:
 	mov ecx, ebx
 	and ecx, 4095
 	mov word ptr [rsp + r8 + 32], cx
@@ -30,12 +30,12 @@ mlkem::hazmat::decode12:
 	shr ebx, 12
 	add eax, -12
 	cmp r8, 512
-	je .LBB59_3
-.LBB59_1:
+	je .LBB61_3
+.LBB61_1:
 	cmp eax, 12
-	jae .LBB59_2
+	jae .LBB61_2
 	cmp rdx, 383
-	ja .LBB59_9
+	ja .LBB61_9
 	movzx r9d, byte ptr [rdi + rdx]
 	mov ecx, eax
 	shl r9d, cl
@@ -43,16 +43,16 @@ mlkem::hazmat::decode12:
 	lea r9, [rdx + 1]
 	lea ecx, [rax + 8]
 	cmp eax, 3
-	ja .LBB59_6
+	ja .LBB61_6
 	cmp r9, 384
-	je .LBB59_9
+	je .LBB61_9
 	movzx r9d, byte ptr [rdi + rdx + 1]
 	shl r9d, cl
 	or ebx, r9d
 	add rdx, 2
 	or eax, 16
-	jmp .LBB59_2
-.LBB59_3:
+	jmp .LBB61_2
+.LBB61_3:
 	movdqa xmm0, xmmword ptr [rip + __xmm@f2fff2fff2fff2fff2fff2fff2fff2ff]
 	movdqa xmm4, xmmword ptr [rsp + 32]
 	movdqa xmm5, xmmword ptr [rsp + 48]
@@ -355,11 +355,11 @@ mlkem::hazmat::decode12:
 	pop rdi
 	pop rsi
 	ret
-.LBB59_9:
+.LBB61_9:
 	cmp rdx, 385
 	mov ecx, 384
 	cmovae rcx, rdx
-	lea r8, [rip + anon.cc8941bcbf02e25ec4f0f024fc8c8e42.50]
+	lea r8, [rip + anon.bcdc364150e6b6d4e7eb0dd3f005f22e.52]
 	mov edx, 384
 	call core::panicking::panic_bounds_check
 	ud2
